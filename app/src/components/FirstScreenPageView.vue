@@ -1,20 +1,21 @@
 <template>
-	<v-header class="is-overlay"></v-header>
-	<main class="is-fullwidth">
-		<div class="columns is-gapless is-mobile is-overlay">
-			<side-bar class="column is-narrow"></side-bar>
-			<right-display-area class="column right-display-area"></right-display-area>
-			<div class="emit-enter-button" title="点击弹出侧边栏" @click="toggleSideBar" v-show="!getSideBarStatus" transition="horizontalMove">
-				<span class="icon is-pulled-right toggle-button">
-					<i class="fa fa-angle-right"></i>
-				</span>
+	<div class="first_screen">
+
+		<v-header></v-header>
+		<main :class="{isShowSideBar: sideBarStatus}">
+			<div class="columns is-gapless is-mobile is-overlay">
+				
+				<right-display-area class="column right-display-area"></right-display-area>
 			</div>
-		</div>
-	</main>
+		</main>
+		<v-footer></v-footer>
+		<side-bar class="sibebar"></side-bar>
+	</div>
 </template>
 
 <script>
 	import SideBar from './common/SideBar'
+	import Footer from './common/Footer'
 	import vHeader from './common/Header'
 	import RightDisplayArea from './FirstScreenPageView/RightDisplayArea'
 	import { toggleSideBar } from '../vuex/actions'
@@ -24,7 +25,8 @@
 		components: {
 			vHeader,
 			SideBar,
-			RightDisplayArea
+			RightDisplayArea,
+			vFooter: Footer
 		},
 		name: 'index',
 		data(){
@@ -33,7 +35,7 @@
 		},
 		vuex: {
 			getters: {
-				getSideBarStatus
+				sideBarStatus: getSideBarStatus
 			},
 			actions: {
 				toggleSideBar
@@ -43,31 +45,30 @@
 </script>
 
 <style scoped>
-	.is-narrow{
-		width: 275px;
+	.first_screen {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		justify-content: space-between;
+	}
+
+
+	header, footer{
+		flex-grow: 0;
+		flex-grow: 0;
 	}
 	main{
-		width: 100%;
-		margin-top: 50px;
 		position: relative;
-		height: calc(100vh - 50px);
 		overflow: hidden;
+		flex-grow: 1;
+		flex-shrink: 0;
 	}
 	main>*{
 		width: 100%;
 	}
-	.right-display-area{
-		min-width: 660px;
-		overflow-x: auto;
 
-	}
-	.columns>.column:last-child{
-		width: calc(100% - 275px)
-	}
-	.column>*{
-		width: 100%;
-		height: 100%;
-	}
+	
+
 
 	.emit-enter-button{
 		width: 24px;

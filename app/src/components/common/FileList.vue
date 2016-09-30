@@ -1,25 +1,15 @@
 <template>
-	<nav class="panel file-panel">
-	  <p class="panel-tabs is-left">
-	    <a href="javascript:;" 
-	    	v-for="fileType in allFileType" 
-	    	:class="{'is-active': $index === curTypeIndex}" 
-	    	@click="tabFileType($index, fileType)">
-	    	{{ fileType }}
-	    </a>
-	  </p>
-	  <div class="list">
-	  	<a href="javascript:;" class="panel-block"
-	  		v-for="file in fileList | filterByQuery curSearchVal | filterByType curTypeName">
-		    <span class="panel-icon">
-		      <i class="fa fa-book"></i>
-		    </span>
-		    {{ file.name }}
-		    <button class="button is-small" :class="{'is-loading': $index === curLoadingIndex}" 
-		    	@click="confirm(file.path, $index)">
-		    	导入
-		    </button>
-		  </a>
+	<nav class="file_list_container">
+	  <div class="file_list">
+	  	<ul>
+	  		<li title="双击文件名即可导入"
+	  			v-for="(index, file) in fileList | filterByQuery curSearchVal" 
+	  			@dblclick="confirm(file.path ,index)">
+	  			<span>{{ file.extname.replace(/^./, "") }}</span>
+	  			<p>{{ file.name }}</p>
+	  			<button class="btn del_btn" @click="delUploadFiles(index)">删除</button>
+	  		</li>
+	  	</ul>
 	  </div>
 	</nav>
 </template>
@@ -94,41 +84,66 @@
 
 
 </script>
-
-<style>
-	.panel-tabs.is-left{
-		-webkit-box-pack: start;
-      -ms-flex-pack: start;
-        justify-content: flex-start;
-	}
-	.panel-tabs a{
-		font-size: 12px;
-	}
-	.file-panel{
-		position: relative;
+<style scoped>
+	.del_btn{
+		background-color: #FF4081;
+		color: #fff;
 		border: 0;
-		margin-bottom: 0!important;
+		outline: 0;
+		font-size: 12px;
+		cursor: pointer;
 	}
-	.panel{
-		text-align: left;
+</style>
+<style lang="scss">
+	.file_list_container{
+		padding-left: 24px;
 	}
-	.list{
-		display: block;
-		height: calc(100vh - 226px);
-		overflow: auto;
-		box-shadow: inset 0 -6px 20px -12px rgba(0,0,0,.7)
+	.file_list li{
+		display: flex;
+		align-items: center;
+		height: 48px;
+		justify-content: space-between;
+	}
+	.file_list li:first-child span{
+		background-color: #4285F4;
+	}
+	.file_list li:first-child p{
+		color: #4285F4;
+	}
+	.file_list li:not(:first-child) p{
+		color: rgba(0,0,0, .87);
 
 	}
-	.list>a{
-		position: relative;
+	.file_list li span {
+		display: inline-block;
+		font-size: 10px;
+		margin-right: 16px;
+		width: 40px;
+		text-align: center;
+		border-radius: 2px;
+		line-height: 18px;
+		background-color: #6B727D;
+		color: #fff;
+		flex-shrink: 0;
 	}
-	.list>a .button.is-loading{
+	.file_list li p{
+		flex-grow: 1;
+		font-size: 13px;
+		text-align: left;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: 10px;
+	}
+	.file_list .btn{
+		margin-right: 10px;
+		display: none;
+		flex-shrink: 0;
+	}
+	.file_list li:hover .btn{
 		display: block;
 	}
-	.list>a:hover .button{
-		display: block;
-	}
-	.list .button{
+	.list .btn{
 		display: none;
 		position: absolute;
 		right: 10px;

@@ -1,81 +1,48 @@
 <template>
 	<form @submit.prevent="addFilterHandler">
 		<table class="table">
-			<thead>
-				<tr>
-					<th>选择两列</th>
-					<th>逻辑操作符</th>
-					<th>逻辑操作的值</th>
-					<th></th>
-				</tr>
-			</thead>
 			<tbody>
 				<tr>
+					<td>双列范围逻辑</td>
 					<td>
-						<div>
-							<input type="text" class="input" placeholder="输入列（以，隔开）" 
-								v-model="operatorCol">
-						</div>
+						<span class="select">
+							<select name="">
+								<option value="and">且</option>
+								<option value="or">或</option>
+							</select>
+							<p class="val_mask">且</p>
+						</span>
+					</td>	
+					<td>
+						<span class="select">
+							<select name="">
+								<option value=">">请选择列</option>
+							</select>
+							<p class="val_mask">请选择列</p>
+						</span>
 					</td>
 					<td class="controls">
-						<div class="select">
-							<select v-model="operator">
-								<option v-for="op in filterOptions" 
-									:value="op.char">
-									{{ op.words }}
-								</option>
+						<span class="select">
+							<select name="">
+								<option value="">同时满足</option>
+								<option value="">满足一列</option>
 							</select>
-						</div>
+							<p class="val_mask">同时满足</p>
+						</span>
 					</td>
 					<td>
-						<!-- 不是“或”和“与”的情况下 -->
-						<div v-if="isNotSingleLogicGroupOperator">
-							<input class="input" type="text" 
-								v-model="operatorVal">
-						</div>
-						<!-- 是“或”和“与”的情况下 -->
-						<div v-else>
-							<!-- 已添加的“和”“或”筛选条件 -->
-							<div v-for="(index, subFilter) in subFilters"
-								class="subFilter control has-addons has-addons-centered"
-								title="已添加的子筛选条件不能修改，只能删除">
-							  <span class="select">
-							    <select>
-							    	<option :value="subFilter.operator">
-							    		{{subFilter.words}}
-							    	</option>
-							    </select>
-							  </span>
-							  <input type="text" class="input is-expanded" readonly="true" 
-							  	:value="subFilter.val">
-							  <a class="button is-danger"  
-							    @click="removeSubFilter($index)">
-							    删除
-							  </a>
-							</div>
-							<!-- 新增“和或”的按钮 -->
-							<div>
-								<div class="control has-addons has-addons-centered">
-									<span class="select">
-										<select v-model="subFilterOperator">
-								      <option v-for="op in singleLogicGroupOperators" 
-								      	:value="op.char" 
-								      	:selected="$index === 0"> 
-								      	{{ op.words }} 
-								      </option>
-								    </select>
-								  </span>
-								  <input type="text" class="input is-expanded" 
-								  	v-model="subFilterVal">
-									<a class="button is-success" 
-										@click="addSubFilter($index)">
-								    添加
-								  </a>
-							</div>
-						</div>
+						<span class="select">
+							<select name="">
+								<option value=">">大于</option>
+							</select>
+							<p class="val_mask">大于</p>
+						</span>
 					</td>
 					<td>
-						<filter-button :filter-status="filterStatus"></filter-button>
+						<input type="text">
+					</td>
+					<td>
+						<filter-button class="btn" :filter-status="filterStatus"></filter-button>
 					</td>
 				</tr>
 			</tbody>

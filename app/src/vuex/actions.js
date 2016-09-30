@@ -44,11 +44,22 @@ export const setFilteredData = ({ dispatch }, val) => {
 export const setFilterStatus = ({ dispatch }, val) => {
 	dispatch(types.SET_FILTER_STATUS, val)
 }
+export const setFilterWay = ({ dispatch }, val) => {
+	dispatch(types.SET_FILTER_WAY, val)
+}
 
 // 其他
-export const toggleSideBar = ({ dispatch }) => {
-	dispatch(types.TOGGLE_SIDEBAR)
+export const toggleSideBar = ({ dispatch }, val) => {
+	dispatch(types.TOGGLE_SIDEBAR, val)
 }
 export const exportFile = ({ dispatch }, val) => {
 	dispatch(types.EXPORT_FILE, val)
+}
+
+// 窗口 window
+export const toggleWindowMax = ({ dispatch }) => {
+	dispatch(types.TOGGLE_WINDOW_MAX)
+}
+export const toggleWindowMini = ({ dispatch }) => {
+	dispatch(types.TOGGLE_WINDOW_MINI)
 }

@@ -1,6 +1,6 @@
 <template>
 	<div class="filter-list has-text-left">
-		<filter-tag v-for="filterObj in filterTagList[activeSheet.name]" 
+		<filter-tag v-for="filterObj in filterTagList" 
 			:filter-obj="filterObj" 
 			:tag-index="$index">
 		</filter-tag>
@@ -17,12 +17,29 @@
 		},
 		data(){
 			return {
-				curFilterTagList: []
+				curFilterTagList: [],
+				filterTagList: [{
+					filterWords: 123123123
+				},{
+					filterWords: 123123123
+				},{
+					filterWords: 123123123
+				},{
+					filterWords: 123123123
+				},{
+					filterWords: 123123123
+				},{
+					filterWords: 123123123
+				},{
+					filterWords: 123123123
+				},{
+					filterWords: 123123123
+				}]
 			}
 		},
 		vuex: {
 			getters: {
-				filterTagList: getFilterTagList,
+				// filterTagList: getFilterTagList,
 				activeSheet: getActiveSheet,
 				excelData: getExcelData
 			}
@@ -31,7 +48,11 @@
 </script>
 
 <style scoped>
+	.filter-list{
+		display: flex;
+		flex-wrap: wrap;
+	}
 	.filter-area>div{
-		position: relative;
+
 	}
 </style>

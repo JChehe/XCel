@@ -14,17 +14,14 @@ export const SET_EXCEL_DATA = 'SET_EXCEL_DATA'
 export const SET_ACTIVE_SHEET = 'SET_ACTIVE_SHEET'
 export const SET_FILTERED_DATA = 'SET_FILTERED_DATA'
 export const SET_FILTER_STATUS = 'SET_FILTER_STATUS'
+export const SET_FILTER_WAY = 'SET_FILTER_WAY'
+export const TOGGLE_FILTER_PANEL = 'TOGGLE_FILTER_PANEL'
+
 // 其他
 export const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR'
 export const EXPORT_FILE = 'EXPORT_FILE'
 
-
-
-
-
-
-
-
-
-
+// 窗口 window
+export const TOGGLE_WINDOW_MAX = 'TOGGLE_WINDOW_MAX'
+export const TOGGLE_WINDOW_MINI = 'TOGGLE_WINDOW_MINI'
 

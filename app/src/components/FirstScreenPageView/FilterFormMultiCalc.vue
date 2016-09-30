@@ -1,41 +1,40 @@
 <template>
 	<form @submit.prevent="addFilterHandler">
 		<table class="table">
-			<thead>
-				<tr>
-					<th>选择多列</th>
-					<th>列之间的运算符</th>
-					<th>逻辑操作符</th>
-					<th>逻辑操作的值</th>
-					<th></th>
-				</tr>
-			</thead>
 			<tbody>
 				<tr>
-					<td>
-						<div>
-							<input type="text" class="input" placeholder="输入列（以，隔开）" 
-								v-model="operatorCol">
-						</div>
-					</td>
+					<td>多列运算逻辑</td>
 					<td>
 						<span class="select">
-							<select v-model="colOperatorSelect">
-								<option v-for="op in colOperator" 
-									:value="op.char">
-									{{ op.words }}
-								</option>
+							<select name="">
+								<option value="and">且</option>
+								<option value="or">或</option>
 							</select>
+							<p class="val_mask">且</p>
 						</span>
 					</td>
 					<td>
 						<span class="select">
-							<select v-model="operator">
-								<option v-for="op in singleGroupFilterOptions" 
-									:value="op.char">
-									{{ op.words }}
-									</option>
+							<select name="">
+								<option value=">">请选择列</option>
 							</select>
+							<p class="val_mask">请选择列</p>
+						</span>
+					</td>
+					<td>
+						<span class="select">
+							<select name="">
+								<option value=">">相加</option>
+							</select>
+							<p class="val_mask">相加</p>
+						</span>
+					</td>
+					<td>
+						<span class="select">
+							<select >
+								<option value="">大于</option>
+							</select>
+							<p class="val_mask">大于</p>
 						</span>
 					</td>
 					<td>
@@ -45,7 +44,7 @@
 						</div>
 					</td>
 					<td>
-						<filter-button :filter-status="filterStatus"></filter-button>
+						<filter-button class="btn" :filter-status="filterStatus"></filter-button>
 					</td>
 				</tr>
 			</tbody>

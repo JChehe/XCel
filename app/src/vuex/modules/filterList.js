@@ -8,6 +8,8 @@ moment.locale("zh") // 设置时间格式为中文
 
 const SUFFIX_COLKEYS = "_headers"
 
+var filterWay = window.localStorage.filterWay ? JSON.parse(window.localStorage.filterWay) : 0
+
 // console.log(_.isEqual(.1+.2, .3))
 const state = {
   filterTagList: {}, // 筛选条件列表
@@ -18,6 +20,8 @@ const state = {
   	name: ""
   },
   filterStatus: 0,
+  filterWay: filterWay, // 0 是保留, 1 是剔除
+  isShowFillterPanel: false,
   filterOptions: [
     {
   		char: ">",
@@ -127,7 +131,22 @@ const mutations = {
 
   [types.SET_FILTER_STATUS] (state, val) {
     state.filterStatus = val
+  },
+
+  [types.SET_FILTER_WAY] (state, val) {
+    state.filterWay = val
+    window.localStorage.setItem("filterWay", JSON.stringify(val))
+  },
+
+  [types.TOGGLE_FILTER_PANEL] (state, val) {
+    if(_.isBoolean(val)) {
+      state.isShowFillterPanel = val
+    }else{
+      state.isShowFillterPanel = !state.isShowFillterPanel
+    }
   }
+
+
 }
 
 export default {

@@ -38,6 +38,12 @@ export function getColKeys(state) {
 export function getFilterStatus(state) {
 	return state.filterList.filterStatus
 }
+export function getFilterWay(state) {
+	return state.filterList.filterWay
+}
+export function getFilterPanelStatus(state) {
+	return state.filterList.isShowFillterPanel
+}
 // 其他
 export function getSideBarStatus(state) {
 	return state.fileList.isShowSideBar

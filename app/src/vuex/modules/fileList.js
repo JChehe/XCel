@@ -1,17 +1,22 @@
 import * as types from '../mutation-types'
 import { ipcRenderer } from 'electron'
+import _ from "lodash"
 
 var uploadFiles = window.localStorage.uploadFiles ? JSON.parse(window.localStorage.uploadFiles) : []
 const state = {
   fileList: uploadFiles, // 最近的excel文件列表（sidebar）
   allFileType: ["all", "xls", "xlsx"], 
   curSearchVal: "", // 搜索值
-  isShowSideBar: true
+  isShowSideBar: false
 }
 
-export const mutations = {
-  [types.TOGGLE_SIDEBAR] (state) {
-	  state.isShowSideBar = !state.isShowSideBar
+const mutations = {
+  [types.TOGGLE_SIDEBAR] (state, val) {
+    if( _.isBoolean(val) ){
+      state.isShowSideBar = val
+    }else{
+  	  state.isShowSideBar = !state.isShowSideBar
+    }
 	},
   [types.CHANGE_SEARCH_VALUE] (state, val) {
     state.curSearchVal = val
