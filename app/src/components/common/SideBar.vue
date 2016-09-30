@@ -23,17 +23,13 @@
 </template>
 
 <script>
-	import Search from './Search'
 	import FileList from './FileList'
-	import FixedSideBarBottom from './FixedSideBarBottom'
 	import { getSideBarStatus, getCurSearchVal } from '../../vuex/getters'
 	import { toggleSideBar, changeSearchVal } from '../../vuex/actions'
 
 	export default {
 		components: {
-			Search,
-			FileList,
-			FixedSideBarBottom
+			FileList
 		},
 		computed: {
 			vuexSearchVal: {
@@ -58,7 +54,7 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 	#sidebar{
 		transform: translateZ(0);
 		background-color: #FAFAFA;
@@ -74,61 +70,39 @@
 		background-color: #616161;
 		padding-left: 24px;
 		overflow: hidden;
+		img {
+			width: 56px;
+			margin-top: 24px;
+			&+p {
+				font-size: 13px;
+				color: #fff;
+				line-height: 20px;
+				margin: 28px 0 16px 0;
+			}
+		}
+		.hide_sidebar_btn{
+			position: absolute;
+			width: 24px;
+			height: 24px;
+			top: 6px;
+			right: 6px;
+			text-align: center;
+			line-height: 1;
+			cursor: pointer;
+			padding: 5px;
+		}
 	}
 
-	.sidebar_header img{
-		width: 56px;
-		margin-top: 24px;
-	}
-	.sidebar_header img+p{
-		font-size: 13px;
-		color: #fff;
-		line-height: 20px;
-		margin: 28px 0 16px 0;
-	}
-	.hide_sidebar_btn{
-		position: absolute;
-		width: 24px;
-		height: 24px;
-		top: 6px;
-		right: 6px;
-		text-align: center;
-		line-height: 1;
-		cursor: pointer;
-		padding: 5px;
-	}
-
-
-	.panel-heading{
-		position: relative;
-	}
-
-	#sidebar.enter .toggle-button{
-		background-color: rgba(255,255,255,.9);
-		position: absolute;
-		right: 0;
-		-webkit-transform: translate3d(100%, 0, 0);
-		transform: translate3d(100%, 0, 0);
-	}
-
-	.toggle-button{
-		cursor: pointer;
-	}
-	
 	.search_form{
 		position: absolute;
 		bottom: 0;
 		left: 0;
 		right: 0;
 		height: 34px;
+		input {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
 	}
-	.search_form input{
-		display: block;
-		width: 100%;
-		height: 100%;
-	}
-
-
-
-	
 </style>

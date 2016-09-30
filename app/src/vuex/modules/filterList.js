@@ -138,7 +138,7 @@ const mutations = {
     window.localStorage.setItem("filterWay", JSON.stringify(val))
   },
 
-  [types.TOGGLE_FILTER_PANEL] (state, val) {
+  [types.TOGGLE_FILTER_PANEL_STATUS] (state, val) {
     if(_.isBoolean(val)) {
       state.isShowFillterPanel = val
     }else{

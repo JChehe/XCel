@@ -44,6 +44,38 @@ export function getFilterWay(state) {
 export function getFilterPanelStatus(state) {
 	return state.filterList.isShowFillterPanel
 }
+
+export function getCurSheetSize(state) {
+	var excelData = state.filterList.excelData
+	var filteredData, curActiveSheetName, curActiveSheetIndex,
+		curSheetData, curFilterTagList, curFilteredData,curColKeys
+	if(excelData.sheetNameList && excelData.sheetNameList.length > 0){
+		filteredData = state.filterList.filteredData
+		curActiveSheetIndex = state.filterList.activeSheet.index
+		curActiveSheetName = excelData.sheetNameList[curActiveSheetIndex]
+
+		curSheetData = excelData[curActiveSheetName]
+		curFilterTagList = excelData.filterTagList[curActiveSheetName]
+		curFilteredData = filteredData[curActiveSheetName]
+		curColKeys = excelData[curActiveSheetName + "_headers"]
+	}
+
+	return {
+		origin: {
+			rows: curSheetData && curSheetData.length || 0,
+			cols: curColKeys && curColKeys.length || 0
+		},
+		filtered: {
+			rows: curFilteredData && curFilteredData.length || 0,
+			cols: curColKeys && curColKeys.length || 0
+		},
+		tagList: {
+			length: curFilterTagList && curFilterTagList.length || 0
+		}
+	}
+}
+
+
 // 其他
 export function getSideBarStatus(state) {
 	return state.fileList.isShowSideBar

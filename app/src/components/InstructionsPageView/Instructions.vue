@@ -160,12 +160,18 @@
 	}
 </script>
 
-<style scoped>
+<style>
+	
+
+</style>
+<style lang="scss" scoped>
 	.content{
 		text-align: left;
 		width: 100%;
 		background-color: #fff;
 		outline: 15px solid #fff;
+		height: 100%;
+		overflow: auto;
 	}
 	table th{
 		white-space: nowrap;
@@ -174,10 +180,8 @@
 		overflow: hidden;
 		border-radius: 8px;
 		width: 80%;
-	}
-
-	.img_container img{
-		width: 100%;
-
+		img {
+			width: 100%;
+		}
 	}
 </style>

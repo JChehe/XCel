@@ -1,10 +1,10 @@
 <!-- Excel -->
 <template>
-	<div class="excel-area">
-		<div class="tabs is-boxed is-small excel-cheet-nav">
+	<div class="excel_area">
+		<div class="tabs is_boxed is_small excel_cheet_nav">
 			<ul>
 				<li v-for = "sheetName in excelData.sheetNameList" 
-					:class="{'is-active': $index == activeSheet.index}"
+					:class="{'is_active': $index == activeSheet.index}"
 					@click = "changeTab($index)">
 					<a href="javascript:;">
 						<span>{{ sheetName }}</span>
@@ -13,12 +13,12 @@
 			</ul>
 		</div>
 		<!-- 根据cheetTittle 动态切换数据 -->
-		<div :class="['tabs-body', {isShowSideBar: !sideBarStatus}]">
-			<div class="drop-area content" 
+		<div :class="['tabs_body', {isShowSideBar: !sideBarStatus}]">
+			<div class="drop_area content" 
 				v-show="!excelData.sheetNameList"
 				@drop.prevent.stop="dropHandler" 
 				>
-				<p class="{'is-loading': isLoading}">拖拽一个Excel文件到这里即可完成上传</p>
+				<p class="{'is_loading': isLoading}">拖拽一个Excel文件到这里即可完成上传</p>
 			</div>
 			<sheet-of-excel v-for="sheetName in excelData.sheetNameList"
 				:sheet-data="filteredData[activeSheet.name]"
@@ -33,7 +33,7 @@
 
 <script>
 	import fs from 'fs-extra'
-	import path from 'path'
+	import pathModule from 'path'
 	import { getExcelData, getActiveSheet, getFilteredData, getSideBarStatus } from '../../vuex/getters'
 	import { setActiveSheet, setExcelData, setUploadFiles } from '../../vuex/actions'
 	import SheetOfExcel from './SheetOfExcel'
@@ -63,7 +63,7 @@
 		},
 		created(){
 			setTimeout(() => {
-				var dropArea = document.querySelector(".drop-area")
+				var dropArea = document.querySelector(".drop_area")
 				if(dropArea) {
 					dropArea.addEventListener("dragenter", dragoverHandler, false)
 					dropArea.addEventListener("dragover", dragoverHandler, false)
@@ -102,7 +102,7 @@
 							this.setUploadFiles({
 					      path: curFile.path,
 					      name: curFile.name,
-					      extname: path.extname(curFile.path)
+					      extname: pathModule.extname(curFile.path)
 					    })
 						}
 						reader.readAsBinaryString(f)
@@ -117,42 +117,49 @@
 
 </script>
 
-<style scoped>
-	.excel-area{
+<style lang="scss" scoped>
+	.excel_area{
 		display: flex;
 		flex-direction: column;
+		max-width: 100%;
+		width: 100%;
+		margin-top: 5px;
+		padding: 5px;
+
 	}
 	.tabs{
 		flex-shrink: 0;
+		flex-grow: 0;
 	}
 
-	.tabs-body{
+	.tabs_body{
 		flex-grow: 1;
+		flex-shrink: 1;
 		overflow: auto;
 		position: relative;
-
-	}
-	.excel-area{
-		max-width: 100%;
-		width: 100%;
-		height: calc(100% - 86px);
-		margin-top: -5px;
-	}
-	.excel-area{
-		padding: 5px;
-	}
-	.excel-cheet-nav {
-		margin-bottom: 5px;
-	}
-	.excel-cheet-nav ul{
-		padding-left: 5px;
-	}
-	.tabs-body{
 		display: block;
 		overflow: auto;
+		&>*{
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+		&>p{
+			display: inline-block;
+			&.is_loading {
+				padding-right: 24px;
+			}
+		}
 	}
 
-	.drop-area{
+	.excel_cheet_nav {
+		margin-bottom: 5px;
+		ul {
+			padding-left: 5px;
+		}
+	}
+
+	.drop_area{
 		border: 3px dashed #69707a;
 		font-size: 18px;
 		position: relative;
@@ -162,38 +169,14 @@
 		right: 0;
 		top: 0;
 		bottom: 0;
+		p {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+		}
 	}
-	.drop-area>p{
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%);
-	}
-	.tabs-body>*{
-		display: block;
-		width: 100%;
-		height: 100%;
-	}
-	.drop-area>p{
-		display: inline-block;
-	}
-	.drop-area>p.is-loading{
-		/*position: relative;*/
-		padding-right: 24px;
-	}
-	.drop-area>p.is-loading::after{
-		position: absolute;
-		right: 0;
-		top: 5px;
-	  -webkit-animation: spin-around 500ms infinite linear;
-    animation: spin-around 500ms infinite linear;
-	  border: 2px solid #d3d6db;
-	  border-radius: 290486px;
-	  border-right-color: transparent;
-	  border-top-color: transparent;
-	  content: "";
-	  display: block;
-	  height: 16px;
-	  width: 16px;
-	}
+
+
+
 </style>

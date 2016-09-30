@@ -17,29 +17,12 @@
 		},
 		data(){
 			return {
-				curFilterTagList: [],
-				filterTagList: [{
-					filterWords: 123123123
-				},{
-					filterWords: 123123123
-				},{
-					filterWords: 123123123
-				},{
-					filterWords: 123123123
-				},{
-					filterWords: 123123123
-				},{
-					filterWords: 123123123
-				},{
-					filterWords: 123123123
-				},{
-					filterWords: 123123123
-				}]
+				curFilterTagList: []
 			}
 		},
 		vuex: {
 			getters: {
-				// filterTagList: getFilterTagList,
+				filterTagList: getFilterTagList,
 				activeSheet: getActiveSheet,
 				excelData: getExcelData
 			}
@@ -47,12 +30,9 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 	.filter-list{
 		display: flex;
 		flex-wrap: wrap;
-	}
-	.filter-area>div{
-
 	}
 </style>

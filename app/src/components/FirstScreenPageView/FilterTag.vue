@@ -39,7 +39,7 @@
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
 	.tag{
 		display: flex;
 		flex-wrap: nowrap;
@@ -47,11 +47,10 @@
 		color: #D8D8D8;
 		margin:0 5px 5px 0;
 		font-size: 12px;
-	}
-	.tag>*{
-		line-height: 24px;
-		/*justify-content: */
-		text-align: center;
+		&>*{
+			line-height: 24px;
+			text-align: center;
+		}
 	}
 	p{
 		min-width: 100px;

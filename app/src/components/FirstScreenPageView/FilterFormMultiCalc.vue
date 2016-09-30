@@ -53,14 +53,10 @@
 </template>
 
 <script>
-	import filterButton from './filterButton'
 	import { getNumCol, getCharCol } from "../../utils/ExcelSet"
 	import { getFilterOptions } from '../../vuex/getters'
 	import { addFilter, setFilterStatus } from '../../vuex/actions'
 	export default{
-		components: {
-			filterButton
-		},
 		data(){
 			return {
 				operatorVal: "",
@@ -219,8 +215,6 @@
 	}
 </script>
 
-<style>
-	form .table{
-		margin-bottom: 0
-	}
+<style lang="scss" scoped>
+	
 </style>

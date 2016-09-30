@@ -1,48 +1,97 @@
 <template>
-	<footer class="footer" :class="{isShowSideBar: isShowSideBar}">
+	<footer class="footer">
 		<ul class="btn_group">
-			<li class="btn search_btn" title="搜索文件" @click="focusSearchInput">
+			
+			<li class="btn search_btn" title="搜索文件"
+				v-show="!isShowInstruction" 
+				@click="focusSearchInput">
 				<i class="fa fa-search"></i>
-				<!-- <div class="search_panel">
-					<form action="">
-						<label>
-							<input type="text" placeholder="文件名" v-model="">
-						</label>
-					</form>
-				</div> -->
 			</li>
-			<li class="btn upload_btn" title="上传文件">
+			<li class="btn upload_btn" title="上传文件"
+				 v-show="!isShowInstruction">
 				<i class="fa fa-upload"></i>
-				<input type="file" @change="handleFile">
+				<input type="file" name="upload-excel-input" @change="handleFile">
 			</li>
-			<li class="btn filter_btn" title="添加筛选条件">
+			<li class="btn filter_btn" title="添加筛选条件" 
+				v-show="!isShowInstruction"
+				@click="toggleFilterPanelStatus"
+				:class="{active: isShowFilterPanel}">
 				<i class="fa fa-filter"></i>
 			</li>
-			<li class="btn instruction_btn" title="使用说明">
+			<li class="btn instruction_btn" title="使用说明" 
+				:class="{'active': isShowInstruction}" 
+				@click="toggleView">
 				<i class="fa fa-info"></i>
 			</li>
 		</ul>
 		<div>
-			<p class="summary_info">筛选后数据为 <em>300</em> 行，原始记录为 <em>1024</em> 行，共 <em>3</em> 个<span attr="会变">保留</span>条件</p>
-			<img src="./assets/O2-icon.png" alt="">
+			<p class="summary_info" v-show="hasFile">
+				筛选后数据为 <em>{{oriRows}}</em> 行，原始记录为 <em>{{ filteredRows }}</em> 行，共 <em>{{ filterTagListLength }}</em> 个{{ filterWay == 0 ? "保留" : "剔除"}}</span>条件
+			</p>
+			<img src="./assets/O2-icon.png" alt="O2_logo">
 		</div>
-		
 	</footer>
 </template>
 
 <script>
-	import { getSideBarStatus, getFilterPanelStatus } from '../../vuex/getters'
-	import { toggleSideBar } from '../../vuex/actions'
+	import pathModule from "path"
+	import { 
+		getSideBarStatus,
+		getFilterPanelStatus,
+		getFilterWay,
+		getCurSheetSize 
+	} from '../../vuex/getters'
+
+	import { 
+		toggleSideBar,
+		toggleFilterPanelStatus,
+		setExcelData,
+		setActiveSheet,setUploadFiles
+	} from '../../vuex/actions'
+
 	export default {
-		vuex: {
-			getters: {
-				isShowSideBar: getSideBarStatus
-			},
-			actions: {
-				toggleSideBar
+		data(){
+			return {
+				isShowInstruction: this.$route.name === "instructions"
 			}
 		},
+		vuex: {
+			getters: {
+				isShowFilterPanel: getFilterPanelStatus,
+				filterWay: getFilterWay,
+				curSheetSize: getCurSheetSize
+			},
+			actions: {
+				toggleSideBar,
+				toggleFilterPanelStatus,
+				setExcelData, 
+				setActiveSheet, 
+				setUploadFiles
+			}
+		},
+		computed: {
+			hasFile(){
+				return this.curSheetSize.origin && this.curSheetSize.origin.rows > 0
+			},
+			oriRows(){
+				return this.curSheetSize.origin && this.curSheetSize.origin.rows
+			},
+			filteredRows(){
+				return this.curSheetSize.filtered && this.curSheetSize.filtered.rows
+			},
+			filterTagListLength(){
+				return this.curSheetSize.tagList && this.curSheetSize.tagList.length
+			}
+		},	
 		methods: {
+			toggleView(){
+				var curRouteName = this.$route.name
+				if(curRouteName === "instructions") {
+					this.$route.router.go("index")
+				}else{
+					this.$route.router.go("instructions")		
+				}
+			},
 			focusSearchInput(){
 				if(!this.isShowSideBar){
 					this.toggleSideBar(true)
@@ -73,7 +122,7 @@
 							this.setUploadFiles({
 					      path: curFile.path,
 					      name: curFile.name,
-					      extname: path.extname(curFile.path)
+					      extname: pathModule.extname(curFile.path)
 					    })
 							console.log("第四阶段")
 						}
@@ -88,10 +137,7 @@
 	}
 </script>
 
-<style scoped>
-	/*.search_panel{
-		position: absolute;
-	}*/
+<style lang="scss" scoped>
 	input[type="file"] {
 		position: absolute;
 		top: 0;
@@ -102,9 +148,7 @@
 		/*visibility: hidden;*/
 		opacity: 0;
 	}
-	.footer.isShowSideBar {
-		/*margin-left: 269px;*/
-	}
+
 	.footer{
 		display: flex;
 		justify-content: space-between;
@@ -114,62 +158,58 @@
 		background-color: #262626;
 		position: relative;
 		z-index: 99;
-	}
-	.footer .btn_group{
-		font-size: 0;
-		display: flex;
-		justify-content: space-between;
-		min-width: 120px;
-		max-width: 150px;
-		width: 30%;
-		margin-right: 20px;
-	}
-	.footer>div{
-		flex-wrap: nowrap;
-		white-space: nowrap;
-	}
-	.footer .btn_group li{
-		width: 24px;
-		height: 24px;
-		display: inline-block;
-		background-color: #4285F4;
-		color: #000;
-		font-size: 12px;
-		border-radius: 50%;
-		white-space: nowrap;
-		flex-shrink: 0;
-		text-align: center;
-		line-height: 24px;
-		position: relative;
-	}
-	.footer .btn_group li.cur{
-		color: #fff;
-	}
-	.footer .btn_group li:not(:last-child) {
-		margin-right: 2.5%;
-	}
-	.footer .btn_group li.cur{
-		color: #2B3244;
-	}
-	.footer .summary_info{
-		font-size: 12px;
-		color: #fff;
-		display: inline-block;
-		vertical-align: middle;
-		white-space: nowrap;
-	}
-	.footer .summary_info em{
-		font-style: normal;
-		text-decoration: underline;
-	}
-	.footer .summary_info+img{
-		width: 24px;
-		vertical-align: middle;
-		border-radius: 50%;
-		margin-left: 5px;
-	}
-
-	.upload_btn{
-		overflow: hidden;
+		>div{
+			flex-wrap: nowrap;
+			white-space: nowrap;
+		}
+		.btn_group{
+			font-size: 0;
+			display: flex;
+			justify-content: space-between;
+			min-width: 120px;
+			max-width: 150px;
+			width: 30%;
+			margin-right: 20px;
+			li {
+				width: 24px;
+				height: 24px;
+				display: inline-block;
+				background-color: #4285F4;
+				color: #000;
+				font-size: 12px;
+				border-radius: 50%;
+				white-space: nowrap;
+				flex-shrink: 0;
+				text-align: center;
+				line-height: 24px;
+				position: relative;
+				&:not(:last-child) {
+					margin-right: 2.5%;
+				}
+				&.active {
+					color: #fff;
+				}
+			}
+		}
+		.summary_info {
+			font-size: 12px;
+			color: #fff;
+			display: inline-block;
+			vertical-align: middle;
+			white-space: nowrap;
+			&+img{
+				width: 24px;
+				vertical-align: middle;
+				border-radius: 50%;
+				margin-left: 5px;
+			}
+			em {
+				font-style: normal;
+				text-decoration: underline;				
+			}
+		}
+		.upload_btn{
+			overflow: hidden;
+		}
 	}
 </style>

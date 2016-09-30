@@ -1,14 +1,11 @@
 <template>
 	<div class="first_screen">
-
-		<v-header></v-header>
+		<v-header class="header"></v-header>
 		<main :class="{isShowSideBar: sideBarStatus}">
-			<div class="columns is-gapless is-mobile is-overlay">
-				
-				<right-display-area class="column right-display-area"></right-display-area>
-			</div>
+			<excel-display></excel-display>
 		</main>
-		<v-footer></v-footer>
+		<v-footer class="footer"></v-footer>
+		<filter-panel id="filter-panel"></filter-panel>
 		<side-bar class="sibebar"></side-bar>
 	</div>
 </template>
@@ -17,7 +14,8 @@
 	import SideBar from './common/SideBar'
 	import Footer from './common/Footer'
 	import vHeader from './common/Header'
-	import RightDisplayArea from './FirstScreenPageView/RightDisplayArea'
+	import ExcelDisplay from './FirstScreenPageView/ExcelDisplay'
+	import FilterPanel from './FirstScreenPageView/FilterPanel'
 	import { toggleSideBar } from '../vuex/actions'
 	import { getSideBarStatus } from '../vuex/getters'
 	
@@ -25,8 +23,9 @@
 		components: {
 			vHeader,
 			SideBar,
-			RightDisplayArea,
-			vFooter: Footer
+			vFooter: Footer,
+			ExcelDisplay,
+			FilterPanel
 		},
 		name: 'index',
 		data(){
@@ -48,57 +47,18 @@
 	.first_screen {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: calc(100vh - 32px);
 		justify-content: space-between;
-	}
-
-
-	header, footer{
-		flex-grow: 0;
-		flex-grow: 0;
 	}
 	main{
 		position: relative;
 		overflow: hidden;
 		flex-grow: 1;
+		flex-shrink: 1;
+		display: flex;
+	}
+	.header, .footer{
+		flex-grow: 0;
 		flex-shrink: 0;
-	}
-	main>*{
-		width: 100%;
-	}
-
-	
-
-
-	.emit-enter-button{
-		width: 24px;
-		height: 30px;
-		background-color: rgba(255, 255, 255, .98);
-		border: 1px solid #ccc;
-		border-left-width: 0;
-		position: fixed;
-		z-index: 800;margin-top: 4px;
-	}
-	.emit-enter-button>span{
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-	}
-	
-	.horizontalMove-transition{
-		-webkit-transition: all .6s;
-		transition: all .6s;
-	}
-
-	.horizontalMove-enter{
-		transform: translateX(-100%);
-		width: 0;
-		opacity: 0;
-	}
-	.horizontalMove-leave{
-		transform: translateX(0);
-		opacity: 0;
-		width: 0;
 	}
 </style>

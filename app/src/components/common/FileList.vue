@@ -25,8 +25,6 @@
 	export default {
 		data(){
 			return {
-				curTypeIndex: 0,
-				curTypeName: "all",
 				filterFileList: [],
 				curLoadingIndex: -1
 			}
@@ -46,10 +44,6 @@
 			}
 		},
 		methods: {
-			tabFileType(n, s){
-				this.curTypeIndex = n
-				this.curTypeName = s
-			},
 			confirm(path, index){
 				var isConfirm = window.confirm("导入该文件会覆盖目前的筛选结果，是否确认要导入？")
 				if(isConfirm) {
@@ -61,9 +55,7 @@
 							var workbook = xlsx.readFile(path)
 							this.setExcelData(workbook)
 							this.setActiveSheet(0)
-							
 							console.log("第五阶段")
-							
 							this.setUploadFiles({
 					      path: path,
 					      name: pathModule.basename(path),
@@ -94,63 +86,57 @@
 		cursor: pointer;
 	}
 </style>
-<style lang="scss">
-	.file_list_container{
+<style lang="scss" scoped>
+	.file_list_container {
 		padding-left: 24px;
+		.file_list {
+			li {
+				display: flex;
+				align-items: center;
+				height: 48px;
+				justify-content: space-between;
+				&:hover {
+					display: block;
+				}
+				&:not(:first-child) p {
+						color: rgba(0,0,0, .87);
+				}
+				&:first-child {
+					span {
+						background-color: #4285F4;
+					}
+					p {
+						color: #4285F4;
+					}
+				}
+				p {
+					flex-grow: 1;
+					font-size: 13px;
+					text-align: left;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					padding-right: 10px;
+				}
+				span {
+					display: inline-block;
+					font-size: 10px;
+					margin-right: 16px;
+					width: 40px;
+					text-align: center;
+					border-radius: 2px;
+					line-height: 18px;
+					background-color: #6B727D;
+					color: #fff;
+					flex-shrink: 0;
+				}
+				.btn {
+					margin-right: 10px;
+					display: none;
+					flex-shrink: 0;
+				}
+			}
+		}
 	}
-	.file_list li{
-		display: flex;
-		align-items: center;
-		height: 48px;
-		justify-content: space-between;
-	}
-	.file_list li:first-child span{
-		background-color: #4285F4;
-	}
-	.file_list li:first-child p{
-		color: #4285F4;
-	}
-	.file_list li:not(:first-child) p{
-		color: rgba(0,0,0, .87);
 
-	}
-	.file_list li span {
-		display: inline-block;
-		font-size: 10px;
-		margin-right: 16px;
-		width: 40px;
-		text-align: center;
-		border-radius: 2px;
-		line-height: 18px;
-		background-color: #6B727D;
-		color: #fff;
-		flex-shrink: 0;
-	}
-	.file_list li p{
-		flex-grow: 1;
-		font-size: 13px;
-		text-align: left;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		padding-right: 10px;
-	}
-	.file_list .btn{
-		margin-right: 10px;
-		display: none;
-		flex-shrink: 0;
-	}
-	.file_list li:hover .btn{
-		display: block;
-	}
-	.list .btn{
-		display: none;
-		position: absolute;
-		right: 10px;
-		top: 50%;
-		-webkit-transform: translateY(-50%);
-		-ms-transform: translateY(-50%);
-		-o-transform: translateY(-50%);
-		transform: translateY(-50%);
-	}	
 </style>
