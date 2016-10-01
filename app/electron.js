@@ -6,6 +6,7 @@ const path = require('path')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const ipcMain = electron.ipcMain
+const dialog = electron.dialog
 
 let mainWindow
 let config = {}
@@ -62,6 +63,17 @@ app.on('activate', () => {
   }
 })
 
+
+ipcMain.on("sync-alert-dialog", (event, arg) => {
+  dialog.showMessageBox({
+    type: "warning",
+      buttons: ["确定"],
+      defaultId: 0, // dialog 打开是默认选中哪个按钮
+      title: arg.title || "xcel",
+      message: arg.content || "",
+      detail: arg.detail || ""
+  })
+})
 
 ipcMain.on("sync-close", (event, arg) => {
   mainWindow.close()

@@ -95,7 +95,9 @@
 				align-items: center;
 				height: 48px;
 				justify-content: space-between;
-				&:hover {
+				-webkit-user-select: none;
+				user-select: none;
+				&:hover .del_btn{
 					display: block;
 				}
 				&:not(:first-child) p {

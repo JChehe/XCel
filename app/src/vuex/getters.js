@@ -49,17 +49,15 @@ export function getCurSheetSize(state) {
 	var excelData = state.filterList.excelData
 	var filteredData, curActiveSheetName, curActiveSheetIndex,
 		curSheetData, curFilterTagList, curFilteredData,curColKeys
-	if(excelData.sheetNameList && excelData.sheetNameList.length > 0){
+	if( excelData && excelData.sheetNameList && excelData.sheetNameList.length > 0){
 		filteredData = state.filterList.filteredData
 		curActiveSheetIndex = state.filterList.activeSheet.index
 		curActiveSheetName = excelData.sheetNameList[curActiveSheetIndex]
-
 		curSheetData = excelData[curActiveSheetName]
-		curFilterTagList = excelData.filterTagList[curActiveSheetName]
+		curFilterTagList = excelData.filterTagList && excelData.filterTagList[curActiveSheetName]
 		curFilteredData = filteredData[curActiveSheetName]
 		curColKeys = excelData[curActiveSheetName + "_headers"]
 	}
-
 	return {
 		origin: {
 			rows: curSheetData && curSheetData.length || 0,

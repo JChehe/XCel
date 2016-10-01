@@ -1,7 +1,6 @@
 <template>
 	<footer class="footer">
 		<ul class="btn_group">
-			
 			<li class="btn search_btn" title="搜索文件"
 				v-show="!isShowInstruction" 
 				@click="focusSearchInput">
@@ -71,16 +70,16 @@
 		},
 		computed: {
 			hasFile(){
-				return this.curSheetSize.origin && this.curSheetSize.origin.rows > 0
+				return this.curSheetSize && this.curSheetSize.origin && this.curSheetSize.origin.rows > 0
 			},
 			oriRows(){
-				return this.curSheetSize.origin && this.curSheetSize.origin.rows
+				return this.curSheetSize && this.curSheetSize.origin && this.curSheetSize.origin.rows
 			},
 			filteredRows(){
-				return this.curSheetSize.filtered && this.curSheetSize.filtered.rows
+				return this.curSheetSize && this.curSheetSize.filtered && this.curSheetSize.filtered.rows
 			},
 			filterTagListLength(){
-				return this.curSheetSize.tagList && this.curSheetSize.tagList.length
+				return this.curSheetSize && this.curSheetSize.tagList && this.curSheetSize.tagList.length
 			}
 		},	
 		methods: {

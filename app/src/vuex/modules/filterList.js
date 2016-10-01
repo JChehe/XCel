@@ -21,7 +21,7 @@ const state = {
   },
   filterStatus: 0,
   filterWay: filterWay, // 0 是保留, 1 是剔除
-  isShowFillterPanel: false,
+  isShowFillterPanel: true,
   filterOptions: [
     {
   		char: ">",
@@ -56,13 +56,7 @@ const state = {
   	},{
   		char: "regexp",
   		words: "正则表达式"
-  	},{
-      char: "or",
-      words: "或"
-    },{
-      char: "and",
-      words: "且"
-    }
+  	}
   ]
 }
 
@@ -85,11 +79,12 @@ const mutations = {
   		var tempTagList = Object.assign({}, state.filterTagList)
   		tempTagList[curSheetName].push(filter)
 	  	state.filterTagList = tempTagList
-
+      console.log("filter", filter)
+      console.log("tempTagList", tempTagList)
       tempTagList = null
       // filteredDataCache[curSheetName+filter]
       // 筛选结果赋值
-      state.filteredData = addDelHandler()
+      // state.filteredData = addDelHandler()
   	}else{
       alert("您还没上传相应的Excel文件。")
     }
@@ -107,7 +102,7 @@ const mutations = {
   	var len = state.filterTagList[curSheetName].length
   	if( len > 0){
       // 筛选结果赋值
-      state.filteredData = addDelHandler()
+      // state.filteredData = addDelHandler()
   	}else{
   		state.filteredData = Object.assign({}, state.excelData)
       state.filterStatus = 0
@@ -315,7 +310,7 @@ var filterSet = {
       return isRowPassed
     })
 
-    console.log("Result", result)
+    // console.log("Result", result)
     return result
   },
   // 第二个表单：多列运算逻辑
@@ -337,7 +332,7 @@ var filterSet = {
         target
       })
     })
-    console.log("filterByMultiColCalc", result)
+    // console.log("filterByMultiColCalc", result)
     return result
   },
   // 计算每行是否符合要求
@@ -348,7 +343,7 @@ var filterSet = {
     if(!colOperator.includes('time')){
 
       calcResult = this.calcNum({row, colOperator, filterCol, colKeys})
-      console.log("calcResult", calcResult)
+      // console.log("calcResult", calcResult)
     }else{
       var date0 = moment(row[colKeys[filterCol[0] - 1]], "m/d/y hh:mm")
       var date1 = moment(row[colKeys[filterCol[1] - 1]], "m/d/y hh:mm")
@@ -364,7 +359,7 @@ var filterSet = {
     result = result === undefined ? 0 : +result
     if(isNaN(result)) return undefined
 
-    console.log(filterCol)
+    // console.log(filterCol)
     for(var i = 1, len = filterCol.length; i < len; i++){
       var cKey = colKeys[filterCol[i]]
       var curVal = row[cKey] === undefined ? 0 : +row[cKey]
@@ -390,9 +385,6 @@ var filterSet = {
       // 另外toFixed 返回的是字符串类型
       curVal = _.isNumber(+curVal) ? +(+curVal).toFixed(12) : (+curVal)
       target = _.isNumber(+target) ? +(+target).toFixed(12) : (+target)
-      console.log("curVal", typeof curVal)
-    console.log("target", typeof target)
-      console.log("是数字")
     }
     
     switch (operator) {

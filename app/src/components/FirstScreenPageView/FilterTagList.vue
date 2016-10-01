@@ -1,6 +1,6 @@
 <template>
 	<div class="filter-list has-text-left">
-		<filter-tag v-for="filterObj in filterTagList" 
+		<filter-tag v-for="filterObj in filterTagList[activeSheet.name]" 
 			:filter-obj="filterObj" 
 			:tag-index="$index">
 		</filter-tag>

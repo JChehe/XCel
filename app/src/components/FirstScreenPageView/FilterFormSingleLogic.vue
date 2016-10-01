@@ -6,37 +6,44 @@
 					<td>单列运算逻辑</td>
 					<td>
 						<span class="select">
-							<select name="">
+							<select v-model="logicOperator">
 								<option value="and">且</option>
 								<option value="or">或</option>
 							</select>
-							<p class="val_mask">且</p>
+							<p class="val_mask">{{ getLogicOperatorWords(logicOperator) }}</p>
+						</span>
+					</td>
+					<td>
+						<!-- <input type="text" placeholder=""> -->
+						<span class="select">
+							<select v-model="operatorCol">
+								<option value="0">请选择列</option>
+								<option v-else v-for="col in colNum" 
+									:value="$index+1">
+									{{ getCharCol(col + 1) }}
+								</option>
+							</select>
+							<p class="val_mask">{{ operatorCol == 0 ? "请选择列" : getCharCol(operatorCol) }}</p>
 						</span>
 					</td>
 					<td>
 						<span class="select">
-							<select name="">
-								<option value=">">请选择列</option>
+							<select v-model="operator">
+								<option v-for="op in filterOptions" 
+									:value="op.char">
+									{{ op.words }}
+								</option>
 							</select>
-							<p class="val_mask">请选择列</p>
+							<p class="val_mask">{{ getOperatorWords(filterOptions, operator) }}</p>
 						</span>
 					</td>
+					<td class="placeholder_td"></td>
 					<td>
-						<span class="select">
-							<select name="">
-								<option value=">">大于</option>
-							</select>
-							<p class="val_mask">大于</p>
-						</span>
-					</td>
-					<td class="placeholder_td">
-						
+						<input type="text" placeholder="请填写运算符的值" 
+							v-model="operatorVal">
 					</td>
 					<td>
-						<input type="text" placeholder="请填写运算符的值">
-					</td>
-					<td>
-						<filter-button class="btn" :filter-status="filterStatus"></filter-button>
+						<button type="submit">添加</button>
 					</td>
 				</tr>
 			</tbody>
@@ -47,17 +54,19 @@
 <script>
 	import { addFilter, setFilterStatus } from '../../vuex/actions'
 	import { getActiveSheet, getColKeys, getFilterOptions, getExcelData } from '../../vuex/getters'
-	import { getCharCol } from '../../utils/ExcelSet'
+	import { getCharCol, getLogicOperatorWords, getOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
+	import { ipcRenderer } from 'electron'
 
 	export default {
 		data(){
 			return {
 				operatorVal: "",
-				operatorCol: '1',
+				operatorCol: '0',
 				operator: ">",
 				subFilters: [],
 				subFilterOperator: "",
-				subFilterVal: ""
+				subFilterVal: "",
+				logicOperator: "and"
 			}
 		},
 		vuex: {
@@ -73,73 +82,35 @@
 			}
 		},
 		computed: {
-			colNum(){
-				if(this.colKeys){
-					return this.colKeys.length
+			colChar(){
+				if(this.colKeys) {
+					return this.colKeys.forEach((item, index) => {
+						return this.getCharCol(index)
+					})
 				}
+			},
+			colNum(){
+				if(this.colKeys)
+					return this.colKeys.length
 				else
 					return 0
 			},
-			isNotSingleLogicGroupOperator(){
-				return this.operator !== "or" && this.operator !== "and"
-			},
-			singleLogicGroupOperators(){
-				return this.filterOptions.filter((opt, index) => {
-					if(opt.char === "or" || opt.char === "and") {
-						return false
-					}else{
-						return true
-					}
-				})
-			}
 		},
 		methods: {
 			getCharCol,
-			addSubFilter(index) {
-				var subFilterOperator = this.subFilterOperator
-				var subFilterVal = this.subFilterVal
-				var subFilterWords = ""
-				
-				this.filterOptions.forEach((opt, index) => {
-					if(opt.char === subFilterOperator){
-						subFilterWords = opt.words
-						return true
-					}
-				})
-
-				if(!this.isNotSingleLogicGroupOperator && subFilterVal.trim().length === 0){
-					alert("第1.2种表格 未填写完整")
-					return
-				}
-
-				if(!this.isNotSingleLogicGroupOperator){
-					this.subFilters.push({
-						operator: subFilterOperator,
-						val: subFilterVal,
-						words: subFilterWords
-					})
-
-					this.subFilterOperator = ">" 
-					this.subFilterVal = ""
-				}
-			},
-			removeSubFilter(index) {
-				this.subFilters.splice(index, 1)
-			},
+			getLogicOperatorWords,
+			getOperatorWords,
+			getFilterWordsPrimitive,
 			addFilterHandler() {
-					
 				var filterObj = {}
 				var filterWords = ""
 				var curCol = this.operatorCol
 				var operator = this.operator
-				var operatorWords = this.getOperatorWords(operator)
+				var operatorWords = this.getOperatorWords(this.filterOptions, operator)
 				var opVal = this.operatorVal.trim()
 				var subFilters = this.subFilters
 
-				if(this.isNotSingleLogicGroupOperator && opVal.length === 0 || 
-					!this.isNotSingleLogicGroupOperator && this.subFilters.length === 0) {
-					alert("请填写完整")
-					this.setFilterStatus(0)
+				if(!this.validateForm({curCol, opVal})) {
 					return
 				}
 
@@ -149,52 +120,48 @@
 
 				// 延迟是为了让“filterForm的提交按钮能作出响应（不会因为卡死了不能加入loading动画，加入web Worker后可取消该延时器）”
 				setTimeout(()=>{
-					var preStr = `第${curCol}列的值`
-
-					if(!this.isNotSingleLogicGroupOperator) {
-						var tempStr = ""
-						for(var i = 0, len = subFilters.length; i < len; i++){
-							var curFilter = this.subFilters[i]
-							var primitiveFilterWords = this.getFilterWordPrimitive(curFilter.operator, curFilter.words, curFilter.val)
-							tempStr += i !== len - 1 ? `${primitiveFilterWords} ${operatorWords} ` : `${primitiveFilterWords}`
-						}
-						filterWords = preStr + tempStr
-					}else{
-						filterWords = preStr + this.getFilterWordPrimitive(operator, operatorWords, opVal)
-					}
+					var preStr = `第${this.getCharCol(curCol)}列的值`
+					filterWords = preStr + this.getFilterWordsPrimitive({
+						operator,
+						operatorWords,
+						val: opVal
+					})
 
 					filterObj = {
+						logicOperator: this.logicOperator,
 						col: curCol - 1,
 						operator: this.operator,
 						value: opVal,
 						filterWords: filterWords,
 						subFilters: this.subFilters
 					}
-
 					// 触发 action：目前只做了表述文字，还需要进行筛选的value值
 					this.addFilter(filterObj)
 					this.operatorVal = ""
 					this.subFilters = []
 				}, 0)
 			},
-			getFilterWordPrimitive(operator, operatorWords, val){
-				var primitiveFilterWords = ""
-				// 判断是选择哪个操作符
-				switch(operator){
-					case 'startsWith': ;
-					case 'ends': primitiveFilterWords = `的${operatorWords}为“${val}”`;break;
-					case 'regexp': 
-						val = val.replace(/\//ig, "\\/")
-						primitiveFilterWords = `应用了正则表达式"/${val}/ig"`;break;
-					default: primitiveFilterWords = `${operatorWords}"${val}"`;
+			validateForm(args) {
+				var { curCol, opVal } = args
+				var isValidated = false
+				var tipWords = "单列运算逻辑："
+				if(curCol == "0") {
+					tipWords += "请选择列"
+				}else if(opVal.length === 0) {
+					tipWords += "请填写运算符的值"
+				}else {
+					isValidated = true
 				}
-				return primitiveFilterWords
-			},
-			getOperatorWords(operator){
-			 	for(var i = 0, len = this.filterOptions.length; i < len; i++){
-			 		var obj = this.filterOptions[i]
-			 		if(obj.char === operator) return obj.words
-			 	}
+
+				if(!isValidated) {
+					this.setFilterStatus(0)
+					ipcRenderer.send("sync-alert-dialog", {
+						content: tipWords
+					})
+					return false
+				}else{
+					return true
+				}
 			}
 		}
 	}

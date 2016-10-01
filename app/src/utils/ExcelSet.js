@@ -29,6 +29,76 @@ export function getNumCol(s) {
   return n
 }
 
+export const colOperator = [{
+    char: "+",
+    words: "相加"
+  },{
+    char: "-",
+    words: "相减"
+  },{
+    char: "*",
+    words: "相乘"
+  },{
+    char: "/",
+    words: "相除"
+  },{
+    char: "%",
+    words: "求余"
+  },{
+    char: "-(time)",
+    words: "时间相减"
+  }/*,{
+    char: "+()",
+    words: "字符串拼接"
+  }*/]
+export function getColArithmeticOperatorWords(sets, char) {
+  for(var i = 0, len = sets.length; i < len; i++ ) {
+    var curColOperator = sets[i]
+    if(curColOperator.char === char) {
+      return curColOperator.words
+    }
+  }
+  return "匹配失败"
+}
+
+export function getLogicOperatorWords(char) {
+  return char === "and" ? "且" : "或"
+}
+
+export function getOperatorWords(sets, char) {
+  for(var i = 0, len = sets.length; i < len; i++){
+    var obj = sets[i]
+    if(obj.char === char) 
+      return obj.words
+  }
+  return "匹配失败"
+}
+
+export function getColOperatorWords(sets, char) {
+  for(var i = 0, len = sets.length; i < len; i++){
+    var obj = sets[i]
+    if(obj.char === char) 
+      return obj.words
+  }
+  return "匹配失败"
+}
+
+export function getFilterWordsPrimitive(args){
+  var { operator, operatorCol, operatorWords, val, colOperatorSelect } = args
+  var primitiveFilterWords = ""
+  // 判断是选择哪个操作符
+  switch(operator){
+    case 'startsWith': ;
+    case 'ends': primitiveFilterWords = `的${operatorWords}为“${val}”`;break;
+    case 'regexp': primitiveFilterWords = `应用了正则表达式"/${val}/ig"`;break;
+    default: 
+      primitiveFilterWords = `${operatorWords}"${val}"`;
+      if(colOperatorSelect && colOperatorSelect.includes("time")) primitiveFilterWords += "分钟"
+  }
+  return primitiveFilterWords
+}
+
+
 export function Excel() {
   this.workbook = null,
   this.sheetNameList = null

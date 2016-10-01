@@ -66,7 +66,7 @@
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	.filter_panel{
 		position: fixed;
 		bottom: 56px;
@@ -106,11 +106,24 @@
 			min-width: 1000px;
 			background-color: #fff;
 		}
+		.table {
+			margin-bottom: 0;
+		}
+		form {
+			position: relative;
+			&:not(:last-child)::after {
+				content: "\20";
+				position: absolute;
+				bottom: 0px;
+				width: 100%;
+				border-bottom: 1px solid rgba(0, 0, 0, .1)
+			}
+		}
 	}
 
 	
 
-	.filter_form_group table td{
+	.filter_form_group table tr td{
 	  color: #000;
 	  font-size: 12px;
 	  height: 54px;
@@ -126,6 +139,10 @@
 	    width: 127px;
 	    .select {
 	      width: 107px;
+	    }
+	    input {
+	    	width: 107px;
+	      line-height: 24px;
 	    }
 	  }
 	  &:nth-child(4) {
@@ -145,11 +162,10 @@
 	    input{
 	      width: 300px;
 	      line-height: 24px;
-
 	    }
 	  }
 	  &:last-child {
-	    .btn{
+	    button{
 	      background-color: #4285F4;
 	      font-size: 12px;
 	      text-align: center;
@@ -160,6 +176,7 @@
 	      padding: 0;
 	      border: 0;
 	      outline: 0;
+	      cursor: pointer;
 	    }
 	  }
 	}

@@ -15,16 +15,16 @@
   vertical-align: top;
 }
 
-.table td.is-icon,
-.table th.is-icon {
+.table td.is_icon,
+.table th.is_icon {
   padding: 5px;
   text-align: center;
   white-space: nowrap;
   width: 1%;
 }
 
-.table td.is-icon .fa,
-.table th.is-icon .fa {
+.table td.is_icon .fa,
+.table th.is_icon .fa {
   display: inline-block;
   font-size: 21px;
   height: 24px;
@@ -34,35 +34,35 @@
   width: 24px;
 }
 
-.table td.is-icon.is-link,
-.table th.is-icon.is-link {
+.table td.is_icon.is_link,
+.table th.is_icon.is_link {
   padding: 0;
 }
 
-.table td.is-icon.is-link > a,
-.table th.is-icon.is-link > a {
+.table td.is_icon.is_link > a,
+.table th.is_icon.is_link > a {
   padding: 5px;
 }
 
-.table td.is-link,
-.table th.is-link {
+.table td.is_link,
+.table th.is_link {
   padding: 0;
 }
 
-.table td.is-link > a,
-.table th.is-link > a {
+.table td.is_link > a,
+.table th.is_link > a {
   display: block;
   padding: 8px 10px;
 }
 
-.table td.is-link > a:hover,
-.table th.is-link > a:hover {
+.table td.is_link > a:hover,
+.table th.is_link > a:hover {
   background-color: #1fc8db;
   color: white;
 }
 
-.table td.is-narrow,
-.table th.is-narrow {
+.table td.is_narrow,
+.table th.is_narrow {
   white-space: nowrap;
   width: 1%;
 }
@@ -94,54 +94,54 @@
   color: #aeb1b5;
 }
 
-.table.is-bordered td,
-.table.is-bordered th {
+.table.is_bordered td,
+.table.is_bordered th {
   border-width: 1px;
 }
 
-.table.is-bordered tr:last-child td,
-.table.is-bordered tr:last-child th {
+.table.is_bordered tr:last-child td,
+.table.is_bordered tr:last-child th {
   border-bottom-width: 1px;
 }
 
-.table.is-narrow td,
-.table.is-narrow th {
+.table.is_narrow td,
+.table.is_narrow th {
   padding: 5px 10px;
 }
 
-.table.is-narrow td.is-icon,
-.table.is-narrow th.is-icon {
+.table.is_narrow td.is_icon,
+.table.is_narrow th.is_icon {
   padding: 2px;
 }
 
-.table.is-narrow td.is-icon.is-link,
-.table.is-narrow th.is-icon.is-link {
+.table.is_narrow td.is_icon.is_link,
+.table.is_narrow th.is_icon.is_link {
   padding: 0;
 }
 
-.table.is-narrow td.is-icon.is-link > a,
-.table.is-narrow th.is-icon.is-link > a {
+.table.is_narrow td.is_icon.is_link > a,
+.table.is_narrow th.is_icon.is_link > a {
   padding: 2px;
 }
 
-.table.is-narrow td.is-link,
-.table.is-narrow th.is-link {
+.table.is_narrow td.is_link,
+.table.is_narrow th.is_link {
   padding: 0;
 }
 
-.table.is-narrow td.is-link > a,
-.table.is-narrow th.is-link > a {
+.table.is_narrow td.is_link > a,
+.table.is_narrow th.is_link > a {
   padding: 5px 10px;
 }
 
-.table.is-striped tbody tr:hover {
+.table.is_striped tbody tr:hover {
   background-color: #eef2f7;
 }
 
-.table.is-striped tbody tr:nth-child(2n) {
+.table.is_striped tbody tr:nth-child(2n) {
   background-color: #f5f7fa;
 }
 
-.table.is-striped tbody tr:nth-child(2n):hover {
+.table.is_striped tbody tr:nth-child(2n):hover {
   background-color: #eef2f7;
 }

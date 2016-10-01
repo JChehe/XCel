@@ -1,7 +1,7 @@
 <!-- Excel -->
 <template>
 	<div class="excel_area">
-		<div class="tabs is_boxed is_small excel_cheet_nav">
+		<div class="tabs is_boxed is_small excel_cheet_nav" v-show="excelData.sheetNameList !== undefined">
 			<ul>
 				<li v-for = "sheetName in excelData.sheetNameList" 
 					:class="{'is_active': $index == activeSheet.index}"
@@ -17,8 +17,10 @@
 			<div class="drop_area content" 
 				v-show="!excelData.sheetNameList"
 				@drop.prevent.stop="dropHandler" 
+				@dragenter="dragenterHandler"
+				@dragleave="dragleaveHandler"
 				>
-				<p class="{'is_loading': isLoading}">拖拽一个Excel文件到这里即可完成上传</p>
+				<p>拖拽一个Excel文件到这里即可完成上传</p>
 			</div>
 			<sheet-of-excel v-for="sheetName in excelData.sheetNameList"
 				:sheet-data="filteredData[activeSheet.name]"
@@ -79,13 +81,18 @@
 			changeTab(index) {
 				this.setActiveSheet(index)
 			},
+			dragenterHandler(e) {
+				e.target.classList.add("active")
+			},
+			dragleaveHandler(e) {
+				e.target.classList.remove("active")
+			},
 			dropHandler(e){
 				var files = e.dataTransfer.files
 				var i, f
 				this.$nextTick(()=>{
 					this.isLoading = true
 				})
-
 				try{
 					for(var i = 0, f = files[i]; i != files.length; i++){
 						var curFile = files[i]
@@ -160,6 +167,8 @@
 	}
 
 	.drop_area{
+		// visibility: hidden;
+		opacity: 0;
 		border: 3px dashed #69707a;
 		font-size: 18px;
 		position: relative;
@@ -169,6 +178,11 @@
 		right: 0;
 		top: 0;
 		bottom: 0;
+		transition: opacity .6s;
+		&.active {
+			// visibility: visible;
+			opacity: 1;
+		}
 		p {
 			position: absolute;
 			left: 50%;
@@ -176,6 +190,7 @@
 			transform: translate(-50%, -50%);
 		}
 	}
+
 
 
 
