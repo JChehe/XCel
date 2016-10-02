@@ -8,7 +8,7 @@
 						<span class="select">
 							<select v-model="logicOperator">
 								<option value="and">且</option>
-								<option value="or">或</option>
+								<option v-show="!curSheetSize.tagList.length == 0" value="or">或</option>
 							</select>
 							<p class="val_mask">{{ getLogicOperatorWords(logicOperator) }}</p>
 						</span>
@@ -121,11 +121,9 @@
 				var tempColsArr = []
 				// 去除两边的逗号和中间出现的空格
 				curCols = curCols.replace(/^[，*,*]*/ig, "").replace(/[，*,*]*$/ig, "").replace(/\s/ig, "")
-				console.log("0000", curCols)
 
 				// 切割为数组
 				curCols = curCols.split(/[,，]+/)
-				console.log("1111111", curCols)
 
 				// 过滤掉中间的空元素
 				curCols = curCols.filter((item, index) => {
@@ -135,7 +133,6 @@
 						return true
 					}
 				})
-				console.log("222222", curCols)
 				// 数组中出现的字符转为数字
 				for(var i = 0, len = curCols.length; i < len; i++){
 					var cCol = curCols[i]
@@ -152,10 +149,13 @@
 				// 根据范围生成范围内所有的序列
 				var startIndex = Math.min(Math.abs(+curCols[0]), Math.abs(curCols[1]))
 				var endIndex = Math.max(Math.abs(+curCols[0]), Math.abs(curCols[1]))
+				console.log("startIndex", startIndex, "endIndex", endIndex)
 				for(var i = startIndex, len = endIndex; i <= len; i++){
 					tempColsArr.push(i - 1)
 				}
 				this.operatorCol = `${tempColsArr[0] + 1},${tempColsArr[tempColsArr.length - 1] + 1}`
+				console.log("tempColsArr", tempColsArr)
+
 				this.operatorColArr = tempColsArr
 			},
 			generateNeedConformColWords(index){
@@ -179,7 +179,8 @@
 				})
 
 				setTimeout(()=>{
-					var preStr = `第${getCharCol(operatorColArr[0])}至第${getCharCol(operatorColArr[operatorColArr.length - 1])}列范围内的值中，至少有一个`
+					console.log("operatorColArr", operatorColArr)
+					var preStr = `第${getCharCol(operatorColArr[0] + 1)}至第${getCharCol(operatorColArr[operatorColArr.length - 1] + 1)}列范围内的值中，至少有一个`
 					
 					filterWords = preStr + this.getFilterWordsPrimitive({
 						operator,
@@ -192,12 +193,14 @@
 					
 					console.log("根据首尾两元素获得它们之间的所有元素，并且所有元素进行减一处理", tempCols)
 					filterObj = {
-						col: tempCols,
+						col: this.operatorColArr,
 						operator: this.operator,
 						value: opVal,
 						filterWords: filterWords,
 						colOperator: "",
-						logicOperator
+						logicOperator: this.logicOperator,
+						filterType: 2,
+						needConformColIndex: this.needConformColIndex
 					}
 					console.log(filterObj)
 					// 触发 action：目前只做了表述文字，还需要进行筛选的value值

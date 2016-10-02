@@ -8,7 +8,7 @@
 						<span class="select">
 							<select v-model="logicOperator">
 								<option value="and">且</option>
-								<option value="or">或</option>
+								<option v-show="!curSheetSize.tagList.length == 0" value="or" value="or">或</option>
 							</select>
 							<p class="val_mask">{{ getLogicOperatorWords(logicOperator) }}</p>
 					</td>
@@ -53,7 +53,7 @@
 
 <script>
 	import { colOperator, getNumCol, getCharCol, getOperatorWords, getColOperatorWords, getColArithmeticOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from "../../utils/ExcelSet"
-	import { getFilterOptions } from '../../vuex/getters'
+	import { getFilterOptions, getCurSheetSize } from '../../vuex/getters'
 	import { addFilter, setFilterStatus } from '../../vuex/actions'
 	import { ipcRenderer } from 'electron'
 
@@ -71,7 +71,8 @@
 		},
 		vuex: {
 			getters: {
-				filterOptions: getFilterOptions
+				filterOptions: getFilterOptions,
+				curSheetSize: getCurSheetSize
 			},
 			actions: {
 				addFilter,
@@ -121,7 +122,7 @@
 						colText += `, ${getCharCol(col)}`
 					})
 					// colText去掉逗号+空格）字符
-					var preStr = `第${colText.slice(2)}列的值`
+					var preStr = `第${colText.slice(2)}列的值${colOperatorWords}`
 
 					filterWords = preStr + this.getFilterWordsPrimitive({
 						operator,
@@ -143,7 +144,8 @@
 						filterWords: filterWords,
 						subFilters: this.subFilters,
 						colOperator: this.colOperatorSelect,
-						logicOperator: this.logicOperator
+						logicOperator: this.logicOperator,
+						filterType: 1
 					}
 					console.log("filterObj",filterObj)
 					this.addFilter(filterObj)

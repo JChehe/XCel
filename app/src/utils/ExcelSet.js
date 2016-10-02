@@ -2,7 +2,9 @@
 
 // Excel 横向坐标的转换 1 <--> A
 /* 来自 http://www.cnblogs.com/lavezhang/archive/2012/05/14/2499000.html */ 
-
+import { ipcRenderer } from 'electron'
+import fs from 'fs'
+import XLSX from "xlsx"
 export function getCharCol(n) {
   var temCol = "",
     s = "",
@@ -84,7 +86,7 @@ export function getColOperatorWords(sets, char) {
 }
 
 export function getFilterWordsPrimitive(args){
-  var { operator, operatorCol, operatorWords, val, colOperatorSelect } = args
+  var { operator, operatorCol, operatorWords, val, colOperatorSelect, filterType } = args
   var primitiveFilterWords = ""
   // 判断是选择哪个操作符
   switch(operator){
@@ -111,18 +113,33 @@ Excel.prototype = {
   constructor: Excel,
 
   init(data) {
-    if(typeof data === 'string'){
-      this.readByData(data)
-    }else if(typeof data === 'object'){
-      this.workbook = data
-    }
+    var isParseSuccess = true
     try{
-      this.initData()
+      if(typeof data === 'string'){
+        this.readByData(data)
+      }else if(typeof data === 'object'){
+        this.workbook = data
+      }
     }catch(e){
-      console.log(e)
-      alert("Excel内容的格式不符合要求，故导致文件解析失败")
-    } 
-    return this
+      isParseSuccess = false
+      ipcRenderer.send("sync-alert-dialog", {
+        content: "不支持该文件格式"
+      })
+    }
+    if(isParseSuccess) {
+      try{
+        this.initData()
+      }catch(e){
+        console.log(e)
+        ipcRenderer.send("sync-alert-dialog", {
+          content: "Excel内容的格式不符合要求，故导致文件解析失败"
+        })
+      }
+      return this
+    } else{
+       return {}
+    }
+    
   },
   readByData(data) {
     // 用于前端上传文件，如：上传按钮和拖拽上传
@@ -174,12 +191,17 @@ Excel.prototype = {
     }
     var sheetNameList = this.sheetNameList
     sheetNameList.forEach((sheetName, i) => {
+      var start = window.performance.now()
       var wbTem = this.jsonToWBForOneSheet(filteredData[sheetName], excelData[sheetName + "_headers"], sheetName)
+      var end = window.performance.now()
+      console.log("转化一个表需要", (end-start))
       finalWB.SheetNames.push(wbTem.SheetNames[0])
       Object.assign(finalWB.Sheets, {
         [sheetName]: wbTem["Sheets"][sheetName]
       })
     })
+    console.log(finalWB)
+    // console.log(xlsx.writeFile(finalWB, fileName)) // Node导出
     var wbout = XLSX.write(finalWB, {bookType:'xlsx', bookSST:false, type: 'binary'});
     saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), fileName)
   },
@@ -187,13 +209,13 @@ Excel.prototype = {
   jsonToWBForOneSheet(json, colkeys, sheetName) {
     var _headers = colkeys // 获取表头
     var headers = _headers
-      .map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+      .map((v, i) => Object.assign({}, { v: v, position: getCharCol(i+1) + 1 }))
       .reduce((prev, next) => Object.assign({}, prev, {
         [next.position]: { v: next.v }
       }), {})
 
     var data = json
-      .map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+      .map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: getCharCol(j+1) + (i + 2) })))
       .reduce((prev, next) => prev.concat(next))
       .reduce((prev, next) => Object.assign({}, prev, {
         [next.position]: { v: next.v }

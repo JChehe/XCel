@@ -8,7 +8,7 @@
 						<span class="select">
 							<select v-model="logicOperator">
 								<option value="and">且</option>
-								<option value="or">或</option>
+								<option v-show="!curSheetSize.tagList.length == 0" value="or">或</option>
 							</select>
 							<p class="val_mask">{{ getLogicOperatorWords(logicOperator) }}</p>
 						</span>
@@ -53,7 +53,7 @@
 
 <script>
 	import { addFilter, setFilterStatus } from '../../vuex/actions'
-	import { getActiveSheet, getColKeys, getFilterOptions, getExcelData } from '../../vuex/getters'
+	import { getActiveSheet, getColKeys, getFilterOptions, getExcelData, getCurSheetSize } from '../../vuex/getters'
 	import { getCharCol, getLogicOperatorWords, getOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
 	import { ipcRenderer } from 'electron'
 
@@ -74,7 +74,8 @@
 				activeSheet: getActiveSheet,
 				filterOptions: getFilterOptions,
 				excelData: getExcelData,
-				colKeys: getColKeys
+				colKeys: getColKeys,
+				curSheetSize: getCurSheetSize
 			},
 			actions: {
 				addFilter,
@@ -133,7 +134,8 @@
 						operator: this.operator,
 						value: opVal,
 						filterWords: filterWords,
-						subFilters: this.subFilters
+						subFilters: this.subFilters,
+						filterType: 0
 					}
 					// 触发 action：目前只做了表述文字，还需要进行筛选的value值
 					this.addFilter(filterObj)

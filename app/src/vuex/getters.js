@@ -46,7 +46,8 @@ export function getFilterPanelStatus(state) {
 }
 
 export function getCurSheetSize(state) {
-	var excelData = state.filterList.excelData
+	var filterListState = state.filterList
+	var excelData = filterListState.excelData
 	var filteredData, curActiveSheetName, curActiveSheetIndex,
 		curSheetData, curFilterTagList, curFilteredData,curColKeys
 	if( excelData && excelData.sheetNameList && excelData.sheetNameList.length > 0){
@@ -54,7 +55,7 @@ export function getCurSheetSize(state) {
 		curActiveSheetIndex = state.filterList.activeSheet.index
 		curActiveSheetName = excelData.sheetNameList[curActiveSheetIndex]
 		curSheetData = excelData[curActiveSheetName]
-		curFilterTagList = excelData.filterTagList && excelData.filterTagList[curActiveSheetName]
+		curFilterTagList = filterListState.filterTagList && filterListState.filterTagList[curActiveSheetName]
 		curFilteredData = filteredData[curActiveSheetName]
 		curColKeys = excelData[curActiveSheetName + "_headers"]
 	}

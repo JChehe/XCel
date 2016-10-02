@@ -50,6 +50,9 @@ export const setFilterWay = ({ dispatch }, val) => {
 export const toggleFilterPanelStatus = ({ dispatch },val) => {
 	dispatch(types.TOGGLE_FILTER_PANEL_STATUS, val)
 }
+export const structureExp = ({ dispatch }, val) => {
+	dispatch(types.STRUCTURE_EXP)
+}
 // 其他
 export const toggleSideBar = ({ dispatch }, val) => {
 	dispatch(types.TOGGLE_SIDEBAR, val)

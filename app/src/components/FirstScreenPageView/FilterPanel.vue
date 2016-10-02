@@ -2,7 +2,8 @@
 	<div class="filter_panel" v-show="filterPanelStatus">
 		<div class="filter_tag_container">
 			<filter-tag-list class="filter_tag_list"></filter-tag-list>
-			<button class="submit_btn btn" title="">
+			<button class="submit_btn btn" title="点击筛选并导出文件" 
+				@click="filterHandler">
 				<svg width="18px" height="15px" viewBox="23 25 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 				    <!-- Generator: Sketch 40.1 (33804) - http://www.bohemiancoding.com/sketch -->
 				    <desc>Created with Sketch.</desc>
@@ -28,9 +29,9 @@
 	import FilterFormSingleLogic from './FilterFormSingleLogic'
 	import FilterFormMultiCalc from './FilterFormMultiCalc'
 	import FilterFormDoubleColsRange from './FilterFormDoubleColsRange'
-	import { getFilterList, getFilterPanelStatus } from '../../vuex/getters'
-	import { exportFile } from '../../vuex/actions'
-
+	import { getFilterList, getFilterPanelStatus, getCurSheetSize } from '../../vuex/getters'
+	import { exportFile, structureExp } from '../../vuex/actions'
+	import { ipcRenderer } from 'electron'
 	export default{
 		components: {
 			FilterTagList,
@@ -49,10 +50,12 @@
 		},
 		vuex: {
 			getters: {
-				filterPanelStatus: getFilterPanelStatus
+				filterPanelStatus: getFilterPanelStatus,
+				curSheetSize: getCurSheetSize
 			},
 			actions: {
-				exportFile
+				exportFile,
+				structureExp
 			}
 		},
 		methods: {
@@ -61,6 +64,18 @@
 			},
 			submit(){
 				if(filterVal.tirm().length === 0) return false
+			},
+			filterHandler(){
+				// var filterTagListLength = this.filterTagList.length
+				// console.log("this.filterTagList", this.filterTagList)
+				var filterTagListLength = this.curSheetSize.tagList.length
+				if(filterTagListLength === undefined || filterTagListLength === 0) {
+					ipcRenderer.send("sync-alert-dialog", {
+						content: "请先添加筛选条件"
+					})
+				}else {
+					this.structureExp()
+				}
 			}
 		}
 	}

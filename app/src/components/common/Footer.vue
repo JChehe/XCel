@@ -25,7 +25,7 @@
 		</ul>
 		<div>
 			<p class="summary_info" v-show="hasFile">
-				筛选后数据为 <em>{{oriRows}}</em> 行，原始记录为 <em>{{ filteredRows }}</em> 行，共 <em>{{ filterTagListLength }}</em> 个{{ filterWay == 0 ? "保留" : "剔除"}}</span>条件
+				筛选后数据为 <em>{{filteredRows}}</em> 行，原始记录为 <em>{{ oriRows }}</em> 行，共 <em>{{ filterTagListLength }}</em> 个{{ filterWay == 0 ? "保留" : "剔除"}}</span>条件
 			</p>
 			<img src="./assets/O2-icon.png" alt="O2_logo">
 		</div>
