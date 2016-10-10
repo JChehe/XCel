@@ -1,5 +1,6 @@
 <template>
 	<footer class="footer">
+		<button class="emit_btn" @click="emit_background">触发另外进程</button>
 		<ul class="btn_group">
 			<li class="btn search_btn" title="搜索文件"
 				v-show="!isShowInstruction" 
@@ -34,6 +35,7 @@
 
 <script>
 	import pathModule from "path"
+	import {ipcRenderer} from "electron"
 	import { 
 		getSideBarStatus,
 		getFilterPanelStatus,
@@ -83,6 +85,11 @@
 			}
 		},	
 		methods: {
+			emit_background() {
+				ipcRenderer.send("background-start", {
+					name: "ljc"
+				})
+			},
 			toggleView(){
 				var curRouteName = this.$route.name
 				if(curRouteName === "instructions") {
@@ -115,7 +122,7 @@
 						reader.onload = (e) => {
 							var data = e.target.result
 							this.setExcelData(data)
-							this.setActiveSheet(0)
+							// this.setActiveSheet(0)
 
 							this.isLoading = false
 							this.setUploadFiles({

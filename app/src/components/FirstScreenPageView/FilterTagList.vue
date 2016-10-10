@@ -1,7 +1,7 @@
 <template>
 	<div class="filter-list has-text-left">
-		<filter-tag v-for="filterObj in filterTagList[activeSheet.name]" 
-			:filter-obj="filterObj" 
+		<filter-tag v-for="filterTag in filterTagList[activeSheet.name]" 
+			:filter-tag="filterTag" 
 			:tag-index="$index">
 		</filter-tag>
 	</div>

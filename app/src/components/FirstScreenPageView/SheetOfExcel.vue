@@ -114,10 +114,28 @@
 	}
 
 </style>
-<style>
+<style lang="scss">
 	/* 由于td是自己后续加的，没有添加vue属性，放在 scoped里面则不会匹配这些样式 */
 	tbody tr:first-child td{
 		white-space: nowrap;
+	}
+	table {
+		overflow: hidden
+	}
+	tbody td {
+		position: relative;
+		&:hover {
+			&::after {
+				content: "\20";
+				position: absolute;
+				height: 10000px;
+				width: 100%;
+				left: 0;
+				top: -5000px;
+				background-color: #f5f7fa;
+				z-index: -1;
+			}
+		}
 	}
 	.sheet_of_excel thead>tr:first-child>th{
 		&:first-child {

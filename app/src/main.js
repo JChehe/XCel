@@ -9,7 +9,6 @@ import App from './App'
 import filtersOfFileList from "./filters/fileList"
 import routes from './routes'
 
-
 Vue.use(Electron)
 Vue.use(Resource)
 Vue.use(Router)

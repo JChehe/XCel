@@ -1,5 +1,5 @@
 import * as types from './mutation-types'
-
+import {ipcRenderer} from "electron"
 // 脚手架自带 actions
 export const decrementMain = ({ dispatch }) => {
   dispatch(types.DECREMENT_MAIN_COUNTER)
@@ -22,12 +22,20 @@ export const setUploadFiles = ({ dispatch }, val) => {
 	dispatch(types.SET_UPLOAD_FILES, val)
 }
 export const delUploadFiles = ({ dispatch }, val) => {
+	console.log("actions_del", val)
 	dispatch(types.DEL_UPLOAD_FILES, val)
 }
 
 // 过滤Excel数据相关
-export const setExcelData = ({ dispatch }, val) => {
-	dispatch(types.SET_EXCEL_DATA, val)
+export const setExcelData = ({ dispatch }, data) => {
+	ipcRenderer.send("background-start", {
+    type: "readFile",
+    data: data
+  })
+  ipcRenderer.on("background-response", (event, arg) => {
+  	dispatch(types.SET_EXCEL_DATA, arg)
+  	dispatch(types.SET_ACTIVE_SHEET, 0)
+  })
 }
 export const setActiveSheet = ({ dispatch }, val) => {
 	dispatch(types.SET_ACTIVE_SHEET, val)

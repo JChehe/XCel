@@ -38,8 +38,6 @@ const mutations = {
       state.fileList.unshift(val)
     }
 
-    // ipcRenderer.send("async-fileList", state.fileList)
-
     window.localStorage.setItem("uploadFiles", JSON.stringify(state.fileList))
   },
   [types.DEL_UPLOAD_FILES] (state, index) {

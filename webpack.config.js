@@ -7,6 +7,7 @@ const webpack = require('webpack')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 let config = {
   devtool: '#eval-source-map',
@@ -61,7 +62,10 @@ let config = {
       template: './app/main.ejs',
       title: settings.name
     }),
-    new webpack.NoErrorsPlugin()
+    new webpack.NoErrorsPlugin(),
+    new CopyWebpackPlugin([
+      {from: path.join(__dirname, 'app/src/background'), to: path.join(__dirname, 'app/dist')}
+    ])
   ],
   output: {
     filename: '[name].js',

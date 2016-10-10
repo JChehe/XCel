@@ -101,9 +101,9 @@
 						var name = f.name
 						reader.onload = (e) => {
 							var data = e.target.result
-
+							
 							this.setExcelData(data)
-							this.setActiveSheet(0)
+							// this.setActiveSheet(0)
 
 							this.isLoading = false
 							this.setUploadFiles({

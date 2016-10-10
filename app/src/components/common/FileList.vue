@@ -4,10 +4,10 @@
 	  	<ul>
 	  		<li title="双击文件名即可导入"
 	  			v-for="(index, file) in fileList | filterByQuery curSearchVal" 
-	  			@dblclick="confirm(file.path ,index)">
+	  			@dblclick="confirmRead(file.path ,index)">
 	  			<span>{{ file.extname.replace(/^./, "") }}</span>
 	  			<p>{{ file.name }}</p>
-	  			<button class="btn del_btn" @click="delUploadFiles(index)">删除</button>
+	  			<button class="btn del_btn" @click="confirmDel(index)">删除</button>
 	  		</li>
 	  	</ul>
 	  </div>
@@ -19,6 +19,7 @@
 	import xlsx from 'xlsx'
 	import fs from 'fs'
 	import pathModule from 'path'
+	import { ipcRenderer } from 'electron'
 	import { changeFileType, setExcelData, setActiveSheet, setUploadFiles, delUploadFiles } from '../../vuex/actions'
 	import { getCurSearchVal, getAllFileType, getUploadFiles } from '../../vuex/getters'
 
@@ -43,33 +44,56 @@
 				delUploadFiles
 			}
 		},
-		methods: {
-			confirm(path, index){
-				var isConfirm = window.confirm("导入该文件会覆盖目前的筛选结果，是否确认要导入？")
-				if(isConfirm) {
-					this.$nextTick(() => {
-						this.curLoadingIndex = index
-					})
-					fs.stat(path, (err, stats) => {
-						if(stats && stats.isFile()) {
-							var workbook = xlsx.readFile(path)
-							this.setExcelData(workbook)
-							this.setActiveSheet(0)
-							console.log("第五阶段")
-							this.setUploadFiles({
-					      path: path,
-					      name: pathModule.basename(path),
-					      extname: pathModule.extname(path)
-					    })
-						}else{
-							var isDelConfirm = window.confirm("当前文件不存在，是否删除该记录？")
-							if(isDelConfirm) {
-								this.delUploadFiles(index)
+		created(){
+			ipcRenderer.on("sync-confirm-dialog-reponse", (event, arg) => {
+				// 点击确认按钮
+				if(arg.index === 0) {
+					// 是否删除无效文件
+					if(arg.typeId === "isDel") {
+						this.delUploadFiles(arg.fileIndex)
+					}
+					// 是否确认导入
+					if(arg.typeId === "coverFile") {
+						var path = arg.path
+						console.log("确定导入")
+						this.$nextTick(() => {
+							this.curLoadingIndex = arg.fileIndex
+						})
+						fs.stat(path, (err, stats) => {
+							if(stats && stats.isFile()) {
+								var workbook = xlsx.readFile(path)
+								this.setExcelData(workbook)
+								// this.setActiveSheet(0)
+								console.log("第五阶段")
+								this.setUploadFiles({
+						      path: path,
+						      name: pathModule.basename(path),
+						      extname: pathModule.extname(path)
+						    })
+							}else{
+								this.confirmDel(arg.fileIndex)
 							}
-						}
-						this.curLoadingIndex = -1
-					})
+							this.curLoadingIndex = -1
+						})
+					}
 				}
+			})
+		},
+		methods: {
+			confirmRead(path, index){
+				ipcRenderer.send("sync-confirm-dialog", {
+					typeId: "coverFile",
+					content: "导入该文件会覆盖目前的筛选结果，是否确认要导入？",
+					fileIndex: index,
+					path: path
+				})
+			},
+			confirmDel(index) {
+				ipcRenderer.send("sync-confirm-dialog", {
+					typeId: "isDel",
+					content: "当前文件不存在，是否删除该记录？",
+					fileIndex: index
+				})
 			}
 		}
 	}

@@ -9,7 +9,8 @@ moment.locale("zh") // 设置时间格式为中文
 
 const SUFFIX_COLKEYS = "_headers"
 
-var filterWay = window.localStorage.filterWay ? JSON.parse(window.localStorage.filterWay) : 0
+var filterWay = window.localStorage.filterWay
+                ? JSON.parse(window.localStorage.filterWay) : 0
 
 // console.log(_.isEqual(.1+.2, .3))
 const state = {
@@ -64,30 +65,48 @@ const state = {
 var isChange = false
 // 疑问：修改filterTagList 却不会触发DOM更新。而依赖于 activeSheet
 const mutations = {
-  [types.SET_EXCEL_DATA] (state, data) {
+  [types.SET_EXCEL_DATA] (state, arg) {
     var tStart = window.performance.now();
-    state.excelData = new ExcelSet.Excel().init(data)
-
+    state.excelData = arg.result
     initFilterState(state, state.excelData.sheetNameList)
-
-    var tEnd = window.performance.now()
-    console.log(`上传文件后，初始化数据耗时${ tEnd - tStart }毫秒`)
-    console.log("第4阶段")
   },
 
   [types.ADD_FILTER] (state, filter) {
     var curSheetName = state.activeSheet.name
+    var filterTagList = state.filterTagList
   	if(state.excelData.sheetNameList && state.excelData.sheetNameList.length > 0){
   		var tempTagList = Object.assign({}, state.filterTagList)
-  		tempTagList[curSheetName].push(filter)
+      var curTagList = tempTagList[curSheetName]
+      var isHasSameGroup = false
+      
+      // 判断当前filter是否存在组
+      // 若存在，则判断是否存在同类组
+      if( filter.groupId != "-1" ) {
+        curTagList.forEach((item, index) => {
+          // 若存在同类组
+          if( filter.groupId === item.groupId ) {
+            item.filters.push(filter)
+            isHasSameGroup = true
+            return true // as break
+          }
+        })
+      }
+
+      // 若不存在 或 找不到同类组
+      if(!isHasSameGroup) {
+        var filterObj = {
+          groupId: filter.groupId,
+          logicOperator: filter.logicOperator,
+          filters: [filter]
+        }
+        curTagList.push(filterObj)
+      }
+      
+
 	  	state.filterTagList = tempTagList
       
       tempTagList = null
       isChange = true
-      // filteredDataCache[curSheetName+filter]
-      // 筛选结果赋值
-      // state.filteredData = addDelHandler()
-      // filterSet.structureExp()
   	}else{
       ipcRenderer.send("sync-alert-dialog", {
         content: "还没上传相应的Excel文件"
@@ -148,9 +167,12 @@ const mutations = {
     }
   },
   [types.STRUCTURE_EXP] (state, val) {
-    var tempFilteredData = Object.assign({}, state.excelData)
+    // return;
+    var excelData = state.excelData
+    var tempFilteredData = Object.assign({}, excelData)
+    var filterWay = state.filterWay
     if(!isChange){
-      state.excelData.exportFileByWB({
+      excelData.exportFileByWB({
         filteredData: state.filteredData, 
         excelData: state.excelData, 
         fileName: "过滤后的Excel.xlsx"
@@ -158,43 +180,66 @@ const mutations = {
       return
     }
     isChange = false
-    for(var i = 0, len = state.excelData.sheetNameList.length; i < len; i++) {
-      var curSheetName = state.excelData.sheetNameList[i]
+    for(var i = 0, len = excelData.sheetNameList.length; i < len; i++) {
+      var curSheetName = excelData.sheetNameList[i]
       var curFilterTagList = state.filterTagList[curSheetName]
-      var colKeys = state.excelData[curSheetName + SUFFIX_COLKEYS]
+      var colKeys = excelData[curSheetName + SUFFIX_COLKEYS]
 
       if(curFilterTagList.length !== 0){
         tempFilteredData[curSheetName] = tempFilteredData[curSheetName].filter((row, index) => {
-          var expStr = ""
+          var rowExpStr = ""
           for(var i = 0, len = curFilterTagList.length; i < len; i++) {
-            var cF = curFilterTagList[i]
-            var logicChar = cF.logicOperator === "and" ? "&&" : "||"
-            var filterType = cF.filterType
-            var filterCol = cF.col
-            var operator = cF.operator
-            var colOperator = cF.colOperator
-            var target = cF.value
-            var needConformColIndex = cF.needConformColIndex
-            // console.log(row, colKeys, filterCol, operator, target)
-            var oneFilterResult;
-            if(filterType === 0){
-              oneFilterResult = (filterSet.filterByOneOperator({row, colKeys, filterCol, operator, target}))
-            }else if(filterType === 1){
-              oneFilterResult = (filterSet.filterByMultiColCalc({row, colKeys, filterCol, operator, target, colOperator}))
-            }else if(filterType === 2){
-              oneFilterResult = (filterSet.filterByDoubleColsRange({row, colKeys, filterCol, operator, target, needConformColIndex}))
-            }
-            expStr = expStr + logicChar + oneFilterResult 
-            if(logicChar === "||" && oneFilterResult === true) {
-              console.log("符合")
+            var cTag = curFilterTagList[i]
+            var cFilters = cTag.filters
+
+            var groupId = cTag.groupId
+            var tagLogicChar = cTag.logicOperator === "and" ? "&&" : "||"
+
+            var oneTagResult
+            var groupExpStr = ""
+
+            // 遍历当前组的 filters
+            cFilters.forEach((cF, index) => {
+              var filterLogicChar = cF.logicOperator === "and" ? "&&" : "||"
+              var filterType = cF.filterType
+              var filterCol = cF.col
+              var operator = cF.operator
+              var colOperator = cF.colOperator
+              var target = cF.value
+              var needConformColIndex = cF.needConformColIndex
+
+              var oneFilterResult
+
+              if(filterType === 0){
+                oneFilterResult = (filterSet.filterByOneOperator({row, colKeys, filterCol, operator, target}))
+              }else if(filterType === 1){
+                oneFilterResult = (filterSet.filterByMultiColCalc({row, colKeys, filterCol, operator, target, colOperator}))
+              }else if(filterType === 2){
+                oneFilterResult = (filterSet.filterByDoubleColsRange({row, colKeys, filterCol, operator, target, needConformColIndex}))
+              }
+              groupExpStr = groupExpStr + filterLogicChar + oneFilterResult
+
+              if(filterLogicChar === "||" && oneFilterResult === true) {
+                console.log("某filter符合")
+                return true // as break
+              }
+            })
+            groupExpStr = groupExpStr.replace(/^[|&]*/ig, "")
+            oneTagResult = eval(groupExpStr)
+
+            
+            rowExpStr = rowExpStr + tagLogicChar + oneTagResult 
+            if(tagLogicChar === "||" && oneTagResult === true) {
+              console.log("某组符合")
               break;
             }
           }
-          expStr = expStr.replace(/^[|&]*/ig, "")
-          console.log(expStr)
-          var rowResult = eval(expStr)
-          console.log("eval(expStr)", rowResult)
-          return rowResult
+          rowExpStr = rowExpStr.replace(/^[|&]*/ig, "")
+          console.log(rowExpStr)
+          var rowResult = eval(rowExpStr)
+          console.log("eval(rowExpStr)", rowResult)
+          // return rowResult
+          return filterWay == 0 ? rowResult : !rowResult
         })
         console.log(i + "tempFilteredData[curSheetName]", tempFilteredData[curSheetName])
       }

@@ -44,6 +44,9 @@
 							<input type="text" placeholder="请填写运算符的值" v-model="operatorVal">
 					</td>
 					<td>
+						<group-select :group-id.sync="groupId"></group-select>
+					</td>
+					<td>
 						<button type="submit">添加</button>
 					</td>
 				</tr>
@@ -56,21 +59,25 @@
 	import { addFilter, setFilterStatus } from '../../vuex/actions'
 	import { getActiveSheet, getFilterOptions, getExcelData, getCurSheetSize } from '../../vuex/getters'
 	import { getCharCol, getNumCol, getOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
+	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
 
 	export default {
+		components: {
+			GroupSelect
+		},
 		data(){
 			return {
 				operatorVal: "",
 				operatorCol: "", // 最终会转为数组
 				operatorColArr: [],
 				operator: ">",
-				subFilters: [],
 				subFilterOperator: "",
 				subFilterVal: "",
 				logicOperator: "and",
 				needConformColIndex: 1,
-				isConformDoubleCols: true
+				isConformDoubleCols: true,
+				groupId: -1
 			}
 		},
 		vuex: {
@@ -83,6 +90,13 @@
 			actions: {
 				addFilter,
 				setFilterStatus
+			}
+		},
+		watch: {
+			curSheetSize(){
+				if(this.curSheetSize.tagList.length == 0) {
+					this.logicOperator = "and"
+				}
 			}
 		},
 		computed: {
@@ -168,7 +182,6 @@
 				var operator = this.operator
 				var operatorWords = this.getOperatorWords(this.filterOptions, operator)
 				var opVal = this.operatorVal.trim()
-				var subFilters = this.subFilters
 
 				if(!this.validateForm({operatorColArr, opVal})) {
 					return
@@ -207,7 +220,6 @@
 					this.addFilter(filterObj)
 
 					this.operatorVal = ""
-					this.subFilters = []
 				}, 0)
 			},
 			validateForm(args) {

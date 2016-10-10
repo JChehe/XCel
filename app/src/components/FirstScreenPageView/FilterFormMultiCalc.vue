@@ -43,6 +43,9 @@
 						</div>
 					</td>
 					<td>
+						<group-select :group-id.sync="groupId"></group-select>
+					</td>
+					<td>
 						<button type="submit">添加</button>
 					</td>
 				</tr>
@@ -55,18 +58,22 @@
 	import { colOperator, getNumCol, getCharCol, getOperatorWords, getColOperatorWords, getColArithmeticOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from "../../utils/ExcelSet"
 	import { getFilterOptions, getCurSheetSize } from '../../vuex/getters'
 	import { addFilter, setFilterStatus } from '../../vuex/actions'
+	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
 
 	export default{
+		components: {
+			GroupSelect
+		},
 		data(){
 			return {
 				operatorVal: "",
 				operatorCol: "", // 最终会转为数组
 				operator: ">",
 				colOperatorSelect: "+",
-				subFilters: [],
 				logicOperator: "and",
-				colOperator: colOperator
+				colOperator: colOperator,
+				groupId: -1
 			}
 		},
 		vuex: {
@@ -77,6 +84,13 @@
 			actions: {
 				addFilter,
 				setFilterStatus
+			}
+		},
+		watch: {
+			curSheetSize(){
+				if(this.curSheetSize.tagList.length == 0) {
+					this.logicOperator = "and"
+				}
 			}
 		},
 		methods:{
@@ -138,14 +152,15 @@
 					})
 
 					filterObj = {
+						filterType: 1,
+						logicOperator: this.logicOperator,
 						col: curCols,
 						operator: this.operator,
 						value: opVal,
 						filterWords: filterWords,
-						subFilters: this.subFilters,
 						colOperator: this.colOperatorSelect,
-						logicOperator: this.logicOperator,
-						filterType: 1
+						
+						
 					}
 					console.log("filterObj",filterObj)
 					this.addFilter(filterObj)

@@ -8,8 +8,9 @@ const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
-
+const xlsx = require("xlsx")
 let mainWindow
+let backgroundWindow
 let config = {}
 var windowBounds = {}
 
@@ -21,36 +22,50 @@ if (process.env.NODE_ENV === 'development') {
   config.url = `file://${__dirname}/dist/index.html`
 }
 
-function createWindow () {
+  function createMainWindow () {
   /**
    * Initial window options
    */
-  mainWindow = new BrowserWindow({
+  var win = new BrowserWindow({
     height: 850,
     width: 1280,
     frame: false
   })
-  windowBounds = mainWindow.getBounds()
-  mainWindow.loadURL(config.url)
-
+  windowBounds = win.getBounds()
+  win.loadURL(config.url)
   if (process.env.NODE_ENV === 'development') {
     BrowserWindow.addDevToolsExtension(path.join(__dirname, '../node_modules/devtron'))
 
     let installExtension = require('electron-devtools-installer')
 
     installExtension.default(installExtension.VUEJS_DEVTOOLS)
-      .then((name) => mainWindow.webContents.openDevTools())
+      .then((name) => win.webContents.openDevTools())
       .catch((err) => console.log('An error occurred: ', err))
   }
 
-  mainWindow.on('closed', () => {
+  win.on('closed', () => {
     mainWindow = null
+    backgroundWindow = null
   })
 
   console.log('mainWindow opened')
+  return win
 }
 
-app.on('ready', createWindow)
+function createBackgroundWindow () {
+  var win = new BrowserWindow({
+    // show: false
+  })
+  win.loadURL(`file://${__dirname}/dist/background/index.html`);
+  console.log("backgroundWindow opened")
+
+  return win
+}
+
+app.on('ready', () => {
+  mainWindow = createMainWindow()
+  backgroundWindow = createBackgroundWindow()
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -65,6 +80,55 @@ app.on('activate', () => {
 })
 
 
+ipcMain.on("background-response", (event, arg) => {
+  mainWindow.webContents.send("background-response", arg)
+})
+
+ipcMain.on("background-start", (event, arg) => {
+  backgroundWindow.webContents.send("background-start", arg)
+})
+
+
+
+ipcMain.on("sync-saveFile-dialog", (event, arg) => {
+  dialog.showSaveDialog({
+    title: "请选择保存路径",
+    filters: [{
+      name: "Excel",
+      extensions: ["xlsx"]
+    }]
+  }, function(p) {
+    if(p !== undefined) {
+      xlsx.writeFile(arg.data, p)
+    }
+    // p 是用户输入的路径名
+    console.log("p" , p);
+  })
+})
+
+
+ipcMain.on("sync-confirm-dialog", (event, arg) => {
+  dialog.showMessageBox({
+    type: "question",
+    buttons: ["确定", "取消"],  // Mac 中显示顺序相反
+    defaultId: 0,
+    title: arg.title || "xcel",
+    message: arg.content || "",
+    detail: arg.detail || "",
+  }, function(index) {
+    // 返回点击按钮的 index
+    console.log("BtnIndex", index)
+    console.log(event)
+    event.sender.send("sync-confirm-dialog-reponse", {
+      index,
+      typeId: arg.typeId, // 用于区分 emit 者
+      path: arg.path,
+      fileIndex: arg.fileIndex
+    })
+  })
+})
+
+
 ipcMain.on("sync-alert-dialog", (event, arg) => {
   dialog.showMessageBox({
     type: "warning",
@@ -76,6 +140,7 @@ ipcMain.on("sync-alert-dialog", (event, arg) => {
   })
 })
 
+// 接受窗口的最小化、最大化、关闭 事件
 ipcMain.on("sync-close", (event, arg) => {
   mainWindow.close()
   console.log("关闭")

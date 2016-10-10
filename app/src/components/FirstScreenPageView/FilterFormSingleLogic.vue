@@ -10,7 +10,7 @@
 								<option value="and">且</option>
 								<option v-show="!curSheetSize.tagList.length == 0" value="or">或</option>
 							</select>
-							<p class="val_mask">{{ getLogicOperatorWords(logicOperator) }}</p>
+							<p class="val_mask">{{ getLogicOperatorWords(logicOperator)}}</p>
 						</span>
 					</td>
 					<td>
@@ -43,6 +43,9 @@
 							v-model="operatorVal">
 					</td>
 					<td>
+						<group-select :group-id.sync="groupId"></group-select>
+					</td>
+					<td>
 						<button type="submit">添加</button>
 					</td>
 				</tr>
@@ -55,18 +58,22 @@
 	import { addFilter, setFilterStatus } from '../../vuex/actions'
 	import { getActiveSheet, getColKeys, getFilterOptions, getExcelData, getCurSheetSize } from '../../vuex/getters'
 	import { getCharCol, getLogicOperatorWords, getOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
+	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
 
 	export default {
+		components: {
+			GroupSelect
+		},
 		data(){
 			return {
 				operatorVal: "",
 				operatorCol: '0',
 				operator: ">",
-				subFilters: [],
 				subFilterOperator: "",
 				subFilterVal: "",
-				logicOperator: "and"
+				logicOperator: "and",
+				groupId: -1
 			}
 		},
 		vuex: {
@@ -80,6 +87,13 @@
 			actions: {
 				addFilter,
 				setFilterStatus
+			}
+		},
+		watch: {
+			curSheetSize(){
+				if(this.curSheetSize.tagList.length == 0) {
+					this.logicOperator = "and"
+				}
 			}
 		},
 		computed: {
@@ -109,7 +123,6 @@
 				var operator = this.operator
 				var operatorWords = this.getOperatorWords(this.filterOptions, operator)
 				var opVal = this.operatorVal.trim()
-				var subFilters = this.subFilters
 
 				if(!this.validateForm({curCol, opVal})) {
 					return
@@ -129,18 +142,17 @@
 					})
 
 					filterObj = {
+						filterType: 0,
+						groupId: this.groupId,
 						logicOperator: this.logicOperator,
 						col: curCol - 1,
 						operator: this.operator,
 						value: opVal,
-						filterWords: filterWords,
-						subFilters: this.subFilters,
-						filterType: 0
+						filterWords: filterWords
 					}
 					// 触发 action：目前只做了表述文字，还需要进行筛选的value值
 					this.addFilter(filterObj)
 					this.operatorVal = ""
-					this.subFilters = []
 				}, 0)
 			},
 			validateForm(args) {

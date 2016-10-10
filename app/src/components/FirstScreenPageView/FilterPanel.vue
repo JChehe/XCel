@@ -118,11 +118,12 @@
 		padding: 22px 20px;
 		overflow: auto;
 		&_inside {
-			min-width: 1000px;
+			min-width: 1080px;
 			background-color: #fff;
 		}
 		.table {
 			margin-bottom: 0;
+			width: 100%;
 		}
 		form {
 			position: relative;
