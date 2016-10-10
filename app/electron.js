@@ -80,13 +80,28 @@ app.on('activate', () => {
 })
 
 
-ipcMain.on("background-response", (event, arg) => {
-  mainWindow.webContents.send("background-response", arg)
+ipcMain.on("readFile-response", (event, arg) => {
+  mainWindow.webContents.send("readFile-response", arg)
+})
+ipcMain.on("readFile-start", (event, arg) => {
+  console.log("读取文件emit")
+  backgroundWindow.webContents.send("readFile-start", arg)
 })
 
-ipcMain.on("background-start", (event, arg) => {
-  backgroundWindow.webContents.send("background-start", arg)
+ipcMain.on("filter-response", (event, arg) => {
+  mainWindow.webContents.send("filter-response", arg)
 })
+ipcMain.on("filter-start", (event, arg) => {
+  backgroundWindow.webContents.send("filter-start", arg)
+})
+
+ipcMain.on("exportFile-response", (event, arg) => {
+  mainWindow.webContents.send("exportFile-response", arg)
+})
+ipcMain.on("exportFile-start", (event, arg) => {
+  backgroundWindow.webContents.send("exportFile-start", arg)
+})
+
 
 
 

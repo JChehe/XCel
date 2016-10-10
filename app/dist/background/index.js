@@ -1,29 +1,117 @@
 'use strict';
 const {ipcRenderer} = require('electron');
 const xlsx = require('xlsx')
+const filterUtils = require('./filterUtils')
+const SUFFIX_COLKEYS = "_headers"
+
+var tempExcelData;
 
 window.onload = function () {
-	ipcRenderer.on('background-start', (event, arg) => {
-		console.log("background 收到11")
+  ipcRenderer.on("readFile-start", (event, arg) => {
+    var tStart = window.performance.now();
 
-		if(arg.type === "readFile") {
-	    var tStart = window.performance.now();
+    var result = new Excel().init(arg.data)
+    tempExcelData = result
+    var tEnd = window.performance.now()
+    console.log(`初始化数据耗时${ tEnd - tStart }毫秒`)
 
-			var initData = new Excel().init(arg.data)
+    ipcRenderer.send("readFile-response", {result})
+  })
 
-	    var tEnd = window.performance.now()
-      console.log(`上传文件后，初始化数据耗时${ tEnd - tStart }毫秒`)
-				
-			console.log(initData)
-		}
+  ipcRenderer.on("filter-start", (event, arg) => {
+    var tStart = window.performance.now();
 
-		ipcRenderer.send('background-response', {
-			result: initData,
-		});
-	});
-};
+    var result = filterHandler(arg)
+    
+    var tEnd = window.performance.now()
+    console.log(`过滤数据耗时${ tEnd - tStart }毫秒`)
+    console.log("state.excelData.exportFileByWB", arg.excelData.exportFileByWB)
 
+    ipcRenderer.send("filter-response", {result})
+  })
 
+  ipcRenderer.on("exportFile-start", (event, arg) => {
+    var tStart = window.performance.now();
+
+    tempExcelData.exportFileByWB(arg)
+
+    var tEnd = window.performance.now()
+    console.log(`导出文件耗时${ tEnd - tStart }毫秒`)
+
+    ipcRenderer.send("exportFile-response", {info: "成功导出"})
+  })
+}
+
+function filterHandler(arg){
+  var {excelData, filterTagList, filterWay} = arg
+  var tempFilteredData = Object.assign({}, excelData)
+  for(var i = 0, len = excelData.sheetNameList.length; i < len; i++) {
+    var curSheetName = excelData.sheetNameList[i]
+    var curFilterTagList = filterTagList[curSheetName]
+    var colKeys = excelData[curSheetName + SUFFIX_COLKEYS]
+
+    if(curFilterTagList.length !== 0){
+      tempFilteredData[curSheetName] = tempFilteredData[curSheetName].filter((row, index) => {
+        var rowExpStr = ""
+        for(var i = 0, len = curFilterTagList.length; i < len; i++) {
+          var cTag = curFilterTagList[i]
+          var cFilters = cTag.filters
+
+          var groupId = cTag.groupId
+          var tagLogicChar = cTag.logicOperator === "and" ? "&&" : "||"
+
+          var oneTagResult
+          var groupExpStr = ""
+
+          // 遍历当前组的 filters
+          cFilters.forEach((cF, index) => {
+            var filterLogicChar = cF.logicOperator === "and" ? "&&" : "||"
+            var filterType = cF.filterType
+            var filterCol = cF.col
+            var operator = cF.operator
+            var colOperator = cF.colOperator
+            var target = cF.value
+            var needConformColIndex = cF.needConformColIndex
+
+            var oneFilterResult
+
+            if(filterType === 0){
+              oneFilterResult = (filterUtils.filterByOneOperator({row, colKeys, filterCol, operator, target}))
+            }else if(filterType === 1){
+              oneFilterResult = (filterUtils.filterByMultiColCalc({row, colKeys, filterCol, operator, target, colOperator}))
+            }else if(filterType === 2){
+              oneFilterResult = (filterUtils.filterByDoubleColsRange({row, colKeys, filterCol, operator, target, needConformColIndex}))
+            }
+            groupExpStr = groupExpStr + filterLogicChar + oneFilterResult
+
+            if(filterLogicChar === "||" && oneFilterResult === true) {
+              console.log("某filter符合")
+              return true // as break
+            }
+          })
+          groupExpStr = groupExpStr.replace(/^[|&]*/ig, "")
+          oneTagResult = eval(groupExpStr)
+
+          
+          rowExpStr = rowExpStr + tagLogicChar + oneTagResult 
+          if(tagLogicChar === "||" && oneTagResult === true) {
+            console.log("某组符合")
+            break;
+          }
+        }
+        rowExpStr = rowExpStr.replace(/^[|&]*/ig, "")
+        console.log(rowExpStr)
+        var rowResult = eval(rowExpStr)
+        console.log("eval(rowExpStr)", rowResult)
+        // return rowResult
+        return filterWay == 0 ? rowResult : !rowResult
+      })
+      console.log(i + "tempFilteredData[curSheetName]", tempFilteredData[curSheetName])
+    }
+  }
+
+  return tempFilteredData
+}
 
 function Excel() {
   this.workbook = null,
@@ -105,7 +193,7 @@ Excel.prototype = {
 
   },
   exportFileByWB(args) {
-    var {filteredData, excelData, fileName, writeOpts} = args
+    var {filteredData, excelData, writeOpts} = args
     var finalWB = {
       SheetNames: [],
       Sheets: {}
@@ -113,7 +201,7 @@ Excel.prototype = {
     var sheetNameList = this.sheetNameList
     sheetNameList.forEach((sheetName, i) => {
       var start = window.performance.now()
-      var wbTem = this.jsonToWBForOneSheet(filteredData[sheetName], excelData[sheetName + "_headers"], sheetName)
+      var wbTem = this.jsonToWBForOneSheet(filteredData[sheetName], excelData[sheetName + SUFFIX_COLKEYS], sheetName)
       var end = window.performance.now()
       console.log("转化一个表需要", (end-start))
       finalWB.SheetNames.push(wbTem.SheetNames[0])

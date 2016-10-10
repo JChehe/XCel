@@ -1,6 +1,5 @@
 <template>
 	<footer class="footer">
-		<button class="emit_btn" @click="emit_background">触发另外进程</button>
 		<ul class="btn_group">
 			<li class="btn search_btn" title="搜索文件"
 				v-show="!isShowInstruction" 
@@ -85,11 +84,6 @@
 			}
 		},	
 		methods: {
-			emit_background() {
-				ipcRenderer.send("background-start", {
-					name: "ljc"
-				})
-			},
 			toggleView(){
 				var curRouteName = this.$route.name
 				if(curRouteName === "instructions") {

@@ -28,11 +28,10 @@ export const delUploadFiles = ({ dispatch }, val) => {
 
 // 过滤Excel数据相关
 export const setExcelData = ({ dispatch }, data) => {
-	ipcRenderer.send("background-start", {
-    type: "readFile",
+	ipcRenderer.send("readFile-start", {
     data: data
   })
-  ipcRenderer.on("background-response", (event, arg) => {
+  ipcRenderer.once("readFile-response", (event, arg) => {
   	dispatch(types.SET_EXCEL_DATA, arg)
   	dispatch(types.SET_ACTIVE_SHEET, 0)
   })
@@ -48,6 +47,7 @@ export const delFilter = ({ dispatch }, val) => {
 }
 export const setFilteredData = ({ dispatch }, val) => {
 	dispatch(types.SET_FILTERED_DATA, val)
+	dispatch(types.EXPORT_FILE, val)
 }
 export const setFilterStatus = ({ dispatch }, val) => {
 	dispatch(types.SET_FILTER_STATUS, val)
