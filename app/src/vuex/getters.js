@@ -13,7 +13,9 @@ export function getAllFileType(state) {
 export function getCurSearchVal(state) {
 	return state.fileList.curSearchVal
 }	
-
+export function getFileStatus(state) {
+	return state.fileList.fileStatus
+}
 
 // 过滤 Excel 数据相关
 export function getFilterOptions(state) {

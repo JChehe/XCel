@@ -72,8 +72,6 @@
 				operatorCol: "", // 最终会转为数组
 				operatorColArr: [],
 				operator: ">",
-				subFilterOperator: "",
-				subFilterVal: "",
 				logicOperator: "and",
 				needConformColIndex: 1,
 				isConformDoubleCols: true,
@@ -206,13 +204,13 @@
 					
 					console.log("根据首尾两元素获得它们之间的所有元素，并且所有元素进行减一处理", tempCols)
 					filterObj = {
+						filterType: 2,
+						groupId: this.groupId,
+						logicOperator: this.logicOperator,
 						col: this.operatorColArr,
 						operator: this.operator,
 						value: opVal,
 						filterWords: filterWords,
-						colOperator: "",
-						logicOperator: this.logicOperator,
-						filterType: 2,
 						needConformColIndex: this.needConformColIndex
 					}
 					console.log(filterObj)

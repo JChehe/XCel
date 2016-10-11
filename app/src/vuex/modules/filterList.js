@@ -146,10 +146,6 @@ const mutations = {
       filteredData: state.filteredData,
       excelData: state.excelData
     })
-    // state.excelData.exportFileByWB({
-    //   filteredData: state.filteredData, 
-    //   excelData: state.excelData 
-    // })
   },
   [types.SET_FILTERED_DATA] (state, data) {
     state.filteredData = data
@@ -169,49 +165,6 @@ const mutations = {
     }else{
       state.isShowFillterPanel = !state.isShowFillterPanel
     }
-  },
-  [types.STRUCTURE_EXP] (state, val) {
-    // return;
-    if(!isChange){
-
-      // excelData.exportFileByWB({
-      //   filteredData: state.filteredData, 
-      //   excelData: state.excelData,
-      //   fileName: "过滤后的Excel.xlsx"
-      // })
-      return
-    }
-    isChange = false
-    
-    // 多进程处理
-    // ipcRenderer.send("background-start", {
-    //   type: "filterHandler",
-    //   filterTagList: state.filterTagList,
-    //   excelData: state.excelData,
-    //   filterWay: state.filterWay,
-    //   [SUFFIX_COLKEYS]: SUFFIX_COLKEYS
-    // })
-    // ipcRenderer.once("background-response", (event, arg) => {
-    //   if(arg.type === "filterHandler") {
-    //     state.filteredData = tempFilteredData
-    //   }
-    // })
-    // console.log("tempFilteredData", tempFilteredData)
-    
-    // console.log(state.excelData.exportFileByWB)
-    // setTimeout(()=>{
-    //   ipcRenderer.send("sync-export-file", {
-    //     state
-    //   })
-    // }, 10)
-    // setTimeout(() => {
-    //   state.excelData.exportFileByWB({
-    //     filteredData: state.filteredData, 
-    //     excelData: state.excelData, 
-    //     fileName: "过滤后的Excel.xlsx"
-    //   })
-    // }, 0)
-    
   }
 }
 

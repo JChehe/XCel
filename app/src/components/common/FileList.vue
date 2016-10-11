@@ -3,6 +3,7 @@
 	  <div class="file_list">
 	  	<ul>
 	  		<li title="双击文件名即可导入"
+		  		:class="{cur_file: file.path === fileList[0].path}"
 	  			v-for="(index, file) in fileList | filterByQuery curSearchVal" 
 	  			@dblclick="confirmRead(file.path ,index)">
 	  			<span>{{ file.extname.replace(/^./, "") }}</span>
@@ -71,7 +72,7 @@
 						      extname: pathModule.extname(path)
 						    })
 							}else{
-								this.confirmDel(arg.fileIndex)
+								this.confirmDel(arg.fileIndex, "当前文件不存在，是否删除该记录？")
 							}
 							this.curLoadingIndex = -1
 						})
@@ -88,10 +89,10 @@
 					path: path
 				})
 			},
-			confirmDel(index) {
+			confirmDel(index, content) {
 				ipcRenderer.send("sync-confirm-dialog", {
 					typeId: "isDel",
-					content: "当前文件不存在，是否删除该记录？",
+					content: content || "是否要删除该文件记录？",
 					fileIndex: index
 				})
 			}
@@ -127,7 +128,7 @@
 				&:not(:first-child) p {
 						color: rgba(0,0,0, .87);
 				}
-				&:first-child {
+				&.cur_file {
 					span {
 						background-color: #4285F4;
 					}

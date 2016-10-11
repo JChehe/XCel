@@ -29,8 +29,8 @@
 	import FilterFormSingleLogic from './FilterFormSingleLogic'
 	import FilterFormMultiCalc from './FilterFormMultiCalc'
 	import FilterFormDoubleColsRange from './FilterFormDoubleColsRange'
-	import { getFilterTagList, getFilterPanelStatus, getCurSheetSize, getFilterWay, getExcelData } from '../../vuex/getters'
-	import { exportFile, structureExp, setFilteredData } from '../../vuex/actions'
+	import { getFilterTagList, getFilterPanelStatus, getCurSheetSize, getFilterWay, getExcelData, getFileStatus } from '../../vuex/getters'
+	import { exportFile, setFilteredData, setFileStatus } from '../../vuex/actions'
 	import { ipcRenderer } from 'electron'
 	export default{
 		components: {
@@ -54,17 +54,24 @@
 				curSheetSize: getCurSheetSize,
 				filterTagList: getFilterTagList,
 				filterWay: getFilterWay,
-				excelData: getExcelData
+				excelData: getExcelData,
+				fileStatus: getFileStatus
 			},
 			actions: {
 				exportFile,
-				structureExp,
-				setFilteredData
+				setFilteredData,
+				setFileStatus
 			}
 		},
 		created(){
 			ipcRenderer.on("filter-response", (event, arg) => {
+				this.setFileStatus(2)
       	this.setFilteredData(arg.result)
+	    })
+
+	    ipcRenderer.on("exportFile-response", (event, arg) => {
+	    	console.log(arg.info)
+	    	this.setFileStatus(-1)
 	    })
 		},
 		methods: {
@@ -77,11 +84,12 @@
 			
 			filterHandler(){
 				var filterTagListLength = this.curSheetSize.tagList.length
-				if(filterTagListLength === undefined || filterTagListLength === 0) {
+				if(this.fileStatus !== -1 || filterTagListLength === undefined || filterTagListLength === 0) {
 					ipcRenderer.send("sync-alert-dialog", {
 						content: "请先添加筛选条件"
 					})
 				}else {
+					this.setFileStatus(1)
 					ipcRenderer.send("filter-start", {
 			      filterTagList: this.filterTagList,
 			      excelData: this.excelData,

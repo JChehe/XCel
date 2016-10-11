@@ -10,8 +10,11 @@ export default{
 	},
 	filterByQuery(fileList, query){
 		if(query.trim().length === 0) return fileList
-
-		var filterRegExp = new RegExp(query, "gi")
+		try {
+			var filterRegExp = new RegExp(query, "gi")
+		}catch(e) {
+			console.log(e)
+		}
 
 		return fileList.filter((file, index) => {
 			if(file.name.match(filterRegExp)) return true

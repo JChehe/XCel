@@ -22,16 +22,19 @@ export const setUploadFiles = ({ dispatch }, val) => {
 	dispatch(types.SET_UPLOAD_FILES, val)
 }
 export const delUploadFiles = ({ dispatch }, val) => {
-	console.log("actions_del", val)
 	dispatch(types.DEL_UPLOAD_FILES, val)
 }
-
+export const setFileStatus = ({ dispatch }, val) => {
+	dispatch(types.SET_UPLOAD_STATUS, val)
+}
 // 过滤Excel数据相关
 export const setExcelData = ({ dispatch }, data) => {
+	dispatch(types.SET_UPLOAD_STATUS, 0)
 	ipcRenderer.send("readFile-start", {
     data: data
   })
   ipcRenderer.once("readFile-response", (event, arg) => {
+  	dispatch(types.SET_UPLOAD_STATUS, -1)
   	dispatch(types.SET_EXCEL_DATA, arg)
   	dispatch(types.SET_ACTIVE_SHEET, 0)
   })
@@ -58,9 +61,7 @@ export const setFilterWay = ({ dispatch }, val) => {
 export const toggleFilterPanelStatus = ({ dispatch },val) => {
 	dispatch(types.TOGGLE_FILTER_PANEL_STATUS, val)
 }
-export const structureExp = ({ dispatch }, val) => {
-	dispatch(types.STRUCTURE_EXP)
-}
+
 // 其他
 export const toggleSideBar = ({ dispatch }, val) => {
 	dispatch(types.TOGGLE_SIDEBAR, val)

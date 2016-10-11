@@ -71,7 +71,6 @@
 				operatorCol: '0',
 				operator: ">",
 				subFilterOperator: "",
-				subFilterVal: "",
 				logicOperator: "and",
 				groupId: -1
 			}

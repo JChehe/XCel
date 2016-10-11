@@ -153,14 +153,13 @@
 
 					filterObj = {
 						filterType: 1,
+						groupId: this.groupId,
 						logicOperator: this.logicOperator,
 						col: curCols,
 						operator: this.operator,
 						value: opVal,
 						filterWords: filterWords,
-						colOperator: this.colOperatorSelect,
-						
-						
+						colOperator: this.colOperatorSelect
 					}
 					console.log("filterObj",filterObj)
 					this.addFilter(filterObj)

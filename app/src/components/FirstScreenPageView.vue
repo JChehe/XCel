@@ -7,6 +7,7 @@
 		<v-footer class="footer"></v-footer>
 		<filter-panel id="filter-panel"></filter-panel>
 		<side-bar class="sibebar"></side-bar>
+		<loading></loading>
 	</div>
 </template>
 
@@ -14,6 +15,7 @@
 	import SideBar from './common/SideBar'
 	import Footer from './common/Footer'
 	import vHeader from './common/Header'
+	import Loading from './common/Loading'
 	import ExcelDisplay from './FirstScreenPageView/ExcelDisplay'
 	import FilterPanel from './FirstScreenPageView/FilterPanel'
 	import { toggleSideBar } from '../vuex/actions'
@@ -25,7 +27,8 @@
 			SideBar,
 			vFooter: Footer,
 			ExcelDisplay,
-			FilterPanel
+			FilterPanel,
+			Loading
 		},
 		name: 'index',
 		data(){

@@ -45,7 +45,8 @@ var filterUtils = {
     var rowCalcResult = this.calcMultiCol({
       row,
       colOperator,
-      filterCol
+      filterCol,
+      colKeys
     })
     console.log({row, colOperator, filterCol})
     console.log(rowCalcResult)
@@ -57,9 +58,8 @@ var filterUtils = {
   },
   // 计算每行是否符合要求
   calcMultiCol(args){
-    var { row, colOperator, filterCol } = args
+    var { row, colOperator, colKeys, filterCol } = args
     var calcResult
-    var colKeys = state.excelData[ state.activeSheet.name + SUFFIX_COLKEYS]
     if(!colOperator.includes('time')){
       calcResult = this.calcNum({row, colOperator, filterCol, colKeys})
       // console.log("calcResult", calcResult)

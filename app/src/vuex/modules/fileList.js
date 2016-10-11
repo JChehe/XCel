@@ -7,7 +7,8 @@ const state = {
   fileList: uploadFiles, // 最近的excel文件列表（sidebar）
   allFileType: ["all", "xls", "xlsx"], 
   curSearchVal: "", // 搜索值
-  isShowSideBar: false
+  isShowSideBar: false,
+  fileStatus: -1
 }
 
 const mutations = {
@@ -43,6 +44,9 @@ const mutations = {
   [types.DEL_UPLOAD_FILES] (state, index) {
     state.fileList.splice(index, 1)
     window.localStorage.setItem("uploadFiles", JSON.stringify(state.fileList))
+  },
+  [types.SET_UPLOAD_STATUS] (state, val) {
+    state.fileStatus = val
   }
 }
 
