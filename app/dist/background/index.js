@@ -5,7 +5,6 @@ const filterUtils = require('./filterUtils')
 const SUFFIX_COLKEYS = "_headers"
 
 var tempExcelData;
-
 window.onload = function () {
   ipcRenderer.on("readFile-start", (event, arg) => {
     var tStart = window.performance.now();

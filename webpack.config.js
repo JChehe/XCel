@@ -1,5 +1,6 @@
 'use strict'
 
+const fs = require('fs')
 const path = require('path')
 const pkg = require('./app/package.json')
 const settings = require('./config.js')
@@ -8,7 +9,7 @@ const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-
+const TransferWebpackPlugin = require('copy-webpack-plugin')
 let config = {
   devtool: '#eval-source-map',
   entry: {
@@ -55,6 +56,9 @@ let config = {
       }
     ]
   },
+  devServer: {
+    outputPath: path.join(__dirname, 'dist')
+  },
   plugins: [
     new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin({
@@ -64,7 +68,7 @@ let config = {
     }),
     new webpack.NoErrorsPlugin(),
     new CopyWebpackPlugin([
-      {from: path.join(__dirname, 'app/src/background'), to: path.join(__dirname, 'app/dist')}
+      {from: path.join(__dirname, 'app/src/background'), to: path.join(__dirname, "app/dist/background")},
     ])
   ],
   output: {
