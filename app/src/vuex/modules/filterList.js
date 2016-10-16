@@ -23,7 +23,7 @@ const state = {
   },
   filterStatus: 0,
   filterWay: filterWay, // 0 是保留, 1 是剔除
-  isShowFillterPanel: true,
+  isShowFillterPanel: false,
   filterOptions: [
     {
   		char: ">",

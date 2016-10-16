@@ -116,7 +116,7 @@
 </style>
 <style lang="scss">
 	/* 由于td是自己后续加的，没有添加vue属性，放在 scoped里面则不会匹配这些样式 */
-	tbody tr:first-child td{
+	.excel_area tbody tr:first-child td{
 		white-space: nowrap;
 	}
 	table {

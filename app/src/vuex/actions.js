@@ -37,6 +37,8 @@ export const setExcelData = ({ dispatch }, data) => {
   	dispatch(types.SET_UPLOAD_STATUS, -1)
   	dispatch(types.SET_EXCEL_DATA, arg)
   	dispatch(types.SET_ACTIVE_SHEET, 0)
+  	dispatch(types.TOGGLE_FILTER_PANEL_STATUS, true)
+  	dispatch(types.TOGGLE_SIDEBAR, true)
   })
 }
 export const setActiveSheet = ({ dispatch }, val) => {

@@ -1,8 +1,10 @@
 <template>
-	<div class="loading" :class="{show : fileStatus !== -1}">
-		<div class="loading_inner">
-			<p><i class="fa fa-spinner" aria-hidden="true"></i></p>
-			<p>{{ loadingText[fileStatus] }}</p>
+	<div class="loading_mask" :class="{show : fileStatus !== -1}">
+		<div class="loading">
+			<div class="loading_inner">
+				<p><i class="fa fa-spinner" aria-hidden="true"></i></p>
+				<p>{{ loadingText[fileStatus] }}</p>
+			</div>
 		</div>
 	</div>
 </template>
@@ -28,33 +30,42 @@
 </script>
 
 <style lang="scss" scoped>
-	.loading {
+	.loading_mask {
+		background-color: transparent;
 		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		display:none;
-		&_inner {
-			text-align: center;
-			background-color: rgba(0, 0, 0, .8);
-			color: #fff;
-			border-radius: 10px;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			width: 110px;
-			height: 110px;
-			padding: 5px;
-		}
+		top: 32px;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 999;
+		display: none;
 		&.show {
 			display: block
 		}
-		p:first-child {
-			margin-bottom: 8px;
-			.fa{
-				font-size: 26px;
+		.loading {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			&_inner {
+				text-align: center;
+				background-color: rgba(0, 0, 0, .8);
 				color: #fff;
-				animation: rotate 1s infinite;
+				border-radius: 10px;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				width: 110px;
+				height: 110px;
+				padding: 5px;
+			}
+			p:first-child {
+				margin-bottom: 8px;
+				.fa{
+					font-size: 26px;
+					color: #fff;
+					animation: rotate 1s infinite;
+				}
 			}
 		}
 	}

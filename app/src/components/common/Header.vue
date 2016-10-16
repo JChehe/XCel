@@ -1,10 +1,10 @@
 <template>
 	<header>
 		<nav>
-			<div class="toggle_sidebar_btn" title="打开/关闭侧边栏" @click="toggleSideBar">
-		    <i class="fa fa-bars"></i>
+			<div class="toggle_sidebar_btn" :title="isShowInstruction ? '返回' : '打开/关闭侧边栏'" @click="clickHandler">
+		    <i class="fa" :class="isShowInstruction ? 'fa-chevron-left' : 'fa-bars'"></i>
 			</div>
-			<div class="filter_way_container">
+			<div class="filter_way_container" v-show="!isShowInstruction">
 				筛选方式：
 				<label title="符合条件则保留">
 					<input type="radio" name="filter_way" value="0" v-model="vuexFilterWay">保留
@@ -37,7 +37,8 @@
 		},
 		data() {
 			return {
-				isShowNav: false
+				isShowNav: false,
+				isShowInstruction: this.$route.name === "instructions"
 			}
 		},
 		computed: {
@@ -51,9 +52,12 @@
 			}
 		},
 		methods: {
-			toggleNav() {
-				console.log(this.isShowNav)
-				this.isShowNav = !this.isShowNav
+			clickHandler() {
+				if(this.isShowInstruction) {
+					this.$route.router.go("index")
+				}else {
+					this.toggleSideBar()
+				}
 			}
 		}
 	}
@@ -69,14 +73,18 @@
 			align-items: center;
 			justify-content: space-between;
 		}
-		.fa-bars{
+		.fa{
 			font-size: 18px;
 			color: rgba(0, 0, 0, .54);
+			transition: color .3s;
 		}
 		.toggle_sidebar_btn{
 			padding: 0 24px;
 			cursor: pointer;
 			line-height: 64px;
+			&:hover .fa{
+				color: #262626;
+			}
 		}
 		.filter_way_container{
 			font-size: 14px;
