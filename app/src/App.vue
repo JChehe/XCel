@@ -8,6 +8,7 @@
 <script>
   import windowTop from './components/common/WindowTop'
   import store from './vuex/store'
+
   export default {
     store,
     components: {

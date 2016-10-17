@@ -21,6 +21,7 @@
 	import { toggleSideBar, setFilterWay } from '../../vuex/actions'
 	import { getFilterWay } from '../../vuex/getters'
 	import WindowTop from './WindowTop'
+	import os from 'os'
 
 	export default {
 		components :{
@@ -38,7 +39,8 @@
 		data() {
 			return {
 				isShowNav: false,
-				isShowInstruction: this.$route.name === "instructions"
+				isShowInstruction: this.$route.name === "instructions",
+				osStr: os.platform()
 			}
 		},
 		computed: {
@@ -49,7 +51,7 @@
 				set(val) {
 					this.setFilterWay(val)
 				}
-			}
+			},
 		},
 		methods: {
 			clickHandler() {
@@ -92,10 +94,14 @@
 			label:not(:last-child){
 				margin-right: 5px;
 			}
+
 			input[name="filter_way"] {
 				display: inline-block;
 				margin-right: 4px;
-				vertical-align: 1px;
+				vertical-align: middle;
+				.darwin & {
+					vertical-align: 1px;
+				}
 			}
 		}
 	}

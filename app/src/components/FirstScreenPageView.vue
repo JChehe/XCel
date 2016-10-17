@@ -1,5 +1,5 @@
 <template>
-	<div class="first_screen">
+	<div class="first_screen" :class="osStr">
 		<v-header class="header"></v-header>
 		<main :class="{isShowSideBar: sideBarStatus}">
 			<excel-display></excel-display>
@@ -20,7 +20,8 @@
 	import FilterPanel from './FirstScreenPageView/FilterPanel'
 	import { toggleSideBar } from '../vuex/actions'
 	import { getSideBarStatus } from '../vuex/getters'
-	
+	import os from 'os'
+
 	export default {
 		components: {
 			vHeader,
@@ -33,6 +34,7 @@
 		name: 'index',
 		data(){
 			return {
+				osStr: os.platform()
 			}
 		},
 		vuex: {

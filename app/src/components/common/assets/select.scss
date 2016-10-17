@@ -17,6 +17,9 @@
     display: block;
     text-align: center;
     font-size: 0px;
+    option {
+      font-size: 12px;
+    }
   }
   &:after {
     content: "\20";

@@ -231,14 +231,48 @@ Excel.prototype = {
     console.log("构建头部需要时间：", headerEnd - headerStart)
 
     var bodyStart = window.performance.now()
-    var data = json
+    /*var data = json
       .map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: getCharCol(j+1) + (i + 2) })))
       .reduce((prev, next) => prev.concat(next))
       .reduce((prev, next) => Object.assign({}, prev, {
         [next.position]: { v: next.v }
-      }), {});
+      }), {});*/
+    var data = {};
+    var p1S = window.performance.now()
+    var result1 = json.map(function(v,i) {
+      return _headers.map(function(k,j){
+        return Object.assign({}, {v: v[k], position: getCharCol(j+1) + (i + 2)})
+      })
+    })
+    var p1E = window.performance.now()
+    console.log("第一步需要时间：", (p1E - p1S))
+
+    var p2S = window.performance.now()
+    var result2 = result1.reduce(function(prev, next) {
+      return prev.concat(next)
+    })
+    var p2E = window.performance.now()
+    console.log("第二步需要时间：", (p2E - p2S))
+
+    var p3S = window.performance.now()
+    result2.forEach(function(v,i) {
+      console.log("v.position：", v.position, "  v.v：", v.v)
+      data[v.position] = {v: v.v}
+    })
+
+    // 导致导出很慢的原因
+    // data = result2.reduce(function(prev, next) {
+    //   console.log("prev", prev)
+    //   console.log("[next.position]: {v: next.v}", ({[next.position]: {v: next.v}}))
+    //   return Object.assign({}, prev, {
+    //     [next.position]: {v: next.v}
+    //   })
+    // })
+    var p3E = window.performance.now()
+    console.log("第三步需要时间：", (p3E - p3S))
+
     var bodyEnd = window.performance.now()
-    console.log("构建数据部分需要时间：", bodyEnd - bodyStart)
+    console.log("构建数据部分总共需要时间：", bodyEnd - bodyStart)
 
     var output = Object.assign({}, headers, data)
     var outputPos = Object.keys(output)

@@ -9,7 +9,7 @@ const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
-// const Menu = electron.Menu
+const Menu = electron.Menu
 let mainWindow
 let backgroundWindow
 let config = {}
@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === 'development') {
   config.url = `file://${__dirname}/dist/index.html`
 }
 
-/*
+
 let template = [{
   label: 'View',
   submenu: [{
@@ -72,16 +72,17 @@ let template = [{
       }
     }
   }]
-}]*/
+}]
 
 
-  function createMainWindow () {
+function createMainWindow () {
   /**
    * Initial window options
    */
   var win = new BrowserWindow({
     height: 850,
     width: 1280,
+    backgroundColor: "#f5f5f5",
     frame: false
   })
   windowBounds = win.getBounds()
@@ -97,11 +98,16 @@ let template = [{
   }
 
   win.on('closed', () => {
+    console.log("触发 closed")
     mainWindow = null
     backgroundWindow = null
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
   })
 
   console.log('mainWindow opened')
+  console.log("主进程")
   return win
 }
 
@@ -111,6 +117,7 @@ function createBackgroundWindow () {
   })
   win.loadURL(`file://${__dirname}/dist/background/index.html`);
   console.log("backgroundWindow opened")
+  console.log("渲染进程")
 
   return win
 }
@@ -118,11 +125,12 @@ function createBackgroundWindow () {
 app.on('ready', () => {
   mainWindow = createMainWindow()
   backgroundWindow = createBackgroundWindow()
-  // const menu = Menu.buildFromTemplate(template)
-  // Menu.setApplicationMenu(menu)
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 })
 
 app.on('window-all-closed', () => {
+  console.log("window-all-closed??")
   if (process.platform !== 'darwin') {
     app.quit()
   }
@@ -131,6 +139,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     mainWindow = createMainWindow()
+    backgroundWindow = createBackgroundWindow()
   }
 })
 

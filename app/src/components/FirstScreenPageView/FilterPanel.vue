@@ -163,7 +163,11 @@
 	  color: #000;
 	  font-size: 12px;
 	  height: 54px;
-	  
+		color: #2B3244;
+
+	  .val_mask {
+	  	color: #2B3244;
+	  }
 	  &:first-child{
 	    width: 130px;
 	    text-align: center;
@@ -179,6 +183,9 @@
 	    input {
 	    	width: 107px;
 	      line-height: 24px;
+	      &::-webkit-input-placeholder{
+					color: #9B9B9B;
+				}
 	    }
 	  }
 	  &:nth-child(4) {

@@ -90,6 +90,7 @@
 			line-height: 1;
 			cursor: pointer;
 			padding: 5px;
+			-webkit-app-region: no-drag;
 		}
 	}
 

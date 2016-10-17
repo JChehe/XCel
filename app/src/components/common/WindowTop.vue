@@ -62,9 +62,10 @@
 		&:active {
 			background-color: #000;
 		}
-		ul {
+		>ul {
 			display: flex;
 			color: #fff;
+			-webkit-app-region: no-drag;
 			li {
 				width: 32px;
 				line-height: 32px;
