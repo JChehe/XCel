@@ -1,7 +1,7 @@
 {
-  "name": "excelf_my",
-  "version": "0.0.0",
-  "description": "An electron-vue project",
+  "name": "xcel",
+  "version": "1.0.0",
+  "description": "An ultimate excel data filter",
   "main": "electron.js",
   "dependencies": {
     "font-awesome": "^4.6.3",
