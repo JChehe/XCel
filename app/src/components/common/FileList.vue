@@ -19,7 +19,6 @@
 <script>
 	import xlsx from 'xlsx'
 	import fs from 'fs'
-	import pathModule from 'path'
 	import { ipcRenderer } from 'electron'
 	import { changeFileType, setExcelData, setActiveSheet, setUploadFiles, delUploadFiles } from '../../vuex/actions'
 	import { getCurSearchVal, getAllFileType, getUploadFiles } from '../../vuex/getters'
@@ -60,17 +59,14 @@
 						this.$nextTick(() => {
 							this.curLoadingIndex = arg.fileIndex
 						})
+
 						fs.stat(path, (err, stats) => {
 							if(stats && stats.isFile()) {
-								var workbook = xlsx.readFile(path)
-								this.setExcelData(workbook)
-								// this.setActiveSheet(0)
-								console.log("第五阶段")
-								this.setUploadFiles({
-						      path: path,
-						      name: pathModule.basename(path),
-						      extname: pathModule.extname(path)
-						    })
+								this.setExcelData({
+									path: path,
+									type: "node"
+								})
+								this.setUploadFiles(path)
 							}else{
 								this.confirmDel(arg.fileIndex, "当前文件不存在，是否删除该记录？")
 							}

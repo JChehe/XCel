@@ -55,17 +55,11 @@
 		components: {
 			SheetOfExcel
 		},
-		data(){
-			return {
-				isLoading: false
-			}
-		},
 		vuex: {
 			getters: {
 				excelData: getExcelData,
 				activeSheet: getActiveSheet,
-				filteredData: getFilteredData,
-				sideBarStatus: getSideBarStatus
+				filteredData: getFilteredData
 			},
 			actions: {
 				setActiveSheet,
@@ -100,9 +94,6 @@
 			dropHandler(e){
 				var files = e.dataTransfer.files
 				var i, f
-				this.$nextTick(()=>{
-					this.isLoading = true
-				})
 				try{
 					for(var i = 0, f = files[i]; i != files.length; i++){
 						var curFile = files[i]
@@ -111,25 +102,16 @@
 						var name = f.name
 						reader.onload = (e) => {
 							var data = e.target.result
-							
-							this.setExcelData(data)
-							// this.setActiveSheet(0)
-
-							this.isLoading = false
-							this.setUploadFiles({
-					      path: curFile.path,
-					      name: curFile.name,
-					      extname: pathModule.extname(curFile.path)
-					    })
+							this.setExcelData({
+								data: data,
+								type: "drop"
+							})
+							this.setUploadFiles(curFile.path)
 						}
 						reader.readAsBinaryString(f)
-						// e.target.classList.remove("active")
-
 					}
 				}catch(e){
 					console.log(e)
-					// e.target.classList.remove("active")
-					this.isLoading = false
 				}
 			}			
 		}

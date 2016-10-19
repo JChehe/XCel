@@ -34,8 +34,10 @@ module.exports = function(mainWindow, backgroundWindow) {
 			filters: [{name: 'Excel File', extensions: ['xls', "xlsx"]}],
 			properties: ["openFile"]
 		}, function(arr) {
-			// arr 是一个文件路径 数组
-			ipcMain.send("open-file-response", arr[0]);
+	    if(arr !== undefined) {
+				// arr 是一个文件路径 数组
+				event.sender.send("open-file-response", arr[0]);
+			}
 		})
 	})
 

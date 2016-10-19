@@ -10,19 +10,16 @@ const BrowserWindow = electron.BrowserWindow
 const Menu = electron.Menu
 let mainWindow
 let backgroundWindow
-let config = {}
 var windowBounds = {}
-
+let config = {}
 if (process.env.NODE_ENV === 'development') {
   config = require('../config')
   config.mainUrl = `http://localhost:${config.port}`
-  config.backUrl = `http://localhost:${config.port}/background/index.html`
 } else {
   config.devtron = false
   config.mainUrl = `file://${__dirname}/dist/index.html`
-  config.backUrl = `file://${__dirname}/dist/background/index.html`
 }
-
+config.backUrl = `file://${__dirname}/dist/background/index.html`
 
 function createMainWindow () {
   /**
@@ -51,6 +48,11 @@ function createMainWindow () {
     console.log("触发 closed")
     mainWindow = null
     backgroundWindow = null
+    // mainWindow = null
+    // if(!backgroundWindow.isDestroyed()) {
+    //   backgroundWindow.close()
+    // }
+    // backgroundWindow = null
     if (process.platform !== 'darwin') {
       app.quit()
     }
@@ -62,10 +64,9 @@ function createMainWindow () {
 
 function createBackgroundWindow () {
   var win = new BrowserWindow({
-    show: false
+    // show: false
   })
-
-  win.loadURL(`file://${__dirname}/dist/background/index.html`);
+  win.loadURL(config.backUrl)
   console.log("backgroundWindow opened")
   return win
 }
@@ -77,15 +78,6 @@ app.on('ready', () => {
   ipcMainSets(mainWindow, backgroundWindow)
   const menu = Menu.buildFromTemplate(menuTemplate)
   Menu.setApplicationMenu(menu)
-
-  mainWindow.on('reload', () => {
-    console.log("reload")
-    console.log("mainWindow", mainWindow)
-    console.log("backgroundWindow",  backgroundWindow)
-    mainWindow = createMainWindow()
-    backgroundWindow = createBackgroundWindow()
-    ipcMainSets(mainWindow, backgroundWindow)
-  })
 })
 
 
@@ -97,8 +89,11 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  if (mainWindow === null) {
+  // if (mainWindow.isDestroyed()) {
+  if(mainWindow === null) {
     mainWindow = createMainWindow()
     backgroundWindow = createBackgroundWindow()
   }
+    // ipcMainSets(mainWindow, backgroundWindow)
+  // }
 })

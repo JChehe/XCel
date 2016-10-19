@@ -57,7 +57,7 @@
 <script>
 	import { colOperator, getNumCol, getCharCol, getOperatorWords, getColOperatorWords, getColArithmeticOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from "../../utils/ExcelSet"
 	import { getFilterOptions, getCurSheetSize } from '../../vuex/getters'
-	import { addFilter, setFilterStatus } from '../../vuex/actions'
+	import { addFilter } from '../../vuex/actions'
 	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
 
@@ -82,8 +82,7 @@
 				curSheetSize: getCurSheetSize
 			},
 			actions: {
-				addFilter,
-				setFilterStatus
+				addFilter
 			}
 		},
 		watch: {
@@ -124,49 +123,42 @@
 				if(!this.validateForm({curCols, opVal, colOperatorSelect})) {
 					return
 				}
-			
-				
-				this.$nextTick(() => {
-					this.setFilterStatus(1)
+
+				var colText = ""; 
+				curCols.forEach((col, index) => {
+					colText += `, ${getCharCol(col)}`
+				})
+				// colText去掉逗号+空格）字符
+				var preStr = `第${colText.slice(2)}列的值${colOperatorWords}`
+
+				filterWords = preStr + this.getFilterWordsPrimitive({
+					operator,
+					colOperatorWords,
+					operatorWords,
+					val: opVal,
+					colOperatorSelect
 				})
 
-				setTimeout( () => {
-					var colText = ""; 
-					curCols.forEach((col, index) => {
-						colText += `, ${getCharCol(col)}`
-					})
-					// colText去掉逗号+空格）字符
-					var preStr = `第${colText.slice(2)}列的值${colOperatorWords}`
+				// 减一处理，以符合计算机的逻辑
+				curCols.forEach((item, index) => {
+					return curCols[index] = item - 1
+				})
 
-					filterWords = preStr + this.getFilterWordsPrimitive({
-						operator,
-						colOperatorWords,
-						operatorWords,
-						val: opVal,
-						colOperatorSelect
-					})
+				filterObj = {
+					filterType: 1,
+					groupId: this.groupId,
+					logicOperator: this.logicOperator,
+					col: curCols,
+					operator: this.operator,
+					value: opVal,
+					filterWords: filterWords,
+					colOperator: this.colOperatorSelect
+				}
+				console.log("filterObj",filterObj)
+				this.addFilter(filterObj)
 
-					// 减一处理，以符合计算机的逻辑
-					curCols.forEach((item, index) => {
-						return curCols[index] = item - 1
-					})
-
-					filterObj = {
-						filterType: 1,
-						groupId: this.groupId,
-						logicOperator: this.logicOperator,
-						col: curCols,
-						operator: this.operator,
-						value: opVal,
-						filterWords: filterWords,
-						colOperator: this.colOperatorSelect
-					}
-					console.log("filterObj",filterObj)
-					this.addFilter(filterObj)
-
-					this.operatorCol = ""
-					this.operatorVal = ""
-				}, 0)
+				this.operatorCol = ""
+				this.operatorVal = ""
 			},
 			validateForm(args){
 				var {curCols, opVal, colOperatorSelect} = args
@@ -186,7 +178,6 @@
 				}
 				
 				if(!isValidated) {
-					this.setFilterStatus(0)
 					ipcRenderer.send("sync-alert-dialog", {
 						content: tipWords
 					})

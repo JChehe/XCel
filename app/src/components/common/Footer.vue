@@ -7,9 +7,9 @@
 				<i class="fa fa-search"></i>
 			</li>
 			<li class="btn upload_btn" title="上传文件"
-				 v-show="!isShowInstruction">
+				 v-show="!isShowInstruction"
+				 @click="handleFile">
 				<i class="fa fa-upload"></i>
-				<input type="file" name="upload-excel-input" @change="handleFile">
 			</li>
 			<li class="btn filter_btn" title="添加筛选条件" 
 				v-show="!isShowInstruction"
@@ -35,6 +35,7 @@
 <script>
 	import pathModule from "path"
 	import {ipcRenderer} from "electron"
+	import xlsx from "xlsx"
 	import { 
 		getSideBarStatus,
 		getFilterPanelStatus,
@@ -46,7 +47,7 @@
 		toggleSideBar,
 		toggleFilterPanelStatus,
 		setExcelData,
-		setActiveSheet,setUploadFiles
+		setUploadFiles
 	} from '../../vuex/actions'
 
 	export default {
@@ -65,7 +66,6 @@
 				toggleSideBar,
 				toggleFilterPanelStatus,
 				setExcelData, 
-				setActiveSheet, 
 				setUploadFiles
 			}
 		},
@@ -82,7 +82,16 @@
 			filterTagListLength(){
 				return this.curSheetSize && this.curSheetSize.tagList && this.curSheetSize.tagList.length
 			}
-		},	
+		},
+		created() {
+			ipcRenderer.on("open-file-response", (event, path) => {
+				this.setExcelData({
+					path: path,
+					type: "node"
+				})
+				this.setUploadFiles(path)
+			})
+		},
 		methods: {
 			toggleView(){
 				var curRouteName = this.$route.name
@@ -102,36 +111,7 @@
 				}, 0)
 			},
 			handleFile(e) {
-				var files = e.target.files
-				var i,f
-				this.$nextTick(()=>{
-					this.isLoading = true
-				})
-				try{
-					for(var i = 0, f = files[i]; i != files.length; i++){
-						var curFile = files[i]
-						
-						var reader = new FileReader()
-						var name = f.name
-						reader.onload = (e) => {
-							var data = e.target.result
-							this.setExcelData(data)
-							// this.setActiveSheet(0)
-
-							this.isLoading = false
-							this.setUploadFiles({
-					      path: curFile.path,
-					      name: curFile.name,
-					      extname: pathModule.extname(curFile.path)
-					    })
-							console.log("第四阶段")
-						}
-						reader.readAsBinaryString(f)
-					}
-				}catch(e){
-					console.log(e)
-					this.isLoading = false
-				}
+				ipcRenderer.send("sync-openFile-dialog")
 			}
 		}
 	}
@@ -145,7 +125,6 @@
 		left: 0;
 		right: 0;
 		height: 24px;
-		/*visibility: hidden;*/
 		opacity: 0;
 	}
 
@@ -183,6 +162,7 @@
 				text-align: center;
 				line-height: 24px;
 				position: relative;
+				cursor: pointer;
 				&:not(:last-child) {
 					margin-right: 2.5%;
 				}
