@@ -103,6 +103,7 @@ function filterHandler(arg){
         var rowResult = eval(rowExpStr)
         console.log("eval(rowExpStr)", rowResult)
         // return rowResult
+        console.log("filterWay", filterWay)
         return filterWay == 0 ? rowResult : !rowResult
       })
       console.log(i + "tempFilteredData[curSheetName]", tempFilteredData[curSheetName])
@@ -187,7 +188,7 @@ Excel.prototype = {
         this[curSheetName + '_headers'].push(curColKey)
       }
     })
-    console.log("this", this)
+    // console.log("this", this)
     console.log("第三个阶段结束，表头初始化")
 
   },
@@ -208,7 +209,7 @@ Excel.prototype = {
         [sheetName]: wbTem["Sheets"][sheetName]
       })
     })
-    console.log(finalWB)
+    // console.log(finalWB)
     ipcRenderer.send("sync-saveFile-dialog", {
       filename: "过滤后的文件.xlsx",
       data: finalWB
@@ -256,7 +257,7 @@ Excel.prototype = {
 
     var p3S = window.performance.now()
     result2.forEach(function(v,i) {
-      console.log("v.position：", v.position, "  v.v：", v.v)
+      // console.log("v.position：", v.position, "  v.v：", v.v)
       data[v.position] = {v: v.v}
     })
 
@@ -264,9 +265,9 @@ Excel.prototype = {
     // data = result2.reduce(function(prev, next) {
     //   console.log("prev", prev)
     //   console.log("[next.position]: {v: next.v}", ({[next.position]: {v: next.v}}))
-    //   return Object.assign({}, prev, {
-    //     [next.position]: {v: next.v}
-    //   })
+      // return Object.assign({}, prev, {
+      //   [next.position]: {v: next.v}
+      // })
     // })
     var p3E = window.performance.now()
     console.log("第三步需要时间：", (p3E - p3S))

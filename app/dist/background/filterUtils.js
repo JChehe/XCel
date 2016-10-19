@@ -1,4 +1,3 @@
-
 var filterUtils = {
   mathOperaArr: [">", "<", ">=", "<="],
   conditionArr: ["=", "!=", "contain", "notContain", "startsWith", "endsWith", "regexp"],
