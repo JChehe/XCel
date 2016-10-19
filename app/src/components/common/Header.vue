@@ -97,6 +97,9 @@
 		.filter_way_container{
 			font-size: 14px;
 			margin-right: 20px;
+			label {
+				cursor: pointer;
+			}
 			label:not(:last-child){
 				margin-right: 5px;
 			}

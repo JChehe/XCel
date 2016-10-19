@@ -94,7 +94,6 @@ module.exports = function(mainWindow, backgroundWindow) {
 	// 接受窗口的最小化、最大化、关闭 事件
 	ipcMain.on("sync-close", (event, arg) => {
 	  mainWindow.close()
-	  console.log("关闭")
 	})
 	ipcMain.on("sync-maximize", (event, arg) => {
 	  if(mainWindow.isMaximized()){

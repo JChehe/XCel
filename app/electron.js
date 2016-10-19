@@ -22,9 +22,6 @@ if (process.env.NODE_ENV === 'development') {
 config.backUrl = `file://${__dirname}/dist/background/index.html`
 
 function createMainWindow () {
-  /**
-   * Initial window options
-   */
   var win = new BrowserWindow({
     height: 850,
     width: 1280,

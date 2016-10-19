@@ -27,12 +27,14 @@
 			<p class="summary_info" v-show="hasFile">
 				筛选后数据为 <em>{{filteredRows}}</em> 行，原始记录为 <em>{{ oriRows }}</em> 行，共 <em>{{ filterTagListLength }}</em> 个{{ filterWay == 0 ? "保留" : "剔除"}}</span>条件
 			</p>
-			<img src="./assets/O2-icon.png" alt="O2_logo">
+			<img src="./assets/O2-icon.png" alt="O2_logo" @click="openAOTU">
 		</div>
 	</footer>
 </template>
 
 <script>
+	// const {shell} = require("electron")
+	import {shell} from "electron"
 	import pathModule from "path"
 	import {ipcRenderer} from "electron"
 	import xlsx from "xlsx"
@@ -42,7 +44,6 @@
 		getFilterWay,
 		getCurSheetSize 
 	} from '../../vuex/getters'
-
 	import { 
 		toggleSideBar,
 		toggleFilterPanelStatus,
@@ -93,6 +94,9 @@
 			})
 		},
 		methods: {
+			openAOTU() {
+				shell.openExternal("https://aotu.io/")
+			},
 			toggleView(){
 				var curRouteName = this.$route.name
 				if(curRouteName === "instructions") {
@@ -179,6 +183,8 @@
 			white-space: nowrap;
 			&+img{
 				width: 24px;
+				height: 24px;
+				cursor: pointer;
 				vertical-align: middle;
 				border-radius: 50%;
 				margin-left: 5px;
