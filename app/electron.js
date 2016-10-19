@@ -10,24 +10,18 @@ const BrowserWindow = electron.BrowserWindow
 const Menu = electron.Menu
 let mainWindow
 let backgroundWindow
-let config = {}
 var windowBounds = {}
-
+let config = {}
 if (process.env.NODE_ENV === 'development') {
   config = require('../config')
   config.mainUrl = `http://localhost:${config.port}`
-  config.backUrl = `http://localhost:${config.port}/background/index.html`
 } else {
   config.devtron = false
   config.mainUrl = `file://${__dirname}/dist/index.html`
-  config.backUrl = `file://${__dirname}/dist/background/index.html`
 }
-
+config.backUrl = `file://${__dirname}/dist/background/index.html`
 
 function createMainWindow () {
-  /**
-   * Initial window options
-   */
   var win = new BrowserWindow({
     height: 850,
     width: 1280,
@@ -51,9 +45,8 @@ function createMainWindow () {
     console.log("触发 closed")
     mainWindow = null
     backgroundWindow = null
-    if (process.platform !== 'darwin') {
-      app.quit()
-    }
+    // 在Mac中完全退出程序，而不会留在dock中
+    app.quit()
   })
 
   console.log('mainWindow opened')
@@ -64,8 +57,7 @@ function createBackgroundWindow () {
   var win = new BrowserWindow({
     show: false
   })
-
-  win.loadURL(`file://${__dirname}/dist/background/index.html`);
+  win.loadURL(config.backUrl)
   console.log("backgroundWindow opened")
   return win
 }
@@ -77,15 +69,6 @@ app.on('ready', () => {
   ipcMainSets(mainWindow, backgroundWindow)
   const menu = Menu.buildFromTemplate(menuTemplate)
   Menu.setApplicationMenu(menu)
-
-  mainWindow.on('reload', () => {
-    console.log("reload")
-    console.log("mainWindow", mainWindow)
-    console.log("backgroundWindow",  backgroundWindow)
-    mainWindow = createMainWindow()
-    backgroundWindow = createBackgroundWindow()
-    ipcMainSets(mainWindow, backgroundWindow)
-  })
 })
 
 
@@ -96,8 +79,10 @@ app.on('window-all-closed', () => {
   }
 })
 
+// 当应用被激活时触发，常用于点击应用的 dock 图标的时候。
+// 现在取消保留在Dock中，完全退出
 app.on('activate', () => {
-  if (mainWindow === null) {
+  if (mainWindow.isDestroyed()) {
     mainWindow = createMainWindow()
     backgroundWindow = createBackgroundWindow()
   }

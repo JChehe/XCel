@@ -34,8 +34,10 @@ module.exports = function(mainWindow, backgroundWindow) {
 			filters: [{name: 'Excel File', extensions: ['xls', "xlsx"]}],
 			properties: ["openFile"]
 		}, function(arr) {
-			// arr 是一个文件路径 数组
-			ipcMain.send("open-file-response", arr[0]);
+	    if(arr !== undefined) {
+				// arr 是一个文件路径 数组
+				event.sender.send("open-file-response", arr[0]);
+			}
 		})
 	})
 
@@ -92,7 +94,6 @@ module.exports = function(mainWindow, backgroundWindow) {
 	// 接受窗口的最小化、最大化、关闭 事件
 	ipcMain.on("sync-close", (event, arg) => {
 	  mainWindow.close()
-	  console.log("关闭")
 	})
 	ipcMain.on("sync-maximize", (event, arg) => {
 	  if(mainWindow.isMaximized()){

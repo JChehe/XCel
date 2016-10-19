@@ -21,7 +21,6 @@ const state = {
   	index: 0,
   	name: ""
   },
-  filterStatus: 0,
   filterWay: filterWay, // 0 是保留, 1 是剔除
   isShowFillterPanel: false,
   filterOptions: [
@@ -63,7 +62,6 @@ const state = {
 }
 
 var isChange = false
-// 疑问：修改filterTagList 却不会触发DOM更新。而依赖于 activeSheet
 const mutations = {
   [types.SET_EXCEL_DATA] (state, arg) {
     state.excelData = arg.result
@@ -130,7 +128,6 @@ const mutations = {
   	}else{
       var tempCurSheetData = Object.assign([], state.excelData[curSheetName])
   		state.filteredData[curSheetName] = tempCurSheetData
-      state.filterStatus = 0
   	}
   },
   
@@ -149,9 +146,6 @@ const mutations = {
   },
   [types.SET_FILTERED_DATA] (state, data) {
     state.filteredData = data
-  },
-  [types.SET_FILTER_STATUS] (state, val) {
-    state.filterStatus = val
   },
 
   [types.SET_FILTER_WAY] (state, val) {

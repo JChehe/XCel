@@ -1,8 +1,3 @@
-// 脚手架自带的 getter
-export function mainCounter (state) {
-  return state.counters.main
-}
-
 // 文件列表相关
 export function getUploadFiles(state) {
 	return state.fileList.fileList
@@ -37,9 +32,7 @@ export function getColKeys(state) {
 	var curSheet = state.filterList.activeSheet
 	return state.filterList.excelData[curSheet.name + '_headers']
 }
-export function getFilterStatus(state) {
-	return state.filterList.filterStatus
-}
+
 export function getFilterWay(state) {
 	return state.filterList.filterWay
 }

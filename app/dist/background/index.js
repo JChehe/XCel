@@ -121,13 +121,16 @@ function Excel() {
 Excel.prototype = {
   constructor: Excel,
 
-  init(data) {
+  init(arg) {
     var isParseSuccess = true
     try{
-      if(typeof data === 'string'){
-        this.readByData(data)
-      }else if(typeof data === 'object'){
-        this.workbook = data
+      var type = arg.type
+      if(!!type) {
+        if(type === "node") {
+          this.readByPath(arg.path)
+        }else if(type === "data") {
+          this.readByData(data)
+        }
       }
     }catch(e){
       isParseSuccess = false
@@ -154,7 +157,7 @@ Excel.prototype = {
     // 用于前端上传文件，如：上传按钮和拖拽上传
     this.workbook = xlsx.read(data, { type: 'binary' })
   },
-  readByFileName(filename){
+  readByPath(filename){
     // 用于 Node 直接通过路径读取文件
     this.workbook = xlsx.readFile(filename)
   },

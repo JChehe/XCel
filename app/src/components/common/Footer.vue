@@ -7,9 +7,9 @@
 				<i class="fa fa-search"></i>
 			</li>
 			<li class="btn upload_btn" title="上传文件"
-				 v-show="!isShowInstruction">
+				 v-show="!isShowInstruction"
+				 @click="handleFile">
 				<i class="fa fa-upload"></i>
-				<input type="file" name="upload-excel-input" @change="handleFile">
 			</li>
 			<li class="btn filter_btn" title="添加筛选条件" 
 				v-show="!isShowInstruction"
@@ -27,26 +27,28 @@
 			<p class="summary_info" v-show="hasFile">
 				筛选后数据为 <em>{{filteredRows}}</em> 行，原始记录为 <em>{{ oriRows }}</em> 行，共 <em>{{ filterTagListLength }}</em> 个{{ filterWay == 0 ? "保留" : "剔除"}}</span>条件
 			</p>
-			<img src="./assets/O2-icon.png" alt="O2_logo">
+			<img src="./assets/O2-icon.png" alt="O2_logo" @click="openAOTU">
 		</div>
 	</footer>
 </template>
 
 <script>
+	// const {shell} = require("electron")
+	import {shell} from "electron"
 	import pathModule from "path"
 	import {ipcRenderer} from "electron"
+	import xlsx from "xlsx"
 	import { 
 		getSideBarStatus,
 		getFilterPanelStatus,
 		getFilterWay,
 		getCurSheetSize 
 	} from '../../vuex/getters'
-
 	import { 
 		toggleSideBar,
 		toggleFilterPanelStatus,
 		setExcelData,
-		setActiveSheet,setUploadFiles
+		setUploadFiles
 	} from '../../vuex/actions'
 
 	export default {
@@ -65,7 +67,6 @@
 				toggleSideBar,
 				toggleFilterPanelStatus,
 				setExcelData, 
-				setActiveSheet, 
 				setUploadFiles
 			}
 		},
@@ -82,8 +83,20 @@
 			filterTagListLength(){
 				return this.curSheetSize && this.curSheetSize.tagList && this.curSheetSize.tagList.length
 			}
-		},	
+		},
+		created() {
+			ipcRenderer.on("open-file-response", (event, path) => {
+				this.setExcelData({
+					path: path,
+					type: "node"
+				})
+				this.setUploadFiles(path)
+			})
+		},
 		methods: {
+			openAOTU() {
+				shell.openExternal("https://aotu.io/")
+			},
 			toggleView(){
 				var curRouteName = this.$route.name
 				if(curRouteName === "instructions") {
@@ -102,36 +115,7 @@
 				}, 0)
 			},
 			handleFile(e) {
-				var files = e.target.files
-				var i,f
-				this.$nextTick(()=>{
-					this.isLoading = true
-				})
-				try{
-					for(var i = 0, f = files[i]; i != files.length; i++){
-						var curFile = files[i]
-						
-						var reader = new FileReader()
-						var name = f.name
-						reader.onload = (e) => {
-							var data = e.target.result
-							this.setExcelData(data)
-							// this.setActiveSheet(0)
-
-							this.isLoading = false
-							this.setUploadFiles({
-					      path: curFile.path,
-					      name: curFile.name,
-					      extname: pathModule.extname(curFile.path)
-					    })
-							console.log("第四阶段")
-						}
-						reader.readAsBinaryString(f)
-					}
-				}catch(e){
-					console.log(e)
-					this.isLoading = false
-				}
+				ipcRenderer.send("sync-openFile-dialog")
 			}
 		}
 	}
@@ -145,7 +129,6 @@
 		left: 0;
 		right: 0;
 		height: 24px;
-		/*visibility: hidden;*/
 		opacity: 0;
 	}
 
@@ -183,6 +166,7 @@
 				text-align: center;
 				line-height: 24px;
 				position: relative;
+				cursor: pointer;
 				&:not(:last-child) {
 					margin-right: 2.5%;
 				}
@@ -199,6 +183,8 @@
 			white-space: nowrap;
 			&+img{
 				width: 24px;
+				height: 24px;
+				cursor: pointer;
 				vertical-align: middle;
 				border-radius: 50%;
 				margin-left: 5px;

@@ -56,7 +56,7 @@
 </template>
 
 <script>
-	import { addFilter, setFilterStatus } from '../../vuex/actions'
+	import { addFilter } from '../../vuex/actions'
 	import { getActiveSheet, getFilterOptions, getExcelData, getCurSheetSize } from '../../vuex/getters'
 	import { getCharCol, getNumCol, getOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
 	import GroupSelect from './GroupSelect'
@@ -86,8 +86,7 @@
 				curSheetSize: getCurSheetSize
 			},
 			actions: {
-				addFilter,
-				setFilterStatus
+				addFilter
 			}
 		},
 		watch: {
@@ -161,13 +160,10 @@
 				// 根据范围生成范围内所有的序列
 				var startIndex = Math.min(Math.abs(+curCols[0]), Math.abs(curCols[1]))
 				var endIndex = Math.max(Math.abs(+curCols[0]), Math.abs(curCols[1]))
-				console.log("startIndex", startIndex, "endIndex", endIndex)
 				for(var i = startIndex, len = endIndex; i <= len; i++){
 					tempColsArr.push(i - 1)
 				}
 				this.operatorCol = `${tempColsArr[0] + 1},${tempColsArr[tempColsArr.length - 1] + 1}`
-				console.log("tempColsArr", tempColsArr)
-
 				this.operatorColArr = tempColsArr
 			},
 			generateNeedConformColWords(index){
@@ -180,51 +176,34 @@
 				var operator = this.operator
 				var operatorWords = this.getOperatorWords(this.filterOptions, operator)
 				var opVal = this.operatorVal.trim()
+				var preStr = `第${getCharCol(operatorColArr[0] + 1)}至第${getCharCol(operatorColArr[operatorColArr.length - 1] + 1)}列范围内的值中，至少有一个`
 
 				if(!this.validateForm({operatorColArr, opVal})) {
 					return
 				}
-
-				this.$nextTick(() => {
-					this.setFilterStatus(1)
+				filterWords = preStr + this.getFilterWordsPrimitive({
+					operator,
+					operatorWords,
+					val: opVal
 				})
-
-				setTimeout(()=>{
-					console.log("operatorColArr", operatorColArr)
-					var preStr = `第${getCharCol(operatorColArr[0] + 1)}至第${getCharCol(operatorColArr[operatorColArr.length - 1] + 1)}列范围内的值中，至少有一个`
-					
-					filterWords = preStr + this.getFilterWordsPrimitive({
-						operator,
-						operatorWords,
-						val: opVal
-					})
-
-					// 生成始末范围内的完成序列数组
-					var tempCols = []
-					
-					console.log("根据首尾两元素获得它们之间的所有元素，并且所有元素进行减一处理", tempCols)
-					filterObj = {
-						filterType: 2,
-						groupId: this.groupId,
-						logicOperator: this.logicOperator,
-						col: this.operatorColArr,
-						operator: this.operator,
-						value: opVal,
-						filterWords: filterWords,
-						needConformColIndex: this.needConformColIndex
-					}
-					console.log(filterObj)
-					// 触发 action：目前只做了表述文字，还需要进行筛选的value值
-					this.addFilter(filterObj)
-
-					this.operatorVal = ""
-				}, 0)
+				
+				filterObj = {
+					filterType: 2,
+					groupId: this.groupId,
+					logicOperator: this.logicOperator,
+					col: this.operatorColArr,
+					operator: this.operator,
+					value: opVal,
+					filterWords: filterWords,
+					needConformColIndex: this.needConformColIndex
+				}
+				this.addFilter(filterObj)
+				this.operatorVal = ""
 			},
 			validateForm(args) {
 				var { operatorColArr, opVal } = args
 				var isValidated = false
 				var tipWords = "双列范围逻辑："
-					console.log("operatorColArr[0]", operatorColArr[0])
 				if(operatorColArr.length === 0) {
 					tipWords += "请填写列"
 				}else if(!this.isConformDoubleCols) {
@@ -232,7 +211,6 @@
 				}else if(operatorColArr[0] + 1 < 1) {
 					tipWords += "列从1开始"
 				}else if(this.filteredCols !== 0 && operatorColArr[operatorColArr.length - 1] + 1 > this.filteredCols){
-					console.log("operatorColArr[operatorColArr.length - 1]", operatorColArr[operatorColArr.length - 1])
 					tipWords += `超过最大列${this.filteredCols}`
 				}else if(opVal.length === 0) {
 					tipWords += "请填写运算符的值"
@@ -241,7 +219,6 @@
 				}
 
 				if(!isValidated) {
-					this.setFilterStatus(0)
 					ipcRenderer.send("sync-alert-dialog", {
 						content: tipWords
 					})

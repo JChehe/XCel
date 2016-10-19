@@ -1,16 +1,22 @@
 <template>
 	<header>
 		<nav>
-			<div class="toggle_sidebar_btn" :title="isShowInstruction ? '返回' : '打开/关闭侧边栏'" @click="clickHandler">
-		    <i class="fa" :class="isShowInstruction ? 'fa-chevron-left' : 'fa-bars'"></i>
+			<div class="toggle_sidebar_btn" 
+				:title="isShowInstruction ? '返回' : '打开/关闭侧边栏'" 
+				@click="clickHandler">
+		    <i class="fa" 
+		    	:class="isShowInstruction ? 'fa-chevron-left' : 'fa-bars'"></i>
 			</div>
-			<div class="filter_way_container" v-show="!isShowInstruction">
+			<div class="filter_way_container" 
+		  	v-show="!isShowInstruction">
 				筛选方式：
 				<label title="符合条件则保留">
-					<input type="radio" name="filter_way" value="0" v-model="vuexFilterWay">保留
+					<input type="radio" name="filter_way" value="0" 
+						v-model="vuexFilterWay">保留
 				</label>
 				<label title="符合条件则剔除">
-					<input type="radio" name="filter_way" value="1" v-model="vuexFilterWay">剔除
+					<input type="radio" name="filter_way" value="1" 
+						v-model="vuexFilterWay">剔除
 				</label>
 			</div>
 		</nav>
@@ -91,10 +97,12 @@
 		.filter_way_container{
 			font-size: 14px;
 			margin-right: 20px;
+			label {
+				cursor: pointer;
+			}
 			label:not(:last-child){
 				margin-right: 5px;
 			}
-
 			input[name="filter_way"] {
 				display: inline-block;
 				margin-right: 4px;

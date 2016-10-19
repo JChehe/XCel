@@ -23,7 +23,7 @@
 </template>
 
 <script>
-	import { delFilter, setFilterStatus } from '../../vuex/actions'
+	import { delFilter } from '../../vuex/actions'
 
 	export default {
 		props: {
@@ -38,16 +38,12 @@
 		},
 		vuex: {
 			actions: {
-				delFilter,
-				setFilterStatus
+				delFilter
 			}
 		},
 		methods: {
 			delHandler(index){
-				this.setFilterStatus(1)
-				setTimeout(() => {
-					this.delFilter(index)
-				}, 1)
+				this.delFilter(index)
 			},
 			getLogicOperator(char) {
 				return char === "and" ? "且" : "或"

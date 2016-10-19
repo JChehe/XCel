@@ -55,7 +55,7 @@
 </template>
 
 <script>
-	import { addFilter, setFilterStatus } from '../../vuex/actions'
+	import { addFilter } from '../../vuex/actions'
 	import { getActiveSheet, getColKeys, getFilterOptions, getExcelData, getCurSheetSize } from '../../vuex/getters'
 	import { getCharCol, getLogicOperatorWords, getOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
 	import GroupSelect from './GroupSelect'
@@ -84,8 +84,7 @@
 				curSheetSize: getCurSheetSize
 			},
 			actions: {
-				addFilter,
-				setFilterStatus
+				addFilter
 			}
 		},
 		watch: {
@@ -127,32 +126,24 @@
 					return
 				}
 
-				this.$nextTick(() => {
-					this.setFilterStatus(1)
+				var preStr = `第${this.getCharCol(curCol)}列的值`
+				filterWords = preStr + this.getFilterWordsPrimitive({
+					operator,
+					operatorWords,
+					val: opVal
 				})
 
-				// 延迟是为了让“filterForm的提交按钮能作出响应（不会因为卡死了不能加入loading动画，加入web Worker后可取消该延时器）”
-				setTimeout(()=>{
-					var preStr = `第${this.getCharCol(curCol)}列的值`
-					filterWords = preStr + this.getFilterWordsPrimitive({
-						operator,
-						operatorWords,
-						val: opVal
-					})
-
-					filterObj = {
-						filterType: 0,
-						groupId: this.groupId,
-						logicOperator: this.logicOperator,
-						col: curCol - 1,
-						operator: this.operator,
-						value: opVal,
-						filterWords: filterWords
-					}
-					// 触发 action：目前只做了表述文字，还需要进行筛选的value值
-					this.addFilter(filterObj)
-					this.operatorVal = ""
-				}, 0)
+				filterObj = {
+					filterType: 0,
+					groupId: this.groupId,
+					logicOperator: this.logicOperator,
+					col: curCol - 1,
+					operator: this.operator,
+					value: opVal,
+					filterWords: filterWords
+				}
+				this.addFilter(filterObj)
+				this.operatorVal = ""
 			},
 			validateForm(args) {
 				var { curCol, opVal } = args
@@ -167,7 +158,6 @@
 				}
 
 				if(!isValidated) {
-					this.setFilterStatus(0)
 					ipcRenderer.send("sync-alert-dialog", {
 						content: tipWords
 					})

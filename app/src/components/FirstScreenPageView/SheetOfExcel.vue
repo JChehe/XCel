@@ -15,16 +15,14 @@
 </template>
 
 <script>
-	import { getFilteredData, getSideBarStatus, getColKeys, getActiveSheet } from '../../vuex/getters'
+	import { getSideBarStatus, getColKeys } from '../../vuex/getters'
 	import { getCharCol, getNumCol } from '../../utils/ExcelSet'
 	
 	export default {
 		vuex: {
 			getters: {
-				filteredData: getFilteredData,
 				sideBarStatus: getSideBarStatus,
-				colKeys: getColKeys,
-				activeSheet: getActiveSheet
+				colKeys: getColKeys
 			}
 		},
 		props: {
