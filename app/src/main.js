@@ -12,7 +12,8 @@ import routes from './routes'
 Vue.use(Electron)
 Vue.use(Resource)
 Vue.use(Router)
-Vue.config.debug = true
+
+Vue.config.debug = process.env.NODE_ENV === 'development'
 
 Object.keys(filtersOfFileList).forEach((k) => {
   Vue.filter(k, filtersOfFileList[k])

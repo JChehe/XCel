@@ -93,26 +93,11 @@
 			},
 			dropHandler(e){
 				var files = e.dataTransfer.files
-				var i, f
-				try{
-					for(var i = 0, f = files[i]; i != files.length; i++){
-						var curFile = files[i]
-						
-						var reader = new FileReader()
-						var name = f.name
-						reader.onload = (e) => {
-							var data = e.target.result
-							this.setExcelData({
-								data: data,
-								type: "drop"
-							})
-							this.setUploadFiles(curFile.path)
-						}
-						reader.readAsBinaryString(f)
-					}
-				}catch(e){
-					console.log(e)
-				}
+				this.setExcelData({
+					path: files[0].path,
+					type: "node"
+				})
+				this.setUploadFiles(path)
 			}			
 		}
 	}
