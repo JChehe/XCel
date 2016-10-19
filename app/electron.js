@@ -48,14 +48,8 @@ function createMainWindow () {
     console.log("触发 closed")
     mainWindow = null
     backgroundWindow = null
-    // mainWindow = null
-    // if(!backgroundWindow.isDestroyed()) {
-    //   backgroundWindow.close()
-    // }
-    // backgroundWindow = null
-    if (process.platform !== 'darwin') {
-      app.quit()
-    }
+    // 在Mac中完全退出程序，而不会留在dock中
+    app.quit()
   })
 
   console.log('mainWindow opened')
@@ -64,7 +58,7 @@ function createMainWindow () {
 
 function createBackgroundWindow () {
   var win = new BrowserWindow({
-    // show: false
+    show: false
   })
   win.loadURL(config.backUrl)
   console.log("backgroundWindow opened")
@@ -88,12 +82,11 @@ app.on('window-all-closed', () => {
   }
 })
 
+// 当应用被激活时触发，常用于点击应用的 dock 图标的时候。
+// 现在取消保留在Dock中，完全退出
 app.on('activate', () => {
-  // if (mainWindow.isDestroyed()) {
-  if(mainWindow === null) {
+  if (mainWindow.isDestroyed()) {
     mainWindow = createMainWindow()
     backgroundWindow = createBackgroundWindow()
   }
-    // ipcMainSets(mainWindow, backgroundWindow)
-  // }
 })
