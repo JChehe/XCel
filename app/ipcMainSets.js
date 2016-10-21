@@ -59,27 +59,6 @@ module.exports = function(mainWindow, backgroundWindow) {
 	})
 
 
-	ipcMain.on("sync-confirm-dialog", (event, arg) => {
-	  dialog.showMessageBox({
-	    type: "question",
-	    buttons: ["确定", "取消"],  // Mac 中显示顺序相反
-	    defaultId: 0,
-	    title: arg.title || "xcel",
-	    message: arg.content || "",
-	    detail: arg.detail || "",
-	  }, function(index) {
-	    // 返回点击按钮的 index
-	    console.log("BtnIndex", index)
-	    event.sender.send("sync-confirm-dialog-reponse", {
-	      index,
-	      typeId: arg.typeId, // 用于区分 emit 者
-	      path: arg.path,
-	      fileIndex: arg.fileIndex
-	    })
-	  })
-	})
-
-
 	ipcMain.on("sync-alert-dialog", (event, arg) => {
 	  dialog.showMessageBox({
 	    type: "warning",

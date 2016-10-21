@@ -19,7 +19,7 @@
 <script>
 	import xlsx from 'xlsx'
 	import fs from 'fs'
-	import { ipcRenderer } from 'electron'
+	import { remote, ipcRenderer } from 'electron'
 	import { changeFileType, setExcelData, setActiveSheet, setUploadFiles, delUploadFiles } from '../../vuex/actions'
 	import { getCurSearchVal, getAllFileType, getUploadFiles } from '../../vuex/getters'
 
@@ -44,22 +44,16 @@
 				delUploadFiles
 			}
 		},
-		created(){
-			ipcRenderer.on("sync-confirm-dialog-reponse", (event, arg) => {
-				// 点击确认按钮
-				if(arg.index === 0) {
-					// 是否删除无效文件
-					if(arg.typeId === "isDel") {
-						this.delUploadFiles(arg.fileIndex)
-					}
-					// 是否确认导入
-					if(arg.typeId === "coverFile") {
-						var path = arg.path
-						console.log("确定导入")
-						this.$nextTick(() => {
-							this.curLoadingIndex = arg.fileIndex
-						})
-
+		methods: {
+			confirmRead(path, index){
+				remote.dialog.showMessageBox({
+					type: "question",
+					buttons: ["确定", "取消"],
+					defaultId: 0,
+					title: "XCel",
+					message: "导入该文件会覆盖目前的筛选结果，是否确认要导入？"
+				}, (btnIndex) => {
+					if(btnIndex === 0) {
 						fs.stat(path, (err, stats) => {
 							if(stats && stats.isFile()) {
 								this.setExcelData({
@@ -68,28 +62,23 @@
 								})
 								this.setUploadFiles(path)
 							}else{
-								this.confirmDel(arg.fileIndex, "当前文件不存在，是否删除该记录？")
+								this.confirmDel(index, "当前文件不存在，是否删除该记录？")
 							}
-							this.curLoadingIndex = -1
 						})
 					}
-				}
-			})
-		},
-		methods: {
-			confirmRead(path, index){
-				ipcRenderer.send("sync-confirm-dialog", {
-					typeId: "coverFile",
-					content: "导入该文件会覆盖目前的筛选结果，是否确认要导入？",
-					fileIndex: index,
-					path: path
 				})
 			},
 			confirmDel(index, content) {
-				ipcRenderer.send("sync-confirm-dialog", {
-					typeId: "isDel",
-					content: content || "是否要删除该文件记录？",
-					fileIndex: index
+				remote.dialog.showMessageBox({
+					type: "question",
+					buttons: ["确定", "取消"],
+					defaultId: 0,
+					title: "XCel",
+					message: "是否要删除该文件记录？"
+				}, (btnIndex) => {
+					if(btnIndex === 0) {
+						this.delUploadFiles(index)
+					} 
 				})
 			}
 		}

@@ -1,53 +1,89 @@
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 
-module.exports = [{
-  label: 'View',
-  submenu: [{
-    label: 'Reload',
-    accelerator: 'CmdOrCtrl+R',
-    click: function (item, focusedWindow) {
-      if (focusedWindow) {
-        // on reload, start fresh and close any old
-        // open secondary windows
-        // console.log(focusedWindow.id)
-        // if (focusedWindow.id === 1) {
-        //   BrowserWindow.getAllWindows().forEach(function (win) {
-        //     if (win.id > 1) {
-        //       win.close()
-        //     }
-        //   })
-        // }
-        focusedWindow.reload()
+var template = [
+  {
+    label: 'View',
+    submenu: [
+      {
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
+        click: function (item, focusedWindow) {
+          if (focusedWindow) focusedWindow.reload()
+        }
+      },
+      {
+        label: 'Toggle Developer Tools',
+        accelerator: (function () {
+          if (process.platform === 'darwin') {
+            return 'Alt+Command+I'
+          } else {
+            return 'Ctrl+Shift+I'
+          }
+        })(),
+        click: function (item, focusedWindow) {
+          if (focusedWindow) focusedWindow.toggleDevTools()
+        }
       }
-    }
-  }, {
-    label: 'Toggle Full Screen',
-    accelerator: (function () {
-      if (process.platform === 'darwin') {
-        return 'Ctrl+Command+F'
-      } else {
-        return 'F11'
+    ]
+  },
+  {
+    label: 'Help',
+    role: 'help'/*,
+    submenu: [
+      {
+        label: 'Learn More',
+        click: function () { require('electron').shell.openExternal('http://electron.atom.io') }
       }
-    })(),
-    click: function (item, focusedWindow) {
-      if (focusedWindow) {
-        focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
+    ]*/
+  }
+]
+
+if (process.platform === 'darwin') {
+  var name = electron.app.getName()
+  console.log("appname", name)
+  template.unshift({
+    label: name,
+    submenu: [
+      {
+        label: 'About ' + name,
+        role: 'about'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Services',
+        role: 'services',
+        submenu: []
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Hide ' + name,
+        accelerator: 'Command+H',
+        role: 'hide'
+      },
+      {
+        label: 'Hide Others',
+        accelerator: 'Command+Alt+H',
+        role: 'hideothers'
+      },
+      {
+        label: 'Show All',
+        role: 'unhide'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Quit',
+        accelerator: 'Command+Q',
+        click: function () { app.quit() }
       }
-    }
-  }, {
-    label: 'Toggle Developer Tools',
-    accelerator: (function () {
-      if (process.platform === 'darwin') {
-        return 'Alt+Command+I'
-      } else {
-        return 'Ctrl+Shift+I'
-      }
-    })(),
-    click: function (item, focusedWindow) {
-      if (focusedWindow) {
-        focusedWindow.toggleDevTools()
-      }
-    }
-  }]
-}]
+    ]
+  })
+}
+
+module.exports = template
