@@ -26,7 +26,8 @@ function createMainWindow () {
     height: 850,
     width: 1280,
     backgroundColor: "#f5f5f5",
-    frame: false
+    frame: false,
+    show: false
   })
   windowBounds = win.getBounds()
   win.loadURL(config.mainUrl)
@@ -49,6 +50,10 @@ function createMainWindow () {
     app.quit()
   })
 
+  win.on('ready-to-show', () => {
+    win.show()
+    win.focus()
+  })
   console.log('mainWindow opened')
   return win
 }
