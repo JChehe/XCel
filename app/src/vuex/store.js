@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex from 'nerdyglasses-vuex'
 import modules from './modules'
-import createLogger from 'vuex/logger'
+import createLogger from 'nerdyglasses-vuex/logger'
 
 Vue.use(Vuex)
 
