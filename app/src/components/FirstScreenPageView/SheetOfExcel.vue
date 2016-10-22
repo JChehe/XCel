@@ -67,7 +67,7 @@
 
 				var resultBodyStr = ""
 
-				for(var i = 0, len = Math.min(this.rawNum, 50); i < len; i++){
+				for(var i = 0, len = Math.min(this.rawNum, 30); i < len; i++){
 					var resultTrStr = "<tr>"
 					this.colKeys.forEach((key, index) => {
 						if(index === 0){

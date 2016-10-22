@@ -4,7 +4,6 @@ const electron = require('electron')
 const path = require('path')
 const menuTemplate = require("./menuTemplate")
 const ipcMainSets = require("./ipcMainSets")
-
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const Menu = electron.Menu
@@ -21,11 +20,14 @@ if (process.env.NODE_ENV === 'development') {
 }
 config.backUrl = `file://${__dirname}/dist/background/index.html`
 
+console.log("主进程pid：", process.pid)
+
 function createMainWindow () {
   var win = new BrowserWindow({
     height: 850,
     width: 1280,
     backgroundColor: "#f5f5f5",
+    fullscreenable: false,
     frame: false,
     show: false
   })

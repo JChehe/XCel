@@ -3,40 +3,36 @@ const {ipcRenderer} = require('electron');
 const xlsx = require('xlsx')
 const filterUtils = require('./filterUtils')
 const SUFFIX_COLKEYS = "_headers"
+console.log("background进程pid：", process.pid)
 
 var tempExcelData;
 window.onload = function () {
   ipcRenderer.on("readFile-start", (event, arg) => {
-    var tStart = window.performance.now();
-
-    var result = new Excel().init(arg.data)
+    var result, tStart, tEnd
+    tStart = window.performance.now()
+    result = new Excel().init(arg.data)
     tempExcelData = result
-    var tEnd = window.performance.now()
+    tEnd = window.performance.now()
     console.log(`初始化数据耗时${ tEnd - tStart }毫秒`)
-
     ipcRenderer.send("readFile-response", {result})
   })
 
   ipcRenderer.on("filter-start", (event, arg) => {
-    var tStart = window.performance.now();
-
-    var result = filterHandler(arg)
-    
-    var tEnd = window.performance.now()
+    var result, tStart, tEnd
+    tStart = window.performance.now();
+    result = filterHandler(arg)
+    tEnd = window.performance.now()
     console.log(`过滤数据耗时${ tEnd - tStart }毫秒`)
     console.log("state.excelData.exportFileByWB", arg.excelData.exportFileByWB)
-
     ipcRenderer.send("filter-response", {result})
   })
 
   ipcRenderer.on("exportFile-start", (event, arg) => {
-    var tStart = window.performance.now();
-
+    var tStart, tEnd
+    tStart = window.performance.now()
     tempExcelData.exportFileByWB(arg)
-
-    var tEnd = window.performance.now()
+    tEnd = window.performance.now()
     console.log(`导出文件耗时${ tEnd - tStart }毫秒`)
-
     ipcRenderer.send("exportFile-response", {info: "成功导出"})
   })
 }
@@ -84,26 +80,20 @@ function filterHandler(arg){
             groupExpStr = groupExpStr + filterLogicChar + oneFilterResult
 
             if(filterLogicChar === "||" && oneFilterResult === true) {
-              console.log("某filter符合")
               return true // as break
             }
           })
           groupExpStr = groupExpStr.replace(/^[|&]*/ig, "")
           oneTagResult = eval(groupExpStr)
-
           
           rowExpStr = rowExpStr + tagLogicChar + oneTagResult 
           if(tagLogicChar === "||" && oneTagResult === true) {
-            console.log("某组符合")
             break;
           }
         }
         rowExpStr = rowExpStr.replace(/^[|&]*/ig, "")
-        console.log(rowExpStr)
         var rowResult = eval(rowExpStr)
-        console.log("eval(rowExpStr)", rowResult)
         // return rowResult
-        console.log("filterWay", filterWay)
         return filterWay == 0 ? rowResult : !rowResult
       })
       console.log(i + "tempFilteredData[curSheetName]", tempFilteredData[curSheetName])
@@ -187,7 +177,7 @@ Excel.prototype = {
 
       var emptyIndex = 0    
       for(var i = startIndex; i <= endIndex; i++){
-        var curColKey = curSheetData[getCharCol(i) + '1'] == undefined ? `表头空${emptyIndex++}` : curSheetData[getCharCol(i) + '1'].v
+        var curColKey = curSheetData[getCharCol(i) + '1'] === undefined ? `表头空${emptyIndex++}` : curSheetData[getCharCol(i) + '1'].v
         this[curSheetName + '_headers'].push(curColKey)
       }
     })
@@ -203,15 +193,16 @@ Excel.prototype = {
     }
     var sheetNameList = this.sheetNameList
     sheetNameList.forEach((sheetName, i) => {
-      var start = window.performance.now()
-      var wbTem = this.jsonToWBForOneSheet(filteredData[sheetName], excelData[sheetName + SUFFIX_COLKEYS], sheetName)
-      var end = window.performance.now()
+      var start, end, wbTem
+      start = window.performance.now()
+      wbTem = this.jsonToWBForOneSheet(filteredData[sheetName], excelData[sheetName + SUFFIX_COLKEYS], sheetName)
+      end = window.performance.now()
       console.log("转化一个表需要", (end-start))
       finalWB.SheetNames.push(wbTem.SheetNames[0])
-      Object.assign(finalWB.Sheets, {
-        [sheetName]: wbTem["Sheets"][sheetName]
-      })
+      finalWB.Sheets[sheetName] = wbTem["Sheets"][sheetName]
+      wbTem = null
     })
+    sheetNameList = null
     // console.log(finalWB)
     ipcRenderer.send("sync-saveFile-dialog", {
       filename: "过滤后的文件.xlsx",
@@ -224,63 +215,31 @@ Excel.prototype = {
 
   jsonToWBForOneSheet(json, colkeys, sheetName) {
     var _headers = colkeys // 获取表头
+    var headerStart, headerEnd, bodyStart, bodyEnd
 
-    var headerStart = window.performance.now()
+    headerStart = window.performance.now()
     var headers = _headers
       .map((v, i) => Object.assign({}, { v: v, position: getCharCol(i+1) + 1 }))
       .reduce((prev, next) => Object.assign({}, prev, {
         [next.position]: { v: next.v }
       }), {})
-    var headerEnd = window.performance.now()
+    headerEnd = window.performance.now()
     console.log("构建头部需要时间：", headerEnd - headerStart)
 
-    var bodyStart = window.performance.now()
-    /*var data = json
-      .map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: getCharCol(j+1) + (i + 2) })))
-      .reduce((prev, next) => prev.concat(next))
-      .reduce((prev, next) => Object.assign({}, prev, {
-        [next.position]: { v: next.v }
-      }), {});*/
-    var data = {};
-    var p1S = window.performance.now()
-    var result1 = json.map(function(v,i) {
-      return _headers.map(function(k,j){
-        return Object.assign({}, {v: v[k], position: getCharCol(j+1) + (i + 2)})
-      })
-    })
-    var p1E = window.performance.now()
-    console.log("第一步需要时间：", (p1E - p1S))
-
-    var p2S = window.performance.now()
-    var result2 = result1.reduce(function(prev, next) {
-      return prev.concat(next)
-    })
-    var p2E = window.performance.now()
-    console.log("第二步需要时间：", (p2E - p2S))
-
-    var p3S = window.performance.now()
-    result2.forEach(function(v,i) {
-      // console.log("v.position：", v.position, "  v.v：", v.v)
-      data[v.position] = {v: v.v}
-    })
-
-    // 导致导出很慢的原因
-    // data = result2.reduce(function(prev, next) {
-    //   console.log("prev", prev)
-    //   console.log("[next.position]: {v: next.v}", ({[next.position]: {v: next.v}}))
-      // return Object.assign({}, prev, {
-      //   [next.position]: {v: next.v}
-      // })
-    // })
-    var p3E = window.performance.now()
-    console.log("第三步需要时间：", (p3E - p3S))
-
-    var bodyEnd = window.performance.now()
+    bodyStart = window.performance.now()
+    var data = {}
+    json.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: getCharCol(j+1) + (i + 2) })))
+        .reduce((prev, next) => prev.concat(next))
+        .forEach((v, i) => data[v.position]= {v: v.v})
+    bodyEnd = window.performance.now()
     console.log("构建数据部分总共需要时间：", bodyEnd - bodyStart)
 
     var output = Object.assign({}, headers, data)
-    var outputPos = Object.keys(output)
 
+    headers = data = null
+
+    var outputPos = Object.keys(output)
+    // 刚好利用了Object的键会排序的特性
     var ref = outputPos[0] + ':' + outputPos[outputPos.length - 1]
     var wb = {
       SheetNames: [sheetName],

@@ -21,7 +21,7 @@
 	import { toggleSideBar } from '../vuex/actions'
 	import { getSideBarStatus } from '../vuex/getters'
 	import os from 'os'
-
+	console.log("主页面pid：", process.pid)
 	export default {
 		components: {
 			vHeader,

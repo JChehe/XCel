@@ -1,4 +1,5 @@
 const electron = require('electron')
+const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const xlsx = require("xlsx")
@@ -6,6 +7,7 @@ const xlsx = require("xlsx")
 module.exports = function(mainWindow, backgroundWindow) {
 
 	ipcMain.on("readFile-response", (event, arg) => {
+		console.log("触发readFile-response")
 	  mainWindow.webContents.send("readFile-response", arg)
 	})
 	ipcMain.on("readFile-start", (event, arg) => {
@@ -27,7 +29,6 @@ module.exports = function(mainWindow, backgroundWindow) {
 	  backgroundWindow.webContents.send("exportFile-start", arg)
 	})
 
-
 	ipcMain.on("sync-openFile-dialog", (event, arg) => {
 		dialog.showOpenDialog({
 			title: "请选择Excel文件",
@@ -36,13 +37,24 @@ module.exports = function(mainWindow, backgroundWindow) {
 		}, function(arr) {
 	    if(arr !== undefined) {
 				// arr 是一个文件路径 数组
-				event.sender.send("open-file-response", arr[0]);
+				console.log("event", event)
+				// 正常触发
+				if(event) {
+					event.sender.send("open-file-response", arr[0])
+				} 
+				// 通过 emit 触发（如快捷键）
+				else {
+					var mainWindow = BrowserWindow.fromId(1)
+					if(mainWindow) {
+						mainWindow.webContents.send("open-file-response", arr[0])
+					}
+				}
 			}
 		})
 	})
 
-
 	ipcMain.on("sync-saveFile-dialog", (event, arg) => {
+		console.log("sync-saveFile-dialog")
 	  dialog.showSaveDialog({
 	    title: "请选择保存路径",
 	    filters: [{

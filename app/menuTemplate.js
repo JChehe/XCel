@@ -1,7 +1,20 @@
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
+const ipcMain = electron.ipcMain
 
 var template = [
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Open File',
+        accelerator: 'CmdOrCtrl+O',
+        click: function(item, focusedWindow) {
+          ipcMain.emit('sync-openFile-dialog')
+        }
+      }
+    ]
+  },
   {
     label: 'View',
     submenu: [
@@ -9,7 +22,11 @@ var template = [
         label: 'Reload',
         accelerator: 'CmdOrCtrl+R',
         click: function (item, focusedWindow) {
-          if (focusedWindow) focusedWindow.reload()
+          console.log("BrowserWindow.getAllWindows()", BrowserWindow.getAllWindows());
+          Array.prototype.forEach.call(BrowserWindow.getAllWindows(), (win, i) => {
+            win.reload()
+          })
+          // if (focusedWindow) focusedWindow.reload()
         }
       },
       {
@@ -42,48 +59,6 @@ var template = [
 if (process.platform === 'darwin') {
   var name = electron.app.getName()
   console.log("appname", name)
-  template.unshift({
-    label: name,
-    submenu: [
-      {
-        label: 'About ' + name,
-        role: 'about'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'Services',
-        role: 'services',
-        submenu: []
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'Hide ' + name,
-        accelerator: 'Command+H',
-        role: 'hide'
-      },
-      {
-        label: 'Hide Others',
-        accelerator: 'Command+Alt+H',
-        role: 'hideothers'
-      },
-      {
-        label: 'Show All',
-        role: 'unhide'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'Quit',
-        accelerator: 'Command+Q',
-        click: function () { app.quit() }
-      }
-    ]
-  })
   template.unshift({
     label: 'Edit',
     submenu: [
@@ -122,6 +97,49 @@ if (process.platform === 'darwin') {
       }
     ]
   })
+  template.unshift({
+    label: name,
+    submenu: [
+      {
+        label: 'About ' + name,
+        role: 'about'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Services',
+        role: 'services',
+        submenu: []
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Hide ' + name,
+        accelerator: 'Command+H',
+        role: 'hide'
+      },
+      {
+        label: 'Hide Others',
+        accelerator: 'Command+Alt+H',
+        role: 'hideothers'
+      },
+      {
+        label: 'Show All',
+        role: 'unhide'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Quit',
+        accelerator: 'Command+Q',
+        click: function () { electron.app.quit() }
+      }
+    ]
+  })
+  template.unshift()
 }
 
 module.exports = template

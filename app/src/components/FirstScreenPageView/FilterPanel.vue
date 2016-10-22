@@ -25,6 +25,7 @@
 </template>
 
 <script>
+	
 	import FilterTagList from './FilterTagList'
 	import FilterFormSingleLogic from './FilterFormSingleLogic'
 	import FilterFormMultiCalc from './FilterFormMultiCalc'
@@ -64,6 +65,8 @@
 			}
 		},
 		created(){
+			console.log("filter_panel 组件被创建")
+			console.log(ipcRenderer)
 			ipcRenderer.on("filter-response", (event, arg) => {
 				this.setFileStatus(2)
       	this.setFilteredData(arg.result)
