@@ -24,6 +24,18 @@ More information can be found [here](https://simulatedgreg.gitbooks.io/electron-
 
 This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about this project can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
 
+## Initialize the project may encounter problems
+```
+ERROR in dlopen(/Users/**/Desktop/XCel/node_modules/node-sass/vendor/darwin-x64-48/binding.node, 1): no suitable image found.  Did find:
+         	/Users/**/Desktop/XCel/node_modules/node-sass/vendor/darwin-x64-48/binding.node: truncated mach-o error: segment __TEXT extends to 1212416 which is past end of file 260668
+          @ ./~/vue-style-loader!./~/css-loader!./~/vue-loader/lib/style-rewriter.js!./~/sass-loader!./~/vue-loader/lib/selector.js?type=style&index=0!./app/src/App.vue 4:14-240 13:2-17:4 14:20-246
+
+```
+What fixed it for me was the following:
+```
+npm rebuild node-sass
+```
+
 
 ## Speed up the installation of electron in China
 
