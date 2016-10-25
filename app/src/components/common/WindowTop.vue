@@ -55,7 +55,7 @@
 		-webkit-user-select: none;
 		user-select: none;
 		height: 32px;
-		background-color: #757575;
+		background-color: #2B3244;
 		display: flex;
 		justify-content: flex-end;
 		transition: background-color .5s;

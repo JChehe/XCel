@@ -6,7 +6,7 @@ const pkg = require('./app/package.json')
 let config = {
   // Name of electron app
   // Will be used in production builds
-  name: 'XCel',
+  name: pkg.product,
 
   // webpack-dev-server port
   port: 9080,
@@ -22,10 +22,21 @@ let config = {
     ignore: /src|main.ejs|icons/,
     out: path.join(__dirname, 'builds'),
     overwrite: true,
-    platform: process.env.PLATFORM_TARGET || 'all'
-  }
+    platform: process.env.PLATFORM_TARGET || 'all',
+    name: pkg.product
+  },
+
+  isDev: process.env.NODE_ENV === 'development',
+  backUrl: `file://${__dirname}/dist/background/index.html`
 }
 
-config.building.name = config.name
+config.mainUrl = `http://localhost:${config.port}`;
+
+if (!config.isDev) {
+  config.devtron = false
+  config.mainUrl = `file://${__dirname}/dist/index.html`
+}
+
+console.log(JSON.stringify(config));
 
 module.exports = config

@@ -1,6 +1,6 @@
-# xcel
+# XCel
 
-> An electron-vue project
+> An ultimate excel data filter
 
 ## Build Setup
 

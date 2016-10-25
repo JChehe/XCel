@@ -1,5 +1,6 @@
 {
   "name": "xcel",
+  "product": "XCel",
   "version": "1.0.0",
   "description": "An ultimate excel data filter",
   "main": "electron.js",

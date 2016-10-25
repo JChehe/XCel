@@ -116,7 +116,7 @@
 	.filter_tag_container{
 		min-height: 64px;
 		background-color: #fff;
-		box-shadow: 0 -2px 4px rgba(0, 0, 0, .1);
+		box-shadow: 0 -2px 4px rgba(0, 0, 0, .2);
 		padding: 20px 27px 15px;
 		position: relative;
 	}

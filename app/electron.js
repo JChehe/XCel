@@ -4,21 +4,14 @@ const electron = require('electron')
 const path = require('path')
 const menuTemplate = require("./menuTemplate")
 const ipcMainSets = require("./ipcMainSets")
+const config = require('../config');
+
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const Menu = electron.Menu
 let mainWindow
 let backgroundWindow
 var windowBounds = {}
-let config = {}
-if (process.env.NODE_ENV === 'development') {
-  config = require('../config')
-  config.mainUrl = `http://localhost:${config.port}`
-} else {
-  config.devtron = false
-  config.mainUrl = `file://${__dirname}/dist/index.html`
-}
-config.backUrl = `file://${__dirname}/dist/background/index.html`
 
 console.log("主进程pid：", process.pid)
 
@@ -26,6 +19,8 @@ function createMainWindow () {
   var win = new BrowserWindow({
     height: 850,
     width: 1280,
+    minWidth: 1120,
+    minHeight: 768,
     backgroundColor: "#f5f5f5",
     fullscreenable: false,
     frame: false,
@@ -34,7 +29,7 @@ function createMainWindow () {
   windowBounds = win.getBounds()
   win.loadURL(config.mainUrl)
 
-  if (process.env.NODE_ENV === 'development') {
+  if (config.isDev) {
     BrowserWindow.addDevToolsExtension(path.join(__dirname, '../node_modules/devtron'))
 
     let installExtension = require('electron-devtools-installer')
@@ -62,7 +57,7 @@ function createMainWindow () {
 
 function createBackgroundWindow () {
   var win = new BrowserWindow({
-    show: false
+    show: config.isDev
   })
   win.loadURL(config.backUrl)
   console.log("backgroundWindow opened")

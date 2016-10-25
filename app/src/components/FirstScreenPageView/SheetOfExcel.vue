@@ -67,7 +67,7 @@
 
 				var resultBodyStr = ""
 
-				for(var i = 0, len = Math.min(this.rawNum, 30); i < len; i++){
+				for(var i = 0, len = Math.min(this.rawNum, 1); i < len; i++){
 					var resultTrStr = "<tr>"
 					this.colKeys.forEach((key, index) => {
 						if(index === 0){
@@ -86,6 +86,7 @@
 				// console.log((resultHeadStr + resultBodyStr))
 				var tEnd = window.performance.now()
 				console.log(`字符串拼接耗时${tEnd - tStart}毫秒`)
+				sheetData = null;
 				return (resultHeadStr + resultBodyStr)
 			}
 		},
@@ -140,7 +141,7 @@
 			position: relative;
 			background-image: linear-gradient(to top right, transparent, transparent calc(50% - 0.5px), #d3d6db calc(50% - 0.5px), #d3d6db calc(50% + 0.5px), transparent calc(50% + 0.5px));
 			&::before {
-				content: "行";
+				content: "列";
 				width: 50%;
 				text-align: center;
 				position: absolute;
@@ -148,7 +149,7 @@
 				top: 3px;
 			}
 			&::after {
-				content: "列";
+				content: "行";
 				width: 50%;
 				position: absolute;
 				text-align: center;
