@@ -87,17 +87,19 @@
 			
 			filterHandler(){
 				var filterTagListLength = this.curSheetSize.tagList.length
-				if(this.fileStatus !== -1 || filterTagListLength === undefined || filterTagListLength === 0) {
+				if(filterTagListLength === undefined || filterTagListLength === 0) {
 					ipcRenderer.send("sync-alert-dialog", {
 						content: "请先添加筛选条件"
 					})
 				}else {
-					this.setFileStatus(1)
-					ipcRenderer.send("filter-start", {
-			      filterTagList: this.filterTagList,
-			      excelData: this.excelData,
-			      filterWay: this.filterWay
-			    })
+					this.setFileStatus(1) 
+					setTimeout(() => {
+						ipcRenderer.send("filter-start", {
+				      filterTagList: this.filterTagList,
+				      excelData: this.excelData,
+				      filterWay: this.filterWay
+				    })
+					}, 10)
 				}
 			}
 		}

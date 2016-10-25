@@ -8,6 +8,7 @@
     "font-awesome": "^4.6.3",
     "moment": "^2.15.0",
     "nerdyglasses-vuex": "^1.0.0",
+    "shortid": "^2.2.6",
     "vue": "^1.0.26",
     "vue-electron": "^1.0.0",
     "vue-multiselect": "^1.1.3",
