@@ -41,6 +41,25 @@ var template = [
         click: function (item, focusedWindow) {
           if (focusedWindow) focusedWindow.toggleDevTools()
         }
+      },
+      {
+        label: 'Toggle Background Renderer',
+        accelerator: (function(){
+          if (process.platform === 'darwin') {
+            return 'Alt+Command+B'
+          } else {
+            return 'Ctrl+Shift+B'
+          }
+        })(),
+        click: function(item, focusedWindow) {
+          var backWin = BrowserWindow.fromId(2)
+          if(backWin.isVisible()) {
+            backWin.hide()
+          }else {
+            backWin.show()
+            backWin.focus()
+          }
+        }
       }
     ]
   },

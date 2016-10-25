@@ -34,7 +34,6 @@
 			
 			<sheet-of-excel v-for="sheetName in excelData.sheetNameList"
 				:sheet-data="filteredData[activeSheet.name]"
-				v-if="excelData.sheetNameList"
 				v-show="activeSheet.index === $index"
 				>
 			</sheet-of-excel>

@@ -8,7 +8,7 @@ const state = {
   allFileType: ["all", "xls", "xlsx"], 
   curSearchVal: "", // 搜索值
   isShowSideBar: false,
-  fileStatus: -1
+  fileStatus: -1 // 0：正在导入中 1：过滤中 2：导出中
 }
 
 const mutations = {

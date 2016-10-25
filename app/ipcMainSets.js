@@ -1,8 +1,14 @@
+const shortid = require('shortid')
+const xlsx = require('xlsx')
+const path = require('path')
 const electron = require('electron')
+const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
-const xlsx = require("xlsx")
+let savePath = ''
+
+shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@')
 
 module.exports = function(mainWindow, backgroundWindow) {
 
@@ -12,6 +18,8 @@ module.exports = function(mainWindow, backgroundWindow) {
 	})
 	ipcMain.on("readFile-start", (event, arg) => {
 	  console.log("读取文件emit")
+	  savePath = getSavePath(arg.data.path)
+	  console.log(savePath)
 	  backgroundWindow.webContents.send("readFile-start", arg)
 	})
 
@@ -37,7 +45,7 @@ module.exports = function(mainWindow, backgroundWindow) {
 		}, function(arr) {
 	    if(arr !== undefined) {
 				// arr 是一个文件路径 数组
-				console.log("event", event)
+				// console.log("event", event)
 				// 正常触发
 				if(event) {
 					event.sender.send("open-file-response", arr[0])
@@ -57,6 +65,7 @@ module.exports = function(mainWindow, backgroundWindow) {
 		console.log("sync-saveFile-dialog")
 	  dialog.showSaveDialog({
 	    title: "请选择保存路径",
+	    defaultPath: savePath,
 	    filters: [{
 	      name: "Excel",
 	      extensions: ["xlsx"]
@@ -103,4 +112,9 @@ module.exports = function(mainWindow, backgroundWindow) {
 	    console.log("不可最小化，因为已经最小化了")
 	  }
 	})
+}
+
+function getSavePath(uPath) {
+	var file = path.parse(uPath)
+	return path.join(file.dir, file.name + '-' + shortid.generate() + file.ext)
 }
