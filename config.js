@@ -27,16 +27,14 @@ let config = {
   },
 
   isDev: process.env.NODE_ENV === 'development',
-  backUrl: `file://${__dirname}/dist/background/index.html`
+  backUrl: `file://${__dirname}/app/dist/background/index.html`
 }
 
 config.mainUrl = `http://localhost:${config.port}`;
 
 if (!config.isDev) {
   config.devtron = false
-  config.mainUrl = `file://${__dirname}/dist/index.html`
+  config.mainUrl = `file://${__dirname}/app/dist/index.html`
 }
-
-console.log(JSON.stringify(config));
 
 module.exports = config
