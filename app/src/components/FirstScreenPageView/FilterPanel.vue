@@ -75,6 +75,14 @@
 	    ipcRenderer.on("exportFile-response", (event, arg) => {
 	    	console.log(arg.info)
 	    	this.setFileStatus(-1)
+	    	
+	    	if(arg.type === -1) {
+	    		setTimeout(() => {
+	    			ipcRenderer.send('sync-alert-dialog', {
+		    			content: arg.info
+		    		})
+	    		}, 30)
+	    	}
 	    })
 		},
 		methods: {

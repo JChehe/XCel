@@ -24,16 +24,31 @@ window.onload = function () {
     tEnd = window.performance.now()
     console.log(`过滤数据耗时${ tEnd - tStart }毫秒`)
     console.log("state.excelData.exportFileByWB", arg.excelData.exportFileByWB)
-    ipcRenderer.send("filter-response", {result})
+    console.log("result",  result)
+    
+
+    
+      ipcRenderer.send("filter-response", {result})
   })
 
   ipcRenderer.on("exportFile-start", (event, arg) => {
     var tStart, tEnd
-    tStart = window.performance.now()
-    tempExcelData.exportFileByWB(arg)
-    tEnd = window.performance.now()
-    console.log(`导出文件耗时${ tEnd - tStart }毫秒`)
-    ipcRenderer.send("exportFile-response", {info: "成功导出"})
+    var isEmpty = false
+    var emptyIndex = 0
+    console.log("arg11111", arg)
+    tempExcelData.sheetNameList.forEach((sheetName, index) => {
+      // if(tempExcelData.filter)
+      if(arg['filteredData'][sheetName].length === 0) {
+        emptyIndex++
+      }
+    })
+    if(emptyIndex === tempExcelData.sheetNameList.length) {
+      ipcRenderer.send("exportFile-response", {type: -1, info: "过滤后文件为空，即无符合条件的数据。因此不会导出文件。"})
+    }
+    else {
+      tempExcelData.exportFileByWB(arg)
+      ipcRenderer.send("exportFile-response", {type: 1, info: "成功导出"})
+    }
   })
 }
 
