@@ -1,3 +1,4 @@
+const moment = require('moment')
 var filterUtils = {
   mathOperaArr: [">", "<", ">=", "<="],
   conditionArr: ["=", "!=", "contain", "notContain", "startsWith", "endsWith", "regexp"],
@@ -62,8 +63,8 @@ var filterUtils = {
       calcResult = this.calcNum({row, colOperator, filterCol, colKeys})
       // console.log("calcResult", calcResult)
     }else{
-      var date0 = moment(row[colKeys[filterCol[0] - 1]], "m/d/y hh:mm")
-      var date1 = moment(row[colKeys[filterCol[1] - 1]], "m/d/y hh:mm")
+      var date0 = moment(row[colKeys[filterCol[0]]], "m/d/y hh:mm")
+      var date1 = moment(row[colKeys[filterCol[1]]], "m/d/y hh:mm")
       var diff = date1.diff(date0, "seconds")
       // minutes
       calcResult = Math.floor(diff/60)

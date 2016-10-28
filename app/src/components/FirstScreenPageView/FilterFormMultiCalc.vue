@@ -111,11 +111,13 @@
 				// 去除两边的逗号
 				curCols = curCols.replace(/^[，*,*]*/ig, "").replace(/[，*,*]*$/ig, "")
 				// 切割为数组
-				curCols = curCols.split(/,?，?/)
-
+				curCols = curCols.split(/[,，]+/)
+				console.log("curCols", curCols)
 				for(var i = 0, len = curCols.length; i < len; i++){
 					var cCol = curCols[i]
+					console.log(cCol)
 					if(cCol.match(/[a-z]/ig)){
+						console.log("getNumCol(cCol)", getNumCol(cCol))
 						curCols.splice(i, 1, getNumCol(cCol))
 					}
 				}

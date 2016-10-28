@@ -163,7 +163,7 @@
 				for(var i = startIndex, len = endIndex; i <= len; i++){
 					tempColsArr.push(i - 1)
 				}
-				this.operatorCol = `${tempColsArr[0] + 1},${tempColsArr[tempColsArr.length - 1] + 1}`
+				// this.operatorCol = `${tempColsArr[0] + 1},${tempColsArr[tempColsArr.length - 1] + 1}`
 				this.operatorColArr = tempColsArr
 			},
 			generateNeedConformColWords(index){
@@ -176,7 +176,7 @@
 				var operator = this.operator
 				var operatorWords = this.getOperatorWords(this.filterOptions, operator)
 				var opVal = this.operatorVal.trim()
-				var preStr = `第${getCharCol(operatorColArr[0] + 1)}至第${getCharCol(operatorColArr[operatorColArr.length - 1] + 1)}列范围内的值中，至少有一个`
+				var preStr = `第${getCharCol(operatorColArr[0] + 1)}至第${getCharCol(operatorColArr[operatorColArr.length - 1] + 1)}列范围内的值中，至少有${this.needConformColIndex}列`
 
 				if(!this.validateForm({operatorColArr, opVal})) {
 					return

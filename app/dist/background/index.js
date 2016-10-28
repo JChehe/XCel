@@ -24,11 +24,8 @@ window.onload = function () {
     tEnd = window.performance.now()
     console.log(`过滤数据耗时${ tEnd - tStart }毫秒`)
     console.log("state.excelData.exportFileByWB", arg.excelData.exportFileByWB)
-    console.log("result",  result)
     
-
-    
-      ipcRenderer.send("filter-response", {result})
+    ipcRenderer.send("filter-response", {result})
   })
 
   ipcRenderer.on("exportFile-start", (event, arg) => {
@@ -37,7 +34,6 @@ window.onload = function () {
     var emptyIndex = 0
     console.log("arg11111", arg)
     tempExcelData.sheetNameList.forEach((sheetName, index) => {
-      // if(tempExcelData.filter)
       if(arg['filteredData'][sheetName].length === 0) {
         emptyIndex++
       }
