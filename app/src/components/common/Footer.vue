@@ -25,7 +25,7 @@
 		</ul>
 		<div>
 			<p class="summary_info" v-show="hasFile">
-				筛选后数据为 <em>{{filteredRows}}</em> 行，原始记录为 <em>{{ oriRows }}</em> 行，共 <em>{{ filterTagListLength }}</em> 个{{ filterWay == 0 ? "保留" : "剔除"}}</span>条件
+				筛选后数据为 <em>{{ curFilRowCount }}</em> 行，原始记录为 <em>{{ curOriRowCount }}</em> 行，共 <em>{{ curFilterTagListCount }}</em> 个{{ filterWay == 0 ? "保留" : "剔除"}}</span>条件
 			</p>
 			<img src="./assets/O2-icon.png" alt="O2_logo" @click="openAOTU">
 		</div>
@@ -42,7 +42,9 @@
 		getSideBarStatus,
 		getFilterPanelStatus,
 		getFilterWay,
-		getCurSheetSize 
+		getCurOriRowCount,
+		getCurFilRowCount,
+		getCurFilterTagListCount
 	} from '../../vuex/getters'
 	import { 
 		toggleSideBar,
@@ -61,7 +63,9 @@
 			getters: {
 				isShowFilterPanel: getFilterPanelStatus,
 				filterWay: getFilterWay,
-				curSheetSize: getCurSheetSize
+				curOriRowCount: getCurOriRowCount,
+				curFilRowCount: getCurFilRowCount,
+				curFilterTagListCount: getCurFilterTagListCount
 			},
 			actions: {
 				toggleSideBar,
@@ -72,16 +76,7 @@
 		},
 		computed: {
 			hasFile(){
-				return this.curSheetSize && this.curSheetSize.origin && this.curSheetSize.origin.rows > 0
-			},
-			oriRows(){
-				return this.curSheetSize && this.curSheetSize.origin && this.curSheetSize.origin.rows
-			},
-			filteredRows(){
-				return this.curSheetSize && this.curSheetSize.filtered && this.curSheetSize.filtered.rows
-			},
-			filterTagListLength(){
-				return this.curSheetSize && this.curSheetSize.tagList && this.curSheetSize.tagList.length
+				return this.curOriRowCount > 0
 			}
 		},
 		created() {

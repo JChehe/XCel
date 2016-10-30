@@ -15,8 +15,11 @@ var filterWay = window.localStorage.filterWay
 // console.log(_.isEqual(.1+.2, .3))
 const state = {
   filterTagList: {}, // 筛选条件列表
-  excelData: {},
-  filteredData: {},
+  // excelData: {},
+  // filteredData: {},
+  oriRow: {},
+  filRow: {},
+  colKeys: [],
   activeSheet: {
   	index: 0,
   	name: ""
@@ -66,6 +69,12 @@ const mutations = {
   [types.SET_EXCEL_DATA] (state, arg) {
     state.excelData = arg.result
     initFilterState(state, state.excelData.sheetNameList)
+  },
+
+  [types.SET_EXCEL_BASE_INFO] (state, arg) {
+    arg.colKeys.forEach((key, index) => {
+      state[key] = arg[key]
+    })
   },
 
   [types.ADD_FILTER] (state, filter) {

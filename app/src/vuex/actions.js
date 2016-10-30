@@ -25,16 +25,19 @@ export const setFileStatus = ({ dispatch }, val) => {
 	dispatch(types.SET_UPLOAD_STATUS, val)
 }
 // 过滤Excel数据相关
+
+// data 目前都是 path
 export const setExcelData = ({ dispatch }, data) => {
 	dispatch(types.SET_UPLOAD_STATUS, 0)
 	ipcRenderer.send("readFile-start", {
     data: data
   })
   ipcRenderer.once("readFile-response", (event, arg) => {
+  	dispatch(types.SET_EXCEL_BASE_INFO, arg)
   	dispatch(types.SET_UPLOAD_STATUS, -1)
-  	dispatch(types.SET_EXCEL_DATA, arg)
   	dispatch(types.SET_ACTIVE_SHEET, 0)
   	dispatch(types.TOGGLE_FILTER_PANEL_STATUS, true)
+  	// dispatch(types.SET_EXCEL_DATA, arg)
   	// dispatch(types.TOGGLE_SIDEBAR, true)
   })
 }

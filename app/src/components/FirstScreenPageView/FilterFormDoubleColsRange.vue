@@ -8,7 +8,7 @@
 						<span class="select">
 							<select v-model="logicOperator">
 								<option value="and">且</option>
-								<option v-show="!curSheetSize.tagList.length == 0" value="or">或</option>
+								<option v-show="!curFilterTagListCount == 0" value="or">或</option>
 							</select>
 							<p class="val_mask">{{ getLogicOperatorWords(logicOperator) }}</p>
 						</span>
@@ -57,7 +57,7 @@
 
 <script>
 	import { addFilter } from '../../vuex/actions'
-	import { getActiveSheet, getFilterOptions, getExcelData, getCurSheetSize } from '../../vuex/getters'
+	import { getActiveSheet, getFilterOptions, getExcelData } from '../../vuex/getters'
 	import { getCharCol, getNumCol, getOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
 	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
@@ -83,15 +83,16 @@
 				activeSheet: getActiveSheet,
 				filterOptions: getFilterOptions,
 				excelData: getExcelData,
-				curSheetSize: getCurSheetSize
+				curFilterTagListCount: getCurFilterTagListCount,
+				curColKeysCount: getCurColKeysCount
 			},
 			actions: {
 				addFilter
 			}
 		},
 		watch: {
-			curSheetSize(){
-				if(this.curSheetSize.tagList.length == 0) {
+			curFilterTagListCount(){
+				if(this.curFilterTagListCount == 0) {
 					this.logicOperator = "and"
 				}
 			}
@@ -115,10 +116,7 @@
 				}else{
 					return 0
 				}
-			},
-			filteredCols() {
-				return this.curSheetSize && this.curSheetSize.filtered && this.curSheetSize.filtered.cols
-			},
+			}
 		},
 		methods: {
 			getNumCol,
@@ -210,8 +208,8 @@
 					tipWords += "只能填写两列，它会取指定两列范围内的所有列（包含自身）"
 				}else if(operatorColArr[0] + 1 < 1) {
 					tipWords += "列从1开始"
-				}else if(this.filteredCols !== 0 && operatorColArr[operatorColArr.length - 1] + 1 > this.filteredCols){
-					tipWords += `超过最大列${this.filteredCols}`
+				}else if(this.curColKeysCount !== 0 && operatorColArr[operatorColArr.length - 1] + 1 > this.curColKeysCount){
+					tipWords += `超过最大列${this.curColKeysCount}`
 				}else if(opVal.length === 0) {
 					tipWords += "请填写运算符的值"
 				}else {

@@ -17,7 +17,7 @@
 <script>
 	import { getSideBarStatus, getColKeys } from '../../vuex/getters'
 	import { getCharCol, getNumCol } from '../../utils/ExcelSet'
-	
+	import { ipcRenderer } from 'electron'
 	export default {
 		vuex: {
 			getters: {
@@ -41,10 +41,14 @@
 			}
 		},
 		created() {
-			setTimeout(() => {
+			ipcRenderer.on("generate-html-string", function(htmlStr) {
 				var tbody = this.$el.querySelector("tbody")
 				tbody && (tbody.innerHTML = this.generateHTMLString)
-			},1)
+			})
+			/*setTimeout(() => {
+				var tbody = this.$el.querySelector("tbody")
+				tbody && (tbody.innerHTML = this.generateHTMLString)
+			},1)*/
 		},
 		computed: {
 			colNum (){
@@ -67,7 +71,7 @@
 
 				var resultBodyStr = ""
 
-				for(var i = 0, len = Math.min(this.rawNum, 1); i < len; i++){
+				for(var i = 0, len = Math.min(this.rawNum, 30); i < len; i++){
 					var resultTrStr = "<tr>"
 					this.colKeys.forEach((key, index) => {
 						if(index === 0){

@@ -40,7 +40,8 @@ export function getFilterPanelStatus(state) {
 	return state.filterList.isShowFillterPanel
 }
 
-export function getCurSheetSize(state) {
+
+/*export function getCurSheetSize(state) {
 	var filterListState = state.filterList
 	var excelData = filterListState.excelData
 	var filteredData, curActiveSheetName, curActiveSheetIndex,
@@ -68,7 +69,35 @@ export function getCurSheetSize(state) {
 		}
 	}
 }
+*/
+export function getCurOriRowCount(state) {
+	var curSheetName = state.filterList.activeSheet.name
+	return state.oriRow[curSheetName]
+}
 
+export function getCurFilRowCount(state) {
+	var curSheetName = state.filterList.activeSheet.name
+	return state.filRow[curSheetName]
+}
+
+export function getCurColCount(state) {
+	var curSheetName = state.filterList.activeSheet.name
+	return state.colKeys[curSheetName].length
+}
+
+export function getCurFilterTagListCount(state) {
+	var curSheetName = state.filterList.activeSheet.name
+	return state.filterTagList[curSheetName].length
+}
+export function getCurColKeys(state) {
+	var curSheetName = state.filterList.activeSheet.name
+	return state.colKeys[curSheetName]
+}
+
+export function getCurColKeysCount(state) {
+	var curSheetName = state.filterList.activeSheet.name
+	return state.colKeys[curSheetName].length	
+}
 
 // 其他
 export function getSideBarStatus(state) {
