@@ -133,6 +133,8 @@
 		<!-- 2.4 -->
 		<h3>联系</h3>
 		<p>如遇软件使用上的问题，请联系 <a @click="openURL('aotu')">凹凸实验室</a>。同时，也欢迎你提出宝贵的意见。</p>
+		<p>咚咚：刘健超</p>
+		<p>问题提交地址（可选）：<a @click="openURL('github')">https://github.com/JChehe/XCel/issues</a></p>
 		<div>
 			<img src="assets/qrcode.jpg" alt="凹凸实验室二维码">
 		</div>
@@ -146,12 +148,14 @@
 	const {shell} = require("electron")
 	const ASCII_URL = "http://tool.oschina.net/commons?type=4"
 	const AOTU_URL = "https://aotu.io/"
+	const GITHUB = "https://github.com/JChehe/XCel/issues"
 	export default {
 		methods: {
 			openURL(args){
 				switch (args){
 					case "ascii": shell.openExternal(ASCII_URL); break;
 					case "aotu": shell.openExternal(AOTU_URL); break;
+					case "github": shell.openExternal(GITHUB); break;
 					default: console.log("无该地址");
 				}
 			}
