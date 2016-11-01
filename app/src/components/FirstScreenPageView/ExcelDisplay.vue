@@ -1,9 +1,9 @@
 <!-- Excel -->
 <template>
 	<div class="excel_area">
-		<div class="tabs is_boxed is_small excel_cheet_nav" v-show="excelData.sheetNameList !== undefined">
+		<div class="tabs is_boxed is_small excel_cheet_nav" v-show="sheetNameList.length !== 0">
 			<ul>
-				<li v-for = "sheetName in excelData.sheetNameList" 
+				<li v-for = "sheetName in sheetNameList" 
 					:class="{'is_active': $index == activeSheet.index}"
 					@click = "changeTab($index)">
 					<a href="javascript:;">
@@ -12,12 +12,9 @@
 				</li>
 			</ul>
 		</div>
-		<!-- 根据cheetTittle 动态切换数据 -->
-				<!-- v-show="!excelData.sheetNameList" -->
-
 		<div class="tabs_body">
 			<div class="drop_area content"
-				v-show="!excelData.sheetNameList"
+				v-show="sheetNameList.length < 1"
 				@drop.prevent.stop="dropHandler" 
 				@dragenter="dragenterHandler"
 				@dragleave="dragleaveHandler"
@@ -32,10 +29,9 @@
 				</p>
 			</div>
 			
-			<sheet-of-excel v-for="sheetName in excelData.sheetNameList"
-				:sheet-data="filteredData[activeSheet.name]"
+			<sheet-of-excel v-for="sheetName in sheetNameList"
 				v-show="activeSheet.index === $index"
-				>
+				:sheet-html="sheetHTML">
 			</sheet-of-excel>
 		</div>
 	</div>
@@ -45,7 +41,8 @@
 <script>
 	import fs from 'fs-extra'
 	import pathModule from 'path'
-	import { getExcelData, getActiveSheet, getFilteredData, getSideBarStatus } from '../../vuex/getters'
+	import { ipcRenderer } from 'electron'
+	import { getSheetNameList, getActiveSheet, getSideBarStatus, getFilterTagList, getFilterWay } from '../../vuex/getters'
 	import { setActiveSheet, setExcelData, setUploadFiles } from '../../vuex/actions'
 	import SheetOfExcel from './SheetOfExcel'
 	
@@ -54,11 +51,17 @@
 		components: {
 			SheetOfExcel
 		},
+		data() {
+			return {
+				sheetHTML: ""
+			}
+		},
 		vuex: {
 			getters: {
-				excelData: getExcelData,
 				activeSheet: getActiveSheet,
-				filteredData: getFilteredData
+				filterTagList: getFilterTagList,
+				filterWay: getFilterWay,
+				sheetNameList: getSheetNameList
 			},
 			actions: {
 				setActiveSheet,
@@ -68,6 +71,11 @@
 		},
 		created(){
 			setTimeout(() => {
+				ipcRenderer.on("generate-htmlstring-response", (event, arg) => {
+					console.log("Asdsadsa")
+					this.sheetHTML = arg.sheetHTML
+				})
+
 				var dropArea = document.querySelector(".drop_area")
 				if(dropArea) {
 					dropArea.addEventListener("dragenter", dragoverHandler, false)
@@ -83,6 +91,11 @@
 		methods: {
 			changeTab(index) {
 				this.setActiveSheet(index)
+				ipcRenderer.send("changeTab-start", {
+					filterTagList: this.filterTagList,
+					filterWay: this.filterWay,
+					curActiveSheetName: this.activeSheet.name
+				})
 			},
 			dragenterHandler(e) {
 				e.target.classList.add("active")

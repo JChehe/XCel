@@ -52,7 +52,6 @@ export const delFilter = ({ dispatch }, val) => {
 }
 export const setFilteredData = ({ dispatch }, val) => {
 	dispatch(types.SET_FILTERED_DATA, val)
-	dispatch(types.EXPORT_FILE, val)
 }
 
 export const setFilterWay = ({ dispatch }, val) => {
@@ -66,9 +65,9 @@ export const toggleFilterPanelStatus = ({ dispatch },val) => {
 export const toggleSideBar = ({ dispatch }, val) => {
 	dispatch(types.TOGGLE_SIDEBAR, val)
 }
-export const exportFile = ({ dispatch }, val) => {
-	dispatch(types.EXPORT_FILE, val)
-}
+// export const exportFile = ({ dispatch }, val) => {
+// 	dispatch(types.EXPORT_FILE, val)
+// }
 
 // 窗口 window
 export const toggleWindowMax = ({ dispatch }) => {

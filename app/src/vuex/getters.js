@@ -16,21 +16,20 @@ export function getFileStatus(state) {
 export function getFilterOptions(state) {
 	return state.filterList.filterOptions
 }
-export function getExcelData(state) {
-	return state.filterList.excelData
+export function getSheetNameList(state) {
+	return state.filterList.sheetNameList
 }
+// 有问题， 没区分多表
 export function getActiveSheet(state) {
 	return state.filterList.activeSheet
 }
 export function getFilterTagList(state) {
 	return state.filterList.filterTagList
 }
-export function getFilteredData(state) {
-	return state.filterList.filteredData
-}
+
 export function getColKeys(state) {
 	var curSheet = state.filterList.activeSheet
-	return state.filterList.excelData[curSheet.name + '_headers']
+	return state.filterList[curSheet.name + '_headers']
 }
 
 export function getFilterWay(state) {
@@ -40,63 +39,35 @@ export function getFilterPanelStatus(state) {
 	return state.filterList.isShowFillterPanel
 }
 
-
-/*export function getCurSheetSize(state) {
-	var filterListState = state.filterList
-	var excelData = filterListState.excelData
-	var filteredData, curActiveSheetName, curActiveSheetIndex,
-		curSheetData, curFilterTagList, curFilteredData,curColKeys
-	if( excelData && excelData.sheetNameList && excelData.sheetNameList.length > 0){
-		filteredData = state.filterList.filteredData
-		curActiveSheetIndex = state.filterList.activeSheet.index
-		curActiveSheetName = excelData.sheetNameList[curActiveSheetIndex]
-		curSheetData = excelData[curActiveSheetName]
-		curFilterTagList = filterListState.filterTagList && filterListState.filterTagList[curActiveSheetName]
-		curFilteredData = filteredData[curActiveSheetName]
-		curColKeys = excelData[curActiveSheetName + "_headers"]
-	}
-	return {
-		origin: {
-			rows: curSheetData && curSheetData.length || 0,
-			cols: curColKeys && curColKeys.length || 0
-		},
-		filtered: {
-			rows: curFilteredData && curFilteredData.length || 0,
-			cols: curColKeys && curColKeys.length || 0
-		},
-		tagList: {
-			length: curFilterTagList && curFilterTagList.length || 0
-		}
-	}
-}
-*/
 export function getCurOriRowCount(state) {
 	var curSheetName = state.filterList.activeSheet.name
-	return state.oriRow[curSheetName]
+	return state.filterList.oriRow[curSheetName] || 0
 }
 
 export function getCurFilRowCount(state) {
 	var curSheetName = state.filterList.activeSheet.name
-	return state.filRow[curSheetName]
+	return state.filterList.filRow[curSheetName] || 0
 }
 
 export function getCurColCount(state) {
 	var curSheetName = state.filterList.activeSheet.name
-	return state.colKeys[curSheetName].length
+	return state.filterList.colKeys[curSheetName] && state.filterList.colKeys[curSheetName].length || 0
 }
 
 export function getCurFilterTagListCount(state) {
 	var curSheetName = state.filterList.activeSheet.name
-	return state.filterTagList[curSheetName].length
+	return state.filterList.filterTagList[curSheetName] && state.filterList.filterTagList[curSheetName].length || 0
 }
 export function getCurColKeys(state) {
 	var curSheetName = state.filterList.activeSheet.name
-	return state.colKeys[curSheetName]
+	return state.filterList.colKeys[curSheetName]
 }
 
 export function getCurColKeysCount(state) {
 	var curSheetName = state.filterList.activeSheet.name
-	return state.colKeys[curSheetName].length	
+	console.log("curSheetName", curSheetName)
+	console.log(state.filterList.colKeys[curSheetName] && state.filterList.colKeys[curSheetName].length || 0)
+	return state.filterList.colKeys[curSheetName] && state.filterList.colKeys[curSheetName].length || 0
 }
 
 // 其他

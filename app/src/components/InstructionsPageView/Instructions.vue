@@ -1,6 +1,6 @@
 <template>
 	<div class="content">
-		<h3>帮助文档</h3>
+		<h2>帮助文档</h2>
 
 		<p>本文将会介绍《Excel数据过滤工具》的使用方法及一些注意事项。</p>
 
@@ -15,7 +15,7 @@
 			<li>从第一列不为空的位置开始读取数据</li>
 			<li>表格中均要求是<strong>单一表格（即无合并表格）</strong></li>
 			<li>对于数据量较大的文件，该程序只会渲染<strong>前30行数据</strong>，但导出的文件是完整的</li>
-			<li>若文件确实过大，建议将文件分割成几份后进行赛选过滤</li>
+			<li>若文件过大（如遇到耗时过长的情况），建议将文件分割成几份后进行筛选过滤</li>
 		</ul>
 		<!-- 2 -->
 		<h3>使用方法</h3>
@@ -133,6 +133,8 @@
 		<!-- 2.4 -->
 		<h3>联系</h3>
 		<p>如遇软件使用上的问题，请联系 <a @click="openURL('aotu')">凹凸实验室</a>。同时，也欢迎你提出宝贵的意见。</p>
+		<p>咚咚：刘健超</p>
+		<p>问题提交地址（可选）：<a @click="openURL('github')">https://github.com/JChehe/XCel/issues</a></p>
 		<div>
 			<img src="assets/qrcode.jpg" alt="凹凸实验室二维码">
 		</div>
@@ -146,12 +148,14 @@
 	const {shell} = require("electron")
 	const ASCII_URL = "http://tool.oschina.net/commons?type=4"
 	const AOTU_URL = "https://aotu.io/"
+	const GITHUB = "https://github.com/JChehe/XCel/issues"
 	export default {
 		methods: {
 			openURL(args){
 				switch (args){
 					case "ascii": shell.openExternal(ASCII_URL); break;
 					case "aotu": shell.openExternal(AOTU_URL); break;
+					case "github": shell.openExternal(GITHUB); break;
 					default: console.log("无该地址");
 				}
 			}

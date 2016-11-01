@@ -1,4 +1,3 @@
-const getCharCol = require("../utils/ExcelSet").getCharCol
 
 module.exports = function generateHTMLString(arg){
 	var {sheetData, colKeys} = arg
@@ -28,4 +27,19 @@ module.exports = function generateHTMLString(arg){
 	
 	sheetData = colKeys = null
 	return (resultHeadStr + resultBodyStr)
+}
+
+
+function getCharCol(n) {
+  var temCol = "",
+    s = "",
+    m = 0
+
+  while (n > 0) {
+    m = n % 26
+    if (m === 0) m = 26
+    s = String.fromCharCode(m + 64) + s
+    n = (n - m) / 26
+  }
+  return s
 }

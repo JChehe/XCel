@@ -7,9 +7,11 @@ const generateHTMLString = require('./generateHTMLString')
 const SUFFIX_COLKEYS = "_headers"
 console.log("background进程pid：", process.pid)
 
-var excelData;
-
-
+var excelData
+var filteredData
+var colKeys = {}
+var oriRow = {}
+var filRow = {}
 
 
 window.onload = function () {
@@ -24,48 +26,101 @@ window.onload = function () {
     */
     excelData = new Excel().init(arg.data)
 
-    var oriRow = {}
-
+    oriRow = {}
+    filRow = {}
+    var filterTagList = {}
     var activeSheetIndex = arg.activeSheetIndex || 0,
         activeSheetName = excelData.sheetNameList[activeSheetIndex],
         curColKeys = excelData[activeSheetName + SUFFIX_COLKEYS],
         curSheetData = excelData[activeSheetName];
 
     excelData.sheetNameList.forEach(function(sheetName, index){
-      oriRow[sheetName] = 
+      oriRow[sheetName] = excelData[sheetName].length
+      filRow[sheetName] = excelData[sheetName].length
+      colKeys[sheetName] = excelData[sheetName + SUFFIX_COLKEYS]
+      filterTagList[sheetName] = []
+    })
+
+    console.log("colKeys", colKeys)
+    ipcRenderer.send("generate-htmlstring-response", {
+      sheetHTML: generateHTMLString({
+        sheetData: curSheetData,
+        colKeys: curColKeys
+      })
     })
 
     ipcRenderer.send("readFile-response", {
-      oriRow: curSheetData
+      oriRow,
+      filRow,
+      colKeys,
+      filterTagList,
+      sheetNameList: excelData.sheetNameList
     })
-    ipcRenderer.send("generate-html-string", generateHTMLString({
-      sheetData: curSheetData,
-      colKeys: curColKeys
+  })
+  ipcRenderer.on("filter-start", (event, arg) => {
+    filteredData = filterHandler(arg)
+    var curActiveSheetName = arg.curActiveSheetName
+    var curColKeys = colKeys[curActiveSheetName]
+    var tempFilRow = {}
+    
+    excelData.sheetNameList.forEach((sheetName, index) => {
+      tempFilRow[sheetName] = filteredData[sheetName].length
+    })
+
+    ipcRenderer.send("filter-response", {
+      filRow: tempFilRow
+    })
+
+    ipcRenderer.send("generate-htmlstring-response", {
+      sheetHTML: generateHTMLString({
+        sheetData: filteredData[curActiveSheetName],
+        colKeys: curColKeys
+      })
     })
   })
 
-  ipcRenderer.on("filter-start", (event, arg) => {
-    var result, tStart, tEnd
-    tStart = window.performance.now();
-    result = filterHandler(arg)
-    tEnd = window.performance.now()
-    console.log(`过滤数据耗时${ tEnd - tStart }毫秒`)
-    console.log("state.excelData.exportFileByWB", arg.excelData.exportFileByWB)
-    ipcRenderer.send("filter-response", {result})
+  ipcRenderer.on("changeTab-start", (event, arg) => {
+    console.log("changeTab")
+    console.log("Arg", arg)
+    filteredData = filterHandler(arg)
+    var curActiveSheetName = arg.curActiveSheetName
+    var curColKeys = colKeys[curActiveSheetName]
+    var tempFilRow = {}
+
+    ipcRenderer.send("generate-htmlstring-response", {
+      sheetHTML: generateHTMLString({
+        sheetData: filteredData[curActiveSheetName],
+        colKeys: curColKeys
+      })
+    })
   })
 
   ipcRenderer.on("exportFile-start", (event, arg) => {
-    var tStart, tEnd
-    tStart = window.performance.now()
-    excelData.exportFileByWB(arg)
-    tEnd = window.performance.now()
-    console.log(`导出文件耗时${ tEnd - tStart }毫秒`)
+    console.log("arg", arg)
+    excelData.exportFileByWB({
+      filteredData,
+      excelData
+    })
     ipcRenderer.send("exportFile-response", {info: "成功导出"})
+  })
+
+  ipcRenderer.on("delAllFilterTag-start", (event, arg) => {
+    var curActiveSheetName = arg.curActiveSheetName
+    var curColKeys = colKeys[curActiveSheetName]
+    var curSheetData = excelData[curActiveSheetName]
+
+    ipcRenderer.send("generate-htmlstring-response", {
+      sheetHTML: generateHTMLString({
+        sheetData: curSheetData,
+        colKeys: curColKeys
+      })
+    })
+
   })
 }
 
 function filterHandler(arg){
-  var {excelData, filterTagList, filterWay} = arg
+  var {filterTagList, filterWay} = arg
   var tempFilteredData = Object.assign({}, excelData)
   for(var i = 0, len = excelData.sheetNameList.length; i < len; i++) {
     var curSheetName = excelData.sheetNameList[i]

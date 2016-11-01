@@ -28,7 +28,8 @@
     border-top-color: #000;
     right: 6px;
     top: 50%;
-    transform: translateY(-2px)
+    transform: translateY(-2px);
+    pointer-events: none;
   }
   p{
     position: absolute;

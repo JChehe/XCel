@@ -4,7 +4,7 @@ const electron = require('electron')
 const path = require('path')
 const menuTemplate = require("./menuTemplate")
 const ipcMainSets = require("./ipcMainSets")
-const config = require('../config');
+// const config = require('../config');
 
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
@@ -13,6 +13,16 @@ let mainWindow
 let backgroundWindow
 var windowBounds = {}
 
+let config = {}
+if (process.env.NODE_ENV === 'development') {
+  config = require('../config')
+  config.mainUrl = `http://localhost:${config.port}`
+} else {
+  config.devtron = false
+  config.mainUrl = `file://${__dirname}/dist/index.html`
+}
+config.backUrl = `file://${__dirname}/dist/background/index.html`
+config.isDev = process.env.NODE_ENV === 'development'
 console.log("主进程pid：", process.pid)
 
 function createMainWindow () {

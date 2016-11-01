@@ -5,93 +5,44 @@
 		<table class="table is_bordered">
 			<thead>
 				<tr>
-					<th v-for="col in colNum">{{ getCharCol(col) }}</th>
+					<th v-for="col in (curColKeysCount + 1)">{{ getCharCol(col) }}</th>
 				</tr>
 			</thead>
-			<tbody>
-			</tbody>
+			<tbody></tbody>
 		</table>
 	</div>
 </template>
 
 <script>
-	import { getSideBarStatus, getColKeys } from '../../vuex/getters'
+	import { getSideBarStatus, getCurColKeysCount, getCurOriRowCount } from '../../vuex/getters'
 	import { getCharCol, getNumCol } from '../../utils/ExcelSet'
 	import { ipcRenderer } from 'electron'
 	export default {
 		vuex: {
 			getters: {
 				sideBarStatus: getSideBarStatus,
-				colKeys: getColKeys
+				curOriRowCount: getCurOriRowCount,
+				curColKeysCount: getCurColKeysCount
 			}
 		},
 		props: {
-			sheetData: {
-				type: [Array],
-				required: true,
-				default() {
-					return []
-				}
-			}
-		},
-		watch: {
-			sheetData(){
-				var tbody = this.$el.querySelector("tbody")
-				tbody && (tbody.innerHTML = this.generateHTMLString)
+			sheetHTML: {
+				type: String,
+				required: true
 			}
 		},
 		created() {
-			ipcRenderer.on("generate-html-string", function(htmlStr) {
+			setTimeout(() => {
 				var tbody = this.$el.querySelector("tbody")
-				tbody && (tbody.innerHTML = this.generateHTMLString)
-			})
-			/*setTimeout(() => {
-				var tbody = this.$el.querySelector("tbody")
-				tbody && (tbody.innerHTML = this.generateHTMLString)
-			},1)*/
+        tbody && (tbody.innerHTML = this.sheetHTML)
+			}, 0)
 		},
-		computed: {
-			colNum (){
-				return this.colKeys.length + 1
-			},
-			rawNum (){
-				console.log(this.colKeys.length * this.sheetData.length)
-				return this.sheetData.length
-			},
-			generateHTMLString(){
-				var tStart = window.performance.now()
-
-				var sheetData = this.sheetData
-
-				var resultHeadStr = "<tr><td>1</td>"
-				this.colKeys.forEach((row, index) => {
-					resultHeadStr += `<td>${row}</td>`
-				})
-				resultHeadStr += "</tr>"
-
-				var resultBodyStr = ""
-
-				for(var i = 0, len = Math.min(this.rawNum, 30); i < len; i++){
-					var resultTrStr = "<tr>"
-					this.colKeys.forEach((key, index) => {
-						if(index === 0){
-							resultTrStr += `<td>${i + 2}</td>`
-						}
-					})
-
-					this.colKeys.forEach((col, index) => {
-						var val = sheetData[i][col]
-						if(val == undefined) val = ""
-						resultTrStr += `<td title="${i + 2}行${this.getCharCol(index + 1)}列">${val}</td>`
-					})
-					resultTrStr += "</tr>"
-					resultBodyStr += resultTrStr
-				}
-				// console.log((resultHeadStr + resultBodyStr))
-				var tEnd = window.performance.now()
-				console.log(`字符串拼接耗时${tEnd - tStart}毫秒`)
-				sheetData = null;
-				return (resultHeadStr + resultBodyStr)
+		watch: {
+			sheetHTML() {
+				console.log("change")
+				var tbody = this.$el.querySelector("tbody")
+				console.log("tbody", tbody)
+        tbody && (tbody.innerHTML = this.sheetHTML)
 			}
 		},
 		methods: {

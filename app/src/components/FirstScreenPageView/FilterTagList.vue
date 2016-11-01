@@ -17,7 +17,7 @@
 
 <script>
 	import FilterTag from './FilterTag'
-	import { getFilterTagList, getActiveSheet, getExcelData } from '../../vuex/getters'
+	import { getFilterTagList, getActiveSheet } from '../../vuex/getters'
 
 	export default {
 		components: {
@@ -31,7 +31,6 @@
 		computed: {
 			isShowPlaceHolder() {
 				var curTagList = this.filterTagList[this.activeSheet.name]
-				console.log("curTagList", curTagList)
 				if(!curTagList || curTagList.length === 0) {
 					return true
 				}else {
@@ -42,8 +41,7 @@
 		vuex: {
 			getters: {
 				filterTagList: getFilterTagList,
-				activeSheet: getActiveSheet,
-				excelData: getExcelData
+				activeSheet: getActiveSheet
 			}
 		}
 	}

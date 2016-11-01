@@ -8,7 +8,7 @@
 						<span class="select">
 							<select v-model="logicOperator">
 								<option value="and">且</option>
-								<option v-show="!curSheetSize.tagList.length == 0" value="or">或</option>
+								<option v-show="!curFilterTagListCount == 0" value="or">或</option>
 							</select>
 							<p class="val_mask">{{ getLogicOperatorWords(logicOperator)}}</p>
 						</span>
@@ -18,7 +18,7 @@
 						<span class="select">
 							<select v-model="operatorCol">
 								<option value="0">请选择列</option>
-								<option v-else v-for="col in colNum" 
+								<option v-else v-for="col in curColCount" 
 									:value="$index+1">
 									{{ getCharCol(col + 1) }}
 								</option>
@@ -56,7 +56,7 @@
 
 <script>
 	import { addFilter } from '../../vuex/actions'
-	import { getActiveSheet, getColKeys, getFilterOptions, getExcelData, getCurSheetSize } from '../../vuex/getters'
+	import { getActiveSheet, getFilterOptions, getCurFilterTagListCount, getCurColCount } from '../../vuex/getters'
 	import { getCharCol, getLogicOperatorWords, getOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
 	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
@@ -79,35 +79,19 @@
 			getters: {
 				activeSheet: getActiveSheet,
 				filterOptions: getFilterOptions,
-				excelData: getExcelData,
-				colKeys: getColKeys,
-				curSheetSize: getCurSheetSize
+				curColCount: getCurColCount,
+				curFilterTagListCount: getCurFilterTagListCount
 			},
 			actions: {
 				addFilter
 			}
 		},
 		watch: {
-			curSheetSize(){
-				if(this.curSheetSize.tagList.length == 0) {
+			curFilterTagListCount(){
+				if(this.curFilterTagListCount == 0) {
 					this.logicOperator = "and"
 				}
 			}
-		},
-		computed: {
-			colChar(){
-				if(this.colKeys) {
-					return this.colKeys.forEach((item, index) => {
-						return this.getCharCol(index)
-					})
-				}
-			},
-			colNum(){
-				if(this.colKeys)
-					return this.colKeys.length
-				else
-					return 0
-			},
 		},
 		methods: {
 			getCharCol,

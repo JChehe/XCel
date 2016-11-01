@@ -125,9 +125,15 @@ Excel.prototype = {
 
     bodyStart = window.performance.now()
     var data = {}
-    json.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: getCharCol(j+1) + (i + 2) })))
-        .reduce((prev, next) => prev.concat(next))
-        .forEach((v, i) => data[v.position]= {v: v.v})
+    var step1 = json.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: getCharCol(j+1) + (i + 2) })))
+    console.log("step1", step1)
+    if(step1.length === 0) {
+      step1.forEach((v, i) => data[v.position]= {v: v.v})
+    }else {
+      var step2 = step1.reduce((prev, next) => prev.concat(next))
+      step2.forEach((v, i) => data[v.position]= {v: v.v})
+    }
+
     bodyEnd = window.performance.now()
     console.log("构建数据部分总共需要时间：", bodyEnd - bodyStart)
 
@@ -136,7 +142,6 @@ Excel.prototype = {
     headers = data = null
 
     var outputPos = Object.keys(output)
-    // 刚好利用了Object的键会排序的特性
     var ref = outputPos[0] + ':' + outputPos[outputPos.length - 1]
     var wb = {
       SheetNames: [sheetName],

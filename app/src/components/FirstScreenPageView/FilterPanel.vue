@@ -30,8 +30,8 @@
 	import FilterFormSingleLogic from './FilterFormSingleLogic'
 	import FilterFormMultiCalc from './FilterFormMultiCalc'
 	import FilterFormDoubleColsRange from './FilterFormDoubleColsRange'
-	import { getFilterTagList, getFilterPanelStatus, getCurSheetSize, getFilterWay, getExcelData, getFileStatus } from '../../vuex/getters'
-	import { exportFile, setFilteredData, setFileStatus } from '../../vuex/actions'
+	import { getFilterTagList, getFilterPanelStatus, getCurFilterTagListCount, getFilterWay, getFileStatus, getActiveSheet } from '../../vuex/getters'
+	import { setFilteredData, setFileStatus } from '../../vuex/actions'
 	import { ipcRenderer } from 'electron'
 	export default{
 		components: {
@@ -52,54 +52,53 @@
 		vuex: {
 			getters: {
 				filterPanelStatus: getFilterPanelStatus,
-				curSheetSize: getCurSheetSize,
 				filterTagList: getFilterTagList,
 				filterWay: getFilterWay,
-				excelData: getExcelData,
-				fileStatus: getFileStatus
+				fileStatus: getFileStatus,
+				curFilterTagListCount: getCurFilterTagListCount,
+				activeSheet: getActiveSheet
 			},
 			actions: {
-				exportFile,
 				setFilteredData,
 				setFileStatus
 			}
 		},
 		created(){
-			console.log("filter_panel 组件被创建")
-			console.log(ipcRenderer)
 			ipcRenderer.on("filter-response", (event, arg) => {
 				this.setFileStatus(2)
-      	this.setFilteredData(arg.result)
+      	this.setFilteredData(arg.filRow)
+      	ipcRenderer.send("exportFile-start")
 	    })
 
 	    ipcRenderer.on("exportFile-response", (event, arg) => {
 	    	console.log(arg.info)
 	    	this.setFileStatus(-1)
+	    	
+	    	if(arg.type === -1) {
+	    		setTimeout(() => {
+	    			ipcRenderer.send('sync-alert-dialog', {
+		    			content: arg.info
+		    		})
+	    		}, 30)
+	    	}
 	    })
 		},
 		methods: {
-			changeTab(index){
-				this.activeFilterFormIndex = index
-			},
 			submit(){
 				if(filterVal.tirm().length === 0) return false
 			},
-			
 			filterHandler(){
-				var filterTagListLength = this.curSheetSize.tagList.length
-				if(filterTagListLength === undefined || filterTagListLength === 0) {
+				if(this.curFilterTagListCount === 0) {
 					ipcRenderer.send("sync-alert-dialog", {
 						content: "请先添加筛选条件"
 					})
 				}else {
 					this.setFileStatus(1) 
-					setTimeout(() => {
-						ipcRenderer.send("filter-start", {
-				      filterTagList: this.filterTagList,
-				      excelData: this.excelData,
-				      filterWay: this.filterWay
-				    })
-					}, 10)
+					ipcRenderer.send("filter-start", {
+			      filterTagList: this.filterTagList,
+			      filterWay: this.filterWay,
+			      curActiveSheetName: this.activeSheet.name
+			    })
 				}
 			}
 		}
@@ -161,8 +160,6 @@
 			}
 		}
 	}
-
-	
 
 	.filter_form_group table tr td{
 	  color: #000;

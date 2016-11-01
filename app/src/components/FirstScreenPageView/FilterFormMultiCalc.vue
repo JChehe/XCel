@@ -8,7 +8,7 @@
 						<span class="select">
 							<select v-model="logicOperator">
 								<option value="and">且</option>
-								<option v-show="!curSheetSize.tagList.length == 0" value="or" value="or">或</option>
+								<option v-show="!curFilterTagListCount == 0" value="or" value="or">或</option>
 							</select>
 							<p class="val_mask">{{ getLogicOperatorWords(logicOperator) }}</p>
 					</td>
@@ -56,7 +56,7 @@
 
 <script>
 	import { colOperator, getNumCol, getCharCol, getOperatorWords, getColOperatorWords, getColArithmeticOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from "../../utils/ExcelSet"
-	import { getFilterOptions, getCurSheetSize } from '../../vuex/getters'
+	import { getFilterOptions, getCurFilterTagListCount } from '../../vuex/getters'
 	import { addFilter } from '../../vuex/actions'
 	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
@@ -79,15 +79,15 @@
 		vuex: {
 			getters: {
 				filterOptions: getFilterOptions,
-				curSheetSize: getCurSheetSize
+				curFilterTagListCount: getCurFilterTagListCount
 			},
 			actions: {
 				addFilter
 			}
 		},
 		watch: {
-			curSheetSize(){
-				if(this.curSheetSize.tagList.length == 0) {
+			curFilterTagListCount(){
+				if(this.curFilterTagListCount == 0) {
 					this.logicOperator = "and"
 				}
 			}
@@ -111,11 +111,13 @@
 				// 去除两边的逗号
 				curCols = curCols.replace(/^[，*,*]*/ig, "").replace(/[，*,*]*$/ig, "")
 				// 切割为数组
-				curCols = curCols.split(/,?，?/)
-
+				curCols = curCols.split(/[,，]+/)
+				console.log("curCols", curCols)
 				for(var i = 0, len = curCols.length; i < len; i++){
 					var cCol = curCols[i]
+					console.log(cCol)
 					if(cCol.match(/[a-z]/ig)){
+						console.log("getNumCol(cCol)", getNumCol(cCol))
 						curCols.splice(i, 1, getNumCol(cCol))
 					}
 				}

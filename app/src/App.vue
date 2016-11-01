@@ -2,7 +2,7 @@
 
 <template>
   <window-top style="-webkit-app-region: drag;"></window-top>
-  <router-view></router-view>
+  <router-view keep-alive></router-view>
 </template>
 
 <script>

@@ -7,16 +7,13 @@ export const SET_UPLOAD_STATUS = 'SET_UPLOAD_STATUS'
 // 过滤 Excel 数据相关
 export const ADD_FILTER = 'ADD_FILTER'
 export const DEL_FILTER = 'DEL_FILTER'
-export const SET_EXCEL_DATA = 'SET_EXCEL_DATA'
 export const SET_ACTIVE_SHEET = 'SET_ACTIVE_SHEET'
-export const SET_FILTERED_DATA = 'SET_FILTERED_DATA'
 export const SET_FILTER_WAY = 'SET_FILTER_WAY'
 export const TOGGLE_FILTER_PANEL_STATUS = 'TOGGLE_FILTER_PANEL_STATUS'
 export const SET_EXCEL_BASE_INFO = 'SET_EXCEL_BASE_INFO'
 
 // 其他
 export const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR'
-export const EXPORT_FILE = 'EXPORT_FILE'
 
 // 窗口 window
 export const TOGGLE_WINDOW_MAX = 'TOGGLE_WINDOW_MAX'

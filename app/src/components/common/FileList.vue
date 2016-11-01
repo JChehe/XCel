@@ -20,7 +20,7 @@
 	import xlsx from 'xlsx'
 	import fs from 'fs'
 	import { remote, ipcRenderer } from 'electron'
-	import { changeFileType, setExcelData, setActiveSheet, setUploadFiles, delUploadFiles } from '../../vuex/actions'
+	import { changeFileType, setExcelData ,setActiveSheet, setUploadFiles, delUploadFiles } from '../../vuex/actions'
 	import { getCurSearchVal, getAllFileType, getUploadFiles } from '../../vuex/getters'
 
 	export default {

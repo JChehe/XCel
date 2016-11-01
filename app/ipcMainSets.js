@@ -23,6 +23,10 @@ module.exports = function(mainWindow, backgroundWindow) {
 	  backgroundWindow.webContents.send("readFile-start", arg)
 	})
 
+	ipcMain.on("generate-htmlstring-response", (event, arg) => {
+		mainWindow.webContents.send("generate-htmlstring-response", arg)
+	})
+
 	ipcMain.on("filter-response", (event, arg) => {
 	  mainWindow.webContents.send("filter-response", arg)
 	})
@@ -30,11 +34,19 @@ module.exports = function(mainWindow, backgroundWindow) {
 	  backgroundWindow.webContents.send("filter-start", arg)
 	})
 
+	ipcMain.on("changeTab-start", (event, arg) => {
+		backgroundWindow.webContents.send("changeTab-start", arg)
+	})
+
 	ipcMain.on("exportFile-response", (event, arg) => {
 	  mainWindow.webContents.send("exportFile-response", arg)
 	})
 	ipcMain.on("exportFile-start", (event, arg) => {
 	  backgroundWindow.webContents.send("exportFile-start", arg)
+	})
+
+	ipcMain.on("delAllFilterTag-start", (event, arg) => {
+		backgroundWindow.webContents.send("delAllFilterTag-start", arg)
 	})
 
 	ipcMain.on("sync-openFile-dialog", (event, arg) => {

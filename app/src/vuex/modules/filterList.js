@@ -12,18 +12,16 @@ const SUFFIX_COLKEYS = "_headers"
 var filterWay = window.localStorage.filterWay
                 ? JSON.parse(window.localStorage.filterWay) : 0
 
-// console.log(_.isEqual(.1+.2, .3))
 const state = {
   filterTagList: {}, // 筛选条件列表
-  // excelData: {},
-  // filteredData: {},
   oriRow: {},
   filRow: {},
-  colKeys: [],
+  colKeys: {},
   activeSheet: {
   	index: 0,
   	name: ""
   },
+  sheetNameList: [],
   filterWay: filterWay, // 0 是保留, 1 是剔除
   isShowFillterPanel: false,
   filterOptions: [
@@ -66,13 +64,9 @@ const state = {
 
 var isChange = false
 const mutations = {
-  [types.SET_EXCEL_DATA] (state, arg) {
-    state.excelData = arg.result
-    initFilterState(state, state.excelData.sheetNameList)
-  },
 
   [types.SET_EXCEL_BASE_INFO] (state, arg) {
-    arg.colKeys.forEach((key, index) => {
+    Object.keys(arg).forEach((key, index) => {
       state[key] = arg[key]
     })
   },
@@ -80,7 +74,7 @@ const mutations = {
   [types.ADD_FILTER] (state, filter) {
     var curSheetName = state.activeSheet.name
     var filterTagList = state.filterTagList
-  	if(state.excelData.sheetNameList && state.excelData.sheetNameList.length > 0){
+  	if(state.sheetNameList && state.sheetNameList.length > 0){
   		var tempTagList = Object.assign({}, state.filterTagList)
       var curTagList = tempTagList[curSheetName]
       var isHasSameGroup = false
@@ -107,7 +101,6 @@ const mutations = {
         }
         curTagList.push(filterObj)
       }
-      
 
 	  	state.filterTagList = tempTagList
       
@@ -124,37 +117,30 @@ const mutations = {
     var curSheetName = state.activeSheet.name
 		var tempTagList = Object.assign({}, state.filterTagList)
 
-    // console.log("delete_index", index)
     tempTagList[curSheetName].splice(index, 1)
   	state.filterTagList = tempTagList
 
   	// 然后进行具体的过滤操作
   	var len = state.filterTagList[curSheetName].length
     isChange = true
-  	if( len > 0){
-      // 筛选结果赋值
-      // state.filteredData = addDelHandler()
-  	}else{
-      var tempCurSheetData = Object.assign([], state.excelData[curSheetName])
-  		state.filteredData[curSheetName] = tempCurSheetData
-  	}
+    console.log("len", len)
+    if(len < 1) {
+      ipcRenderer.send("delAllFilterTag-start", {
+        curActiveSheetName: curSheetName
+      })
+      state.filRow[curSheetName] = state.oriRow[curSheetName]
+    }
   },
   
   [types.SET_ACTIVE_SHEET] (state, index) {
   	state.activeSheet = {
   		index,
-  		name: state.excelData.sheetNameList[index]
+  		name: state.sheetNameList[index]
   	}
   },
 
-  [types.EXPORT_FILE] (state, val) {
-    ipcRenderer.send("exportFile-start", {
-      filteredData: state.filteredData,
-      excelData: state.excelData
-    })
-  },
   [types.SET_FILTERED_DATA] (state, data) {
-    state.filteredData = data
+    state.filRow = data
   },
 
   [types.SET_FILTER_WAY] (state, val) {
@@ -176,9 +162,3 @@ export default {
   mutations
 }
 
-function initFilterState(state, sheetNames) {
-  for(var i = 0, len = sheetNames.length; i < len; i++) {
-    state.filterTagList[sheetNames[i]] = []
-    state.filteredData[sheetNames[i]] = Object.assign([], state.excelData[sheetNames[i]])
-  }
-}
