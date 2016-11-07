@@ -5,8 +5,8 @@
 			{{ filterTag.groupId }}
 		</span>
 		<ul>
-			<li v-for="filter in filterTag.filters">
-				<span class="logic_char" v-if="$index !== 0">{{ getLogicOperator(filter.logicOperator) }}</span>
+			<li v-for="(filter, index) in filterTag.filters">
+				<span class="logic_char" v-if="index !== 0">{{ getLogicOperator(filter.logicOperator) }}</span>
 				<p>{{ filter.filterWords }}</p>
 			</li>
 		</ul>
@@ -46,10 +46,10 @@
 				this.delFilter(index)
 			},
 			getLogicOperator(char) {
-				return char === "and" ? "且" : "或"
+				return char === 'and' ? '且' : '或'
 			},
 			getFilterWords(filterTag) {
-				var finalWords = ""
+				let finalWords = ''
 				filterTag.filters.forEach((item, index) => {
 					finalWords
 				})

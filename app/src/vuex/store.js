@@ -1,12 +1,12 @@
 import Vue from 'vue'
-import Vuex from 'nerdyglasses-vuex'
+import Vuex from 'vuex'
 import modules from './modules'
-// import createLogger from 'nerdyglasses-vuex/logger'
 
 Vue.use(Vuex)
 
+const isDev = process.env.NODE_ENV !== 'production'
+
 export default new Vuex.Store({
-  // plugins: [createLogger()],
   modules,
-  strict: process.env.NODE_ENV !== 'production'
+  strict: isDev
 })

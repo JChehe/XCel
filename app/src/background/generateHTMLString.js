@@ -1,15 +1,17 @@
+'use strict';
 
 module.exports = function generateHTMLString(arg){
-	var {sheetData, colKeys} = arg
-	var resultHeadStr = "<tr><td>1</td>"
-	var resultBodyStr = ""
+	let	{ sheetData, colKeys } = arg,
+			resultHeadStr = '<tr><td>1</td>',
+			resultBodyStr = ''
+
 	colKeys.forEach((row, index) => {
 		resultHeadStr += `<td>${row}</td>`
 	})
-	resultHeadStr += "</tr>"
+	resultHeadStr += '</tr>'
 
-	for(var i = 0, len = Math.min(sheetData.length, 30); i < len; i++){
-		var resultTrStr = "<tr>"
+	for(let i = 0, len = Math.min(sheetData.length, 30); i < len; i++){
+		let resultTrStr = '<tr>'
 		colKeys.forEach((key, index) => {
 			if(index === 0){
 				resultTrStr += `<td>${i + 2}</td>`
@@ -17,11 +19,11 @@ module.exports = function generateHTMLString(arg){
 		})
 
 		colKeys.forEach((col, index) => {
-			var val = sheetData[i][col]
+			let val = sheetData[i][col]
 			if(val == undefined) val = ""
 			resultTrStr += `<td title="${i + 2}行${getCharCol(index + 1)}列">${val}</td>`
 		})
-		resultTrStr += "</tr>"
+		resultTrStr += '</tr>'
 		resultBodyStr += resultTrStr
 	}
 	
@@ -31,9 +33,9 @@ module.exports = function generateHTMLString(arg){
 
 
 function getCharCol(n) {
-  var temCol = "",
-    s = "",
-    m = 0
+  let temCol = '',
+  	  s = '',
+    	m = 0
 
   while (n > 0) {
     m = n % 26

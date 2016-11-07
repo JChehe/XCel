@@ -1,16 +1,11 @@
 import * as types from '../mutation-types'
 import * as ExcelSet from '../../utils/ExcelSet'
-import moment from "moment"
-import lodash from "lodash"
-import zh from "moment/locale/zh-cn"
-import { ipcRenderer } from "electron"
+import { ipcRenderer } from 'electron'
 
-moment.locale("zh") // 设置时间格式为中文
+const SUFFIX_COLKEYS = '_headers'
 
-const SUFFIX_COLKEYS = "_headers"
-
-var filterWay = window.localStorage.filterWay
-                ? JSON.parse(window.localStorage.filterWay) : 0
+let filterWay = JSON.parse(window.localStorage.filterWay)
+              ? JSON.parse(window.localStorage.filterWay) : 0
 
 const state = {
   filterTagList: {}, // 筛选条件列表
@@ -19,52 +14,57 @@ const state = {
   colKeys: {},
   activeSheet: {
   	index: 0,
-  	name: ""
+  	name: ''
   },
   sheetNameList: [],
-  filterWay: filterWay, // 0 是保留, 1 是剔除
+  filterWay, // 0 是保留, 1 是剔除
   isShowFillterPanel: false,
+  isShowColSelectDialog: false,
+  colSelectType: -1, // 0：单列运算 1：多列运算 2：双列范围逻辑
+  colSelectVal: {
+    single: [],
+    multi: [],
+    double: []
+  },
   filterOptions: [
     {
-  		char: ">",
-  		words: "大于"
+  		char: '>',
+  		words: '大于'
   	},{
-  		char: "<",
-  		words: "小于"
+  		char: '<',
+  		words: '小于'
   	},{
-  		char: ">=",
-  		words: "大于或等于"
+  		char: '>=',
+  		words: '大于或等于'
   	},{
-  		char: "<=",
-  		words: "小于或等于"
+  		char: '<=',
+  		words: '小于或等于'
   	},{
-  		char: "=",
-  		words: "等于"
+  		char: '=',
+  		words: '等于'
   	},{
-      char: "!=",
-      words: "不等于"
+      char: '!=',
+      words: '不等于'
     },{
-  		char: "contain",
-  		words: "包含"
+  		char: 'contain',
+  		words: '包含'
   	},{
-      char: "notContain",
-      words: "不包含"
+      char: 'notContain',
+      words: '不包含'
     },{
-  		char: "startsWith",
-  		words: "开头字符"
+  		char: 'startsWith',
+  		words: '开头字符'
   	},{
-  		char: "endsWith",
-  		words: "结束字符"
+  		char: 'endsWith',
+  		words: '结束字符'
   	},{
-  		char: "regexp",
-  		words: "正则表达式"
+  		char: 'regexp',
+  		words: '正则表达式'
   	}
   ]
 }
 
-var isChange = false
 const mutations = {
-
   [types.SET_EXCEL_BASE_INFO] (state, arg) {
     Object.keys(arg).forEach((key, index) => {
       state[key] = arg[key]
@@ -72,16 +72,16 @@ const mutations = {
   },
 
   [types.ADD_FILTER] (state, filter) {
-    var curSheetName = state.activeSheet.name
-    var filterTagList = state.filterTagList
+    let curSheetName = state.activeSheet.name,
+        filterTagList = state.filterTagList
   	if(state.sheetNameList && state.sheetNameList.length > 0){
-  		var tempTagList = Object.assign({}, state.filterTagList)
-      var curTagList = tempTagList[curSheetName]
-      var isHasSameGroup = false
+  		let tempTagList = Object.assign({}, state.filterTagList),
+          curTagList = tempTagList[curSheetName],
+          isHasSameGroup = false
       
       // 判断当前filter是否存在组
       // 若存在，则判断是否存在同类组
-      if( filter.groupId != "-1" ) {
+      if( filter.groupId != '-1' ) {
         curTagList.forEach((item, index) => {
           // 若存在同类组
           if( filter.groupId === item.groupId ) {
@@ -94,7 +94,7 @@ const mutations = {
 
       // 若不存在 或 找不到同类组
       if(!isHasSameGroup) {
-        var filterObj = {
+        let filterObj = {
           groupId: filter.groupId,
           logicOperator: filter.logicOperator,
           filters: [filter]
@@ -105,27 +105,24 @@ const mutations = {
 	  	state.filterTagList = tempTagList
       
       tempTagList = null
-      isChange = true
   	}else{
-      ipcRenderer.send("sync-alert-dialog", {
-        content: "还没上传相应的Excel文件"
+      ipcRenderer.send('sync-alert-dialog', {
+        content: '还没上传相应的Excel文件'
       })
     }
   },
 
   [types.DEL_FILTER] (state, index) {
-    var curSheetName = state.activeSheet.name
-		var tempTagList = Object.assign({}, state.filterTagList)
+    let curSheetName = state.activeSheet.name,
+		    tempTagList = Object.assign({}, state.filterTagList)
 
     tempTagList[curSheetName].splice(index, 1)
   	state.filterTagList = tempTagList
 
   	// 然后进行具体的过滤操作
-  	var len = state.filterTagList[curSheetName].length
-    isChange = true
-    console.log("len", len)
+  	let len = state.filterTagList[curSheetName].length
     if(len < 1) {
-      ipcRenderer.send("delAllFilterTag-start", {
+      ipcRenderer.send('delAllFilterTag-start', {
         curActiveSheetName: curSheetName
       })
       state.filRow[curSheetName] = state.oriRow[curSheetName]
@@ -145,20 +142,36 @@ const mutations = {
 
   [types.SET_FILTER_WAY] (state, val) {
     state.filterWay = val
-    window.localStorage.setItem("filterWay", JSON.stringify(val))
+    window.localStorage.setItem('filterWay', JSON.stringify(val))
   },
 
   [types.TOGGLE_FILTER_PANEL_STATUS] (state, val) {
-    if(_.isBoolean(val)) {
+    if(isBoolean(val)) {
       state.isShowFillterPanel = val
     }else{
       state.isShowFillterPanel = !state.isShowFillterPanel
     }
+  },
+
+  [types.SET_COL_SELECT_DIALOG_STATUS] (state, val) {
+    state.isShowColSelectDialog = val
+  },
+
+  [types.SET_COL_SELECT_TYPE] (state, val) {
+    state.colSelectType = val
+  },
+
+  [types.SET_COL_SELECT_VAL] (state, val) {
+    state.colSelectVal = val
   }
 }
 
 export default {
   state,
   mutations
+}
+
+function isBoolean(val) {
+  return val === true || val === false
 }
 

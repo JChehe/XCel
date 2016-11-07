@@ -1,5 +1,5 @@
 <template>
-	<form @submit.prevent="addFilterHandler">
+	<form @submit.prevent="addFilterHandler" @keyup.stop>
 		<table class="table">
 			<tbody>
 				<tr>
@@ -14,16 +14,16 @@
 						</span>
 					</td>	
 					<td>
-						<input type="text" placeholder="输入列（以，隔开）" v-model="operatorCol" @change="generateNeedConformColNum" debounce="300">
+						<p class="col_placeholder" @click="showColSelectDialog">{{operatorCol.length === 0 ? "请选择列" : formatColGroup}}</p>
 					</td>
 					<td class="controls">
 						<span class="select">
 							<select v-model="needConformColIndex">
-								<option v-if="needConformColsNum===0" value="1">
+								<option v-if="needConformColsNum === 0" value="1">
 									{{ generateNeedConformColWords(1) }} 
 								</option>
-								<option v-else track-by="$index" v-for="index in needConformColsNum" :value="index + 1">
-									{{ generateNeedConformColWords(index+1) }}
+								<option v-else v-for="index in needConformColsNum" :key="index"  :value="index + 1">
+									{{ generateNeedConformColWords(index + 1) }}
 								</option>
 							</select>
 							<p class="val_mask">{{ generateNeedConformColWords( needConformColIndex ) }}</p>
@@ -44,7 +44,7 @@
 							<input type="text" placeholder="请填写运算符的值" v-model="operatorVal">
 					</td>
 					<td>
-						<group-select :group-id.sync="groupId"></group-select>
+						<group-select :group-id="groupId"></group-select>
 					</td>
 					<td>
 						<button type="submit">添加</button>
@@ -56,8 +56,8 @@
 </template>
 
 <script>
-	import { addFilter } from '../../vuex/actions'
-	import { getActiveSheet, getFilterOptions, getCurFilterTagListCount, getCurColKeysCount } from '../../vuex/getters'
+	import { addFilter, setColSelectDialogStatus, setColSelectType } from '../../vuex/actions'
+	import { getActiveSheet, getFilterOptions, getCurFilterTagListCount, getCurColCount } from '../../vuex/getters'
 	import { getCharCol, getNumCol, getOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
 	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
@@ -68,11 +68,11 @@
 		},
 		data(){
 			return {
-				operatorVal: "",
-				operatorCol: "", // 最终会转为数组
+				operatorVal: '',
+				operatorCol: '', // 最终会转为数组
 				operatorColArr: [],
-				operator: ">",
-				logicOperator: "and",
+				operator: '>',
+				logicOperator: 'and',
 				needConformColIndex: 1,
 				isConformDoubleCols: true,
 				groupId: -1
@@ -83,28 +83,40 @@
 				activeSheet: getActiveSheet,
 				filterOptions: getFilterOptions,
 				curFilterTagListCount: getCurFilterTagListCount,
-				curColKeysCount: getCurColKeysCount
+				curColCount: getCurColCount
 			},
 			actions: {
+				setColSelectDialogStatus,
+				setColSelectType,
 				addFilter
 			}
+		},
+		mounted() {
+			window.eventBus.$on('colSelVal4Double', (colSelectGroup) => {
+				this.operatorCol = colSelectGroup
+			})
 		},
 		watch: {
 			curFilterTagListCount(){
 				if(this.curFilterTagListCount == 0) {
-					this.logicOperator = "and"
+					this.logicOperator = 'and'
 				}
 			}
 		},
 		computed: {
-			// 只含有始末两个值
+			formatColGroup() {
+				console.log(this.operatorCol)
+				return this.operatorCol.map((col, index) => {
+					return this.getCharCol(col)
+				}).join(',')
+			},
 			needConformColsNum(){
-				var operatorColArr = this.operatorColArr
+				let operatorColArr = this.operatorColArr
 				if(operatorColArr.length >= 2){
 					// 取绝对值，让输入的列的顺序无关
-					var startIndex = operatorColArr[0]
-					var endIndex = operatorColArr[operatorColArr.length - 1]
-					var distance = Math.abs( endIndex - startIndex )
+					let startIndex = operatorColArr[0],
+							endIndex = operatorColArr[operatorColArr.length - 1],
+							distance = Math.abs( endIndex - startIndex )
 					if(distance === 1) {
 						distance = 2
 					}else if(distance > 1) {
@@ -123,57 +135,35 @@
 			getLogicOperatorWords,
 			getOperatorWords,
 			getFilterWordsPrimitive,
-			
-			generateNeedConformColNum(){
-				var curCols = this.operatorCol.trim()
-				var tempColsArr = []
-				// 去除两边的逗号和中间出现的空格
-				curCols = curCols.replace(/^[，*,*]*/ig, "").replace(/[，*,*]*$/ig, "").replace(/\s/ig, "")
-
-				// 切割为数组
-				curCols = curCols.split(/[,，]+/)
-
-				// 过滤掉中间的空元素
-				curCols = curCols.filter((item, index) => {
-					if(item === "" || item === null || item === undefined) {
-						return false
-					}else{
-						return true
-					}
-				})
-				// 数组中出现的字符转为数字
-				for(var i = 0, len = curCols.length; i < len; i++){
-					var cCol = curCols[i]
-					if(cCol.match(/[a-z]/ig)){
-						curCols.splice(i, 1, getNumCol(cCol))
-					}
-				}
-				this.isConformDoubleCols = curCols.length === 2 ? true : false
-
-				if(!this.isConformDoubleCols) {
-					return this.operatorColArr = curCols
-				}
-
-				// 根据范围生成范围内所有的序列
-				var startIndex = Math.min(Math.abs(+curCols[0]), Math.abs(curCols[1]))
-				var endIndex = Math.max(Math.abs(+curCols[0]), Math.abs(curCols[1]))
-				for(var i = startIndex, len = endIndex; i <= len; i++){
-					tempColsArr.push(i - 1)
-				}
-				// this.operatorCol = `${tempColsArr[0] + 1},${tempColsArr[tempColsArr.length - 1] + 1}`
-				this.operatorColArr = tempColsArr
+			showColSelectDialog() {
+				this.setColSelectType(2)
+				this.setColSelectDialogStatus(true)
 			},
 			generateNeedConformColWords(index){
-				return index !== this.needConformColsNum ? `满足${index}列` : "满足全部列"
+				return index !== this.needConformColsNum ? `满足${index}列` : '满足全部列'
+			},
+			generateNeedConformColNum(){
+				let operatorCol = this.operatorCol,
+						abs0 = Math.abs(+operatorCol[0]),
+						abs1 = Math.abs(+operatorCol[1]),
+						startIndex = Math.min(abs0, abs1),
+						endIndex = Math.max(abs0, abs1)
+
+				for(let i = startIndex, len = endIndex; i <= len; i++){
+					tempColsArr.push(i - 1)
+				}
+				this.operatorColArr = tempColsArr
 			},
 			addFilterHandler() {
-				var filterObj = {}
-				var filterWords = ""
-				var operatorColArr = this.operatorColArr
-				var operator = this.operator
-				var operatorWords = this.getOperatorWords(this.filterOptions, operator)
-				var opVal = this.operatorVal.trim()
-				var preStr = `第${getCharCol(operatorColArr[0] + 1)}至第${getCharCol(operatorColArr[operatorColArr.length - 1] + 1)}列范围内的值中，至少有${this.needConformColIndex}列`
+				this.generateNeedConformColNum()
+
+				let filterObj = {},
+						filterWords = '',
+						operatorColArr = this.operatorColArr,
+						operator = this.operator,
+						operatorWords = this.getOperatorWords(this.filterOptions, operator),
+						opVal = this.operatorVal.trim(),
+						preStr = `第${getCharCol(operatorColArr[0] + 1)}至第${getCharCol(operatorColArr[operatorColArr.length - 1] + 1)}列范围内的值中，至少有${this.needConformColIndex}列`
 
 				if(!this.validateForm({operatorColArr, opVal})) {
 					return
@@ -195,28 +185,30 @@
 					needConformColIndex: this.needConformColIndex
 				}
 				this.addFilter(filterObj)
-				this.operatorVal = ""
+				this.operatorVal = ''
+				this.operatorCol = []
 			},
 			validateForm(args) {
-				var { operatorColArr, opVal } = args
-				var isValidated = false
-				var tipWords = "双列范围逻辑："
+				let { operatorColArr, opVal } = args,
+						isValidated = false,
+						tipWords = '双列范围逻辑：'
+				
 				if(operatorColArr.length === 0) {
-					tipWords += "请填写列"
+					tipWords += '请填写列'
 				}else if(!this.isConformDoubleCols) {
-					tipWords += "只能填写两列，它会取指定两列范围内的所有列（包含自身）"
+					tipWords += '只能填写两列，它会取指定两列范围内的所有列（包含自身）'
 				}else if(operatorColArr[0] + 1 < 1) {
-					tipWords += "列从1开始"
-				}else if(this.curColKeysCount !== 0 && operatorColArr[operatorColArr.length - 1] + 1 > this.curColKeysCount){
-					tipWords += `超过最大列${this.curColKeysCount}`
+					tipWords += '列从1开始'
+				}else if(this.curColCount !== 0 && operatorColArr[operatorColArr.length - 1] + 1 > this.curColCount){
+					tipWords += `超过最大列${this.curColCount}`
 				}else if(opVal.length === 0) {
-					tipWords += "请填写运算符的值"
+					tipWords += '请填写运算符的值'
 				}else {
 					isValidated = true
 				}
 
 				if(!isValidated) {
-					ipcRenderer.send("sync-alert-dialog", {
+					ipcRenderer.send('sync-alert-dialog', {
 						content: tipWords
 					})
 					return false

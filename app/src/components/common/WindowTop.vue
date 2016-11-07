@@ -28,7 +28,7 @@
 
 <script>
 	import { ipcRenderer } from 'electron'
-	import { toggleWindowMax, toggleWindowMini } from "../../vuex/actions"
+	import { toggleWindowMax, toggleWindowMini } from '../../vuex/actions'
 	export default {
 		vuex: {
 			actions: {
@@ -44,7 +44,7 @@
 				this.toggleWindowMax()
 			},
 			closeHandler(){
-		    ipcRenderer.send("sync-close")
+		    ipcRenderer.send('sync-close')
 			}
 		}
 	}

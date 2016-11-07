@@ -136,7 +136,7 @@
 		<p>咚咚：刘健超</p>
 		<p>问题提交地址（可选）：<a @click="openURL('github')">https://github.com/JChehe/XCel/issues</a></p>
 		<div>
-			<img src="assets/qrcode.jpg" alt="凹凸实验室二维码">
+			<img src="./assets/qrcode.jpg" alt="凹凸实验室二维码">
 		</div>
 	</div>
 		
@@ -144,19 +144,18 @@
 
 
 <script>
-	// import shell from 'shell'
-	const {shell} = require("electron")
-	const ASCII_URL = "http://tool.oschina.net/commons?type=4"
-	const AOTU_URL = "https://aotu.io/"
-	const GITHUB = "https://github.com/JChehe/XCel/issues"
+	const { shell } = require('electron')
+	const ASCII_URL = 'http://tool.oschina.net/commons?type=4'
+	const AOTU_URL = 'https://aotu.io/'
+	const GITHUB = 'https://github.com/JChehe/XCel/issues'
 	export default {
 		methods: {
 			openURL(args){
 				switch (args){
-					case "ascii": shell.openExternal(ASCII_URL); break;
-					case "aotu": shell.openExternal(AOTU_URL); break;
-					case "github": shell.openExternal(GITHUB); break;
-					default: console.log("无该地址");
+					case 'ascii': shell.openExternal(ASCII_URL); break;
+					case 'aotu': shell.openExternal(AOTU_URL); break;
+					case 'github': shell.openExternal(GITHUB); break;
+					default: console.log('无该地址');
 				}
 			}
 		}

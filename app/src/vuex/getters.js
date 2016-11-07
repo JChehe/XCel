@@ -2,9 +2,6 @@
 export function getUploadFiles(state) {
 	return state.fileList.fileList
 }
-export function getAllFileType(state) {
-	return state.fileList.allFileType
-}
 export function getCurSearchVal(state) {
 	return state.fileList.curSearchVal
 }	
@@ -27,11 +24,6 @@ export function getFilterTagList(state) {
 	return state.filterList.filterTagList
 }
 
-export function getColKeys(state) {
-	var curSheet = state.filterList.activeSheet
-	return state.filterList[curSheet.name + '_headers']
-}
-
 export function getFilterWay(state) {
 	return state.filterList.filterWay
 }
@@ -40,36 +32,40 @@ export function getFilterPanelStatus(state) {
 }
 
 export function getCurOriRowCount(state) {
-	var curSheetName = state.filterList.activeSheet.name
+	let curSheetName = state.filterList.activeSheet.name
 	return state.filterList.oriRow[curSheetName] || 0
 }
 
 export function getCurFilRowCount(state) {
-	var curSheetName = state.filterList.activeSheet.name
+	let curSheetName = state.filterList.activeSheet.name
 	return state.filterList.filRow[curSheetName] || 0
 }
 
 export function getCurColCount(state) {
-	var curSheetName = state.filterList.activeSheet.name
+	let curSheetName = state.filterList.activeSheet.name
 	return state.filterList.colKeys[curSheetName] && state.filterList.colKeys[curSheetName].length || 0
 }
 
 export function getCurFilterTagListCount(state) {
-	var curSheetName = state.filterList.activeSheet.name
+	let curSheetName = state.filterList.activeSheet.name
 	return state.filterList.filterTagList[curSheetName] && state.filterList.filterTagList[curSheetName].length || 0
 }
 export function getCurColKeys(state) {
-	var curSheetName = state.filterList.activeSheet.name
+	let curSheetName = state.filterList.activeSheet.name
 	return state.filterList.colKeys[curSheetName]
 }
 
-export function getCurColKeysCount(state) {
-	var curSheetName = state.filterList.activeSheet.name
-	console.log("curSheetName", curSheetName)
-	console.log(state.filterList.colKeys[curSheetName] && state.filterList.colKeys[curSheetName].length || 0)
-	return state.filterList.colKeys[curSheetName] && state.filterList.colKeys[curSheetName].length || 0
+export function getColSelectDialogStatus(state) {
+	return state.filterList.isShowColSelectDialog
 }
 
+export function getColSelectType(state) {
+	return state.filterList.colSelectType
+}
+
+export function getColSelectVal(state) {
+	return state.filterList.colSelectVal
+}
 // 其他
 export function getSideBarStatus(state) {
 	return state.fileList.isShowSideBar

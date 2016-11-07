@@ -8,9 +8,9 @@
 			    <path d="M0.5,16 L17.5,16 L9,1 L0.5,16 L0.5,16 Z M10,14 L8,14 L8,12 L10,12 L10,14 L10,14 Z M10,11 L8,11 L8,7 L10,7 L10,11 L10,11 Z" id="Shape" stroke="none" fill="#D50000" fill-rule="evenodd"></path>
 			</svg>暂无任何筛选条件.
 		</div>
-		<filter-tag v-for="filterTag in filterTagList[activeSheet.name]" 
+		<filter-tag v-for="(filterTag, index) in filterTagList[activeSheet.name]" 
 			:filter-tag="filterTag" 
-			:tag-index="$index">
+			:tag-index="index">
 		</filter-tag>
 	</div>
 </template>
@@ -28,22 +28,23 @@
 				curFilterTagList: []
 			}
 		},
+		vuex: {
+			getters: {
+				filterTagList: getFilterTagList,
+				activeSheet: getActiveSheet
+			}
+		},
 		computed: {
 			isShowPlaceHolder() {
-				var curTagList = this.filterTagList[this.activeSheet.name]
+				let curTagList = this.filterTagList[this.activeSheet.name]
 				if(!curTagList || curTagList.length === 0) {
 					return true
 				}else {
 					return false
 				}
 			}
-		},
-		vuex: {
-			getters: {
-				filterTagList: getFilterTagList,
-				activeSheet: getActiveSheet
-			}
 		}
+		
 	}
 </script>
 

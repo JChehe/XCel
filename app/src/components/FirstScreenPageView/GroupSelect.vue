@@ -20,16 +20,15 @@
 			groupId: {
 				default: -1,
 				required: true,
-				twoWay: true,
 				type: [Number, String]
 			}
 		},
 		methods: {
 			getGroupValue(index) {
-				return getCharCol(index+1)
+				return getCharCol(index)
 			},
 			getGroupName(groupId) {
-				return groupId == "-1" ? "组别" : groupId
+				return groupId == '-1' ? '组别' : groupId
 			}
 		}
 	}

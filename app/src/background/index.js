@@ -1,21 +1,20 @@
 'use strict';
-const {ipcRenderer} = require('electron');
+const { ipcRenderer } = require('electron')
 const xlsx = require('xlsx')
 const filterUtils = require('./filterUtils')
 const Excel = require('./excelUtils')
 const generateHTMLString = require('./generateHTMLString')
-const SUFFIX_COLKEYS = "_headers"
-console.log("background进程pid：", process.pid)
+const SUFFIX_COLKEYS = '_headers'
+console.log('background进程pid：', process.pid)
 
-var excelData
-var filteredData
-var colKeys = {}
-var oriRow = {}
-var filRow = {}
+let excelData, 
+    filteredData, 
+    colKeys = {},
+    oriRow = {},
+    filRow = {}
 
-
-window.onload = function () {
-  ipcRenderer.on("readFile-start", (event, arg) => {
+window.addEventListener('load', (event) => {
+  ipcRenderer.on('readFile-start', (event, arg) => {
     /* excelData 的数据结构
     {
       sheetNameN: [] 所有行
@@ -25,11 +24,10 @@ window.onload = function () {
     }
     */
     excelData = new Excel().init(arg.data)
-
     oriRow = {}
     filRow = {}
-    var filterTagList = {}
-    var activeSheetIndex = arg.activeSheetIndex || 0,
+    let filterTagList = {},
+        activeSheetIndex = arg.activeSheetIndex || 0,
         activeSheetName = excelData.sheetNameList[activeSheetIndex],
         curColKeys = excelData[activeSheetName + SUFFIX_COLKEYS],
         curSheetData = excelData[activeSheetName];
@@ -41,15 +39,15 @@ window.onload = function () {
       filterTagList[sheetName] = []
     })
 
-    console.log("colKeys", colKeys)
-    ipcRenderer.send("generate-htmlstring-response", {
+    console.log('colKeys', colKeys)
+    ipcRenderer.send('generate-htmlstring-response', {
       sheetHTML: generateHTMLString({
         sheetData: curSheetData,
         colKeys: curColKeys
       })
     })
 
-    ipcRenderer.send("readFile-response", {
+    ipcRenderer.send('readFile-response', {
       oriRow,
       filRow,
       colKeys,
@@ -57,21 +55,21 @@ window.onload = function () {
       sheetNameList: excelData.sheetNameList
     })
   })
-  ipcRenderer.on("filter-start", (event, arg) => {
+  ipcRenderer.on('filter-start', (event, arg) => {
     filteredData = filterHandler(arg)
-    var curActiveSheetName = arg.curActiveSheetName
-    var curColKeys = colKeys[curActiveSheetName]
-    var tempFilRow = {}
+    let curActiveSheetName = arg.curActiveSheetName,
+        curColKeys = colKeys[curActiveSheetName],
+        tempFilRow = {}
     
     excelData.sheetNameList.forEach((sheetName, index) => {
       tempFilRow[sheetName] = filteredData[sheetName].length
     })
 
-    ipcRenderer.send("filter-response", {
+    ipcRenderer.send('filter-response', {
       filRow: tempFilRow
     })
 
-    ipcRenderer.send("generate-htmlstring-response", {
+    ipcRenderer.send('generate-htmlstring-response', {
       sheetHTML: generateHTMLString({
         sheetData: filteredData[curActiveSheetName],
         colKeys: curColKeys
@@ -79,15 +77,13 @@ window.onload = function () {
     })
   })
 
-  ipcRenderer.on("changeTab-start", (event, arg) => {
-    console.log("changeTab")
-    console.log("Arg", arg)
+  ipcRenderer.on('changeTab-start', (event, arg) => {
     filteredData = filterHandler(arg)
-    var curActiveSheetName = arg.curActiveSheetName
-    var curColKeys = colKeys[curActiveSheetName]
-    var tempFilRow = {}
+    let curActiveSheetName = arg.curActiveSheetName,
+        curColKeys = colKeys[curActiveSheetName],
+        tempFilRow = {}
 
-    ipcRenderer.send("generate-htmlstring-response", {
+    ipcRenderer.send('generate-htmlstring-response', {
       sheetHTML: generateHTMLString({
         sheetData: filteredData[curActiveSheetName],
         colKeys: curColKeys
@@ -95,21 +91,20 @@ window.onload = function () {
     })
   })
 
-  ipcRenderer.on("exportFile-start", (event, arg) => {
-    console.log("arg", arg)
+  ipcRenderer.on('exportFile-start', (event, arg) => {
     excelData.exportFileByWB({
       filteredData,
       excelData
     })
-    ipcRenderer.send("exportFile-response", {info: "成功导出"})
+    ipcRenderer.send('exportFile-response', {info: '成功导出'})
   })
 
-  ipcRenderer.on("delAllFilterTag-start", (event, arg) => {
-    var curActiveSheetName = arg.curActiveSheetName
-    var curColKeys = colKeys[curActiveSheetName]
-    var curSheetData = excelData[curActiveSheetName]
+  ipcRenderer.on('delAllFilterTag-start', (event, arg) => {
+    let curActiveSheetName = arg.curActiveSheetName,
+        curColKeys = colKeys[curActiveSheetName],
+        curSheetData = excelData[curActiveSheetName]
 
-    ipcRenderer.send("generate-htmlstring-response", {
+    ipcRenderer.send('generate-htmlstring-response', {
       sheetHTML: generateHTMLString({
         sheetData: curSheetData,
         colKeys: curColKeys
@@ -117,40 +112,37 @@ window.onload = function () {
     })
 
   })
-}
+}, false)
 
 function filterHandler(arg){
-  var {filterTagList, filterWay} = arg
-  var tempFilteredData = Object.assign({}, excelData)
-  for(var i = 0, len = excelData.sheetNameList.length; i < len; i++) {
-    var curSheetName = excelData.sheetNameList[i]
-    var curFilterTagList = filterTagList[curSheetName]
-    var colKeys = excelData[curSheetName + SUFFIX_COLKEYS]
+  let { filterTagList, filterWay } = arg,
+      tempFilteredData = Object.assign({}, excelData)
+  for(let i = 0, len = excelData.sheetNameList.length; i < len; i++) {
+    let curSheetName = excelData.sheetNameList[i],
+        curFilterTagList = filterTagList[curSheetName],
+        colKeys = excelData[curSheetName + SUFFIX_COLKEYS]
 
     if(curFilterTagList.length !== 0){
       tempFilteredData[curSheetName] = tempFilteredData[curSheetName].filter((row, index) => {
-        var rowExpStr = ""
-        for(var i = 0, len = curFilterTagList.length; i < len; i++) {
-          var cTag = curFilterTagList[i]
-          var cFilters = cTag.filters
-
-          var groupId = cTag.groupId
-          var tagLogicChar = cTag.logicOperator === "and" ? "&&" : "||"
-
-          var oneTagResult
-          var groupExpStr = ""
+        let rowExpStr = ''
+        for(let i = 0, len = curFilterTagList.length; i < len; i++) {
+          let cTag = curFilterTagList[i],
+              cFilters = cTag.filters,
+              groupId = cTag.groupId,
+              tagLogicChar = cTag.logicOperator === 'and' ? '&&' : '||',
+              oneTagResult,
+              groupExpStr = ''
 
           // 遍历当前组的 filters
           cFilters.forEach((cF, index) => {
-            var filterLogicChar = cF.logicOperator === "and" ? "&&" : "||"
-            var filterType = cF.filterType
-            var filterCol = cF.col
-            var operator = cF.operator
-            var colOperator = cF.colOperator
-            var target = cF.value
-            var needConformColIndex = cF.needConformColIndex
-
-            var oneFilterResult
+            let filterLogicChar = cF.logicOperator === 'and' ? '&&' : '||',
+                filterType = cF.filterType,
+                filterCol = cF.col,
+                operator = cF.operator,
+                colOperator = cF.colOperator,
+                target = cF.value,
+                needConformColIndex = cF.needConformColIndex,
+                oneFilterResult
 
             if(filterType === 0){
               oneFilterResult = (filterUtils.filterByOneOperator({row, colKeys, filterCol, operator, target}))
@@ -161,26 +153,24 @@ function filterHandler(arg){
             }
             groupExpStr = groupExpStr + filterLogicChar + oneFilterResult
 
-            if(filterLogicChar === "||" && oneFilterResult === true) {
+            if(filterLogicChar === '||' && oneFilterResult === true) {
               return true // as break
             }
           })
-          groupExpStr = groupExpStr.replace(/^[|&]*/ig, "")
+          groupExpStr = groupExpStr.replace(/^[|&]*/ig, '')
           oneTagResult = eval(groupExpStr)
           
           rowExpStr = rowExpStr + tagLogicChar + oneTagResult 
-          if(tagLogicChar === "||" && oneTagResult === true) {
+          if(tagLogicChar === '||' && oneTagResult === true) {
             break;
           }
         }
-        rowExpStr = rowExpStr.replace(/^[|&]*/ig, "")
-        var rowResult = eval(rowExpStr)
+        rowExpStr = rowExpStr.replace(/^[|&]*/ig, '')
+        let rowResult = eval(rowExpStr)
         // return rowResult
         return filterWay == 0 ? rowResult : !rowResult
       })
-      console.log(i + "tempFilteredData[curSheetName]", tempFilteredData[curSheetName])
     }
   }
-
   return tempFilteredData
 }

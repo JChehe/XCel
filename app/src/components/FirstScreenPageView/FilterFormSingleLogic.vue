@@ -1,5 +1,5 @@
 <template>
-	<form @submit.prevent="addFilterHandler">
+	<form @submit.prevent="addFilterHandler" @keyup.stop>
 		<table class="table">
 			<tbody>
 				<tr>
@@ -14,17 +14,7 @@
 						</span>
 					</td>
 					<td>
-						<!-- <input type="text" placeholder=""> -->
-						<span class="select">
-							<select v-model="operatorCol">
-								<option value="0">请选择列</option>
-								<option v-else v-for="col in curColCount" 
-									:value="$index+1">
-									{{ getCharCol(col + 1) }}
-								</option>
-							</select>
-							<p class="val_mask">{{ operatorCol == 0 ? "请选择列" : getCharCol(operatorCol) }}</p>
-						</span>
+						<p class="col_placeholder" @click="showColSelectDialog">{{operatorCol.length === 0 ? "请选择列" : getCharCol(operatorCol[0])}}</p>
 					</td>
 					<td>
 						<span class="select">
@@ -43,7 +33,7 @@
 							v-model="operatorVal">
 					</td>
 					<td>
-						<group-select :group-id.sync="groupId"></group-select>
+						<group-select :group-id="groupId"></group-select>
 					</td>
 					<td>
 						<button type="submit">添加</button>
@@ -55,7 +45,7 @@
 </template>
 
 <script>
-	import { addFilter } from '../../vuex/actions'
+	import { addFilter, setColSelectDialogStatus, setColSelectType } from '../../vuex/actions'
 	import { getActiveSheet, getFilterOptions, getCurFilterTagListCount, getCurColCount } from '../../vuex/getters'
 	import { getCharCol, getLogicOperatorWords, getOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
 	import GroupSelect from './GroupSelect'
@@ -67,11 +57,11 @@
 		},
 		data(){
 			return {
-				operatorVal: "",
-				operatorCol: '0',
-				operator: ">",
-				subFilterOperator: "",
-				logicOperator: "and",
+				operatorVal: '',
+				operatorCol: [],
+				operator: '>',
+				subFilterOperator: '',
+				logicOperator: 'and',
 				groupId: -1
 			}
 		},
@@ -83,13 +73,20 @@
 				curFilterTagListCount: getCurFilterTagListCount
 			},
 			actions: {
+				setColSelectDialogStatus,
+				setColSelectType,
 				addFilter
 			}
+		},
+		mounted() {
+			window.eventBus.$on('colSelVal4Single', (colSelectGroup) => {
+				this.operatorCol = colSelectGroup
+			})
 		},
 		watch: {
 			curFilterTagListCount(){
 				if(this.curFilterTagListCount == 0) {
-					this.logicOperator = "and"
+					this.logicOperator = 'and'
 				}
 			}
 		},
@@ -98,19 +95,23 @@
 			getLogicOperatorWords,
 			getOperatorWords,
 			getFilterWordsPrimitive,
+			showColSelectDialog() {
+				this.setColSelectType(0)
+				this.setColSelectDialogStatus(true)
+			},
 			addFilterHandler() {
-				var filterObj = {}
-				var filterWords = ""
-				var curCol = this.operatorCol
-				var operator = this.operator
-				var operatorWords = this.getOperatorWords(this.filterOptions, operator)
-				var opVal = this.operatorVal.trim()
+				let filterObj = {},
+						filterWords = '',
+						curCol = this.operatorCol,
+						operator = this.operator,
+						operatorWords = this.getOperatorWords(this.filterOptions, operator),
+						opVal = this.operatorVal.trim()
 
 				if(!this.validateForm({curCol, opVal})) {
 					return
 				}
 
-				var preStr = `第${this.getCharCol(curCol)}列的值`
+				let preStr = `第${this.getCharCol(curCol)}列的值`
 				filterWords = preStr + this.getFilterWordsPrimitive({
 					operator,
 					operatorWords,
@@ -127,22 +128,24 @@
 					filterWords: filterWords
 				}
 				this.addFilter(filterObj)
-				this.operatorVal = ""
+				this.operatorVal = ''
+				this.operatorCol = []
 			},
 			validateForm(args) {
-				var { curCol, opVal } = args
-				var isValidated = false
-				var tipWords = "单列运算逻辑："
-				if(curCol == "0") {
-					tipWords += "请选择列"
+				let { curCol, opVal } = args,
+						isValidated = false,
+						tipWords = '单列运算逻辑：'
+
+				if(curCol == '0') {
+					tipWords += '请选择列'
 				}else if(opVal.length === 0) {
-					tipWords += "请填写运算符的值"
+					tipWords += '请填写运算符的值'
 				}else {
 					isValidated = true
 				}
 
 				if(!isValidated) {
-					ipcRenderer.send("sync-alert-dialog", {
+					ipcRenderer.send('sync-alert-dialog', {
 						content: tipWords
 					})
 					return false

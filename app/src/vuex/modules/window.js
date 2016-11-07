@@ -10,17 +10,16 @@ const state = {
 
 const mutations = {
 	[types.TOGGLE_WINDOW_MAX] (state) {
-    ipcRenderer.send("sync-maximize")
+    ipcRenderer.send('sync-maximize')
 		state.isMaximize = !state.isMaximize
 	},
 	[types.TOGGLE_WINDOW_MINI] (state) {
-    ipcRenderer.send("sync-minimize")
+    ipcRenderer.send('sync-minimize')
 		state.isMinimize = !state.isMinimize
 	}
 }
 
-ipcRenderer.on("send-isMax", (event, arg) => {
-	console.log("isMax", arg)
+ipcRenderer.on('send-isMax', (event, arg) => {
 	state.isMaximize = arg
 })
 

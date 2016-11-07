@@ -1,11 +1,12 @@
 <!-- Excel -->
 <template>
 	<div class="excel_area">
-		<div class="tabs is_boxed is_small excel_cheet_nav" v-show="sheetNameList.length !== 0">
+		<div class="tabs is_boxed is_small excel_cheet_nav" 
+			v-show="sheetNameList.length !== 0">
 			<ul>
-				<li v-for = "sheetName in sheetNameList" 
-					:class="{'is_active': $index == activeSheet.index}"
-					@click = "changeTab($index)">
+				<li v-for = "(sheetName, index) in sheetNameList" 
+					:class="{'is_active': index == activeSheet.index}"
+					@click = "changeTab(index)">
 					<a href="javascript:;">
 						<span>{{ sheetName }}</span>
 					</a>
@@ -21,17 +22,15 @@
 				>
 				<p class = "drop_tips">
 					<svg width="18px" height="15px" viewBox="0 1 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-					    <!-- Generator: Sketch 40.2 (33826) - http://www.bohemiancoding.com/sketch -->
 					    <desc>Created with Sketch.</desc>
 					    <defs></defs>
 					    <path d="M0.5,16 L17.5,16 L9,1 L0.5,16 L0.5,16 Z M10,14 L8,14 L8,12 L10,12 L10,14 L10,14 Z M10,11 L8,11 L8,7 L10,7 L10,11 L10,11 Z" id="Shape" stroke="none" fill="#D50000" fill-rule="evenodd"></path>
 					</svg>当前没有选中任何Excel文件，可将文件拖拽至此区域。
 				</p>
 			</div>
-			
-			<sheet-of-excel v-for="sheetName in sheetNameList"
-				v-show="activeSheet.index === $index"
-				:sheet-html="sheetHTML">
+			<sheet-of-excel v-for="(sheetName, index) in sheetNameList"
+				v-show="activeSheet.index === index" 
+				:sheetHTML="sheetHTML">
 			</sheet-of-excel>
 		</div>
 	</div>
@@ -53,7 +52,7 @@
 		},
 		data() {
 			return {
-				sheetHTML: ""
+				sheetHTML: ''
 			}
 		},
 		vuex: {
@@ -69,19 +68,16 @@
 				setUploadFiles
 			}
 		},
-		created(){
-			setTimeout(() => {
-				ipcRenderer.on("generate-htmlstring-response", (event, arg) => {
-					console.log("Asdsadsa")
-					this.sheetHTML = arg.sheetHTML
-				})
+		mounted(){
+			ipcRenderer.on('generate-htmlstring-response', (event, arg) => {
+				this.sheetHTML = arg.sheetHTML
+			})
 
-				var dropArea = document.querySelector(".drop_area")
-				if(dropArea) {
-					dropArea.addEventListener("dragenter", dragoverHandler, false)
-					dropArea.addEventListener("dragover", dragoverHandler, false)
-				}
-			}, 0)
+			let dropArea = document.querySelector('.drop_area')
+			if(dropArea) {
+				dropArea.addEventListener('dragenter', dragoverHandler, false)
+				dropArea.addEventListener('dragover', dragoverHandler, false)
+			}
 			function dragoverHandler(e){
 				e.stopPropagation()
 				e.preventDefault()
@@ -91,23 +87,23 @@
 		methods: {
 			changeTab(index) {
 				this.setActiveSheet(index)
-				ipcRenderer.send("changeTab-start", {
+				ipcRenderer.send('changeTab-start', {
 					filterTagList: this.filterTagList,
 					filterWay: this.filterWay,
 					curActiveSheetName: this.activeSheet.name
 				})
 			},
 			dragenterHandler(e) {
-				e.target.classList.add("active")
+				e.target.classList.add('active')
 			},
 			dragleaveHandler(e) {
-				e.target.classList.remove("active")
+				e.target.classList.remove('active')
 			},
 			dropHandler(e){
-				var files = e.dataTransfer.files
+				let files = e.dataTransfer.files
 				this.setExcelData({
 					path: files[0].path,
-					type: "node"
+					type: 'node'
 				})
 				this.setUploadFiles(path)
 			}			

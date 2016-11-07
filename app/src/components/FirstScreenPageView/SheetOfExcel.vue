@@ -5,7 +5,8 @@
 		<table class="table is_bordered">
 			<thead>
 				<tr>
-					<th v-for="col in (curColKeysCount + 1)">{{ getCharCol(col) }}</th>
+					<th></th>
+					<th v-for="col in curColCount">{{ getCharCol(col) }}</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -14,7 +15,7 @@
 </template>
 
 <script>
-	import { getSideBarStatus, getCurColKeysCount, getCurOriRowCount } from '../../vuex/getters'
+	import { getSideBarStatus, getCurColCount, getCurOriRowCount } from '../../vuex/getters'
 	import { getCharCol, getNumCol } from '../../utils/ExcelSet'
 	import { ipcRenderer } from 'electron'
 	export default {
@@ -22,7 +23,7 @@
 			getters: {
 				sideBarStatus: getSideBarStatus,
 				curOriRowCount: getCurOriRowCount,
-				curColKeysCount: getCurColKeysCount
+				curColCount: getCurColCount
 			}
 		},
 		props: {
@@ -31,17 +32,13 @@
 				required: true
 			}
 		},
-		created() {
-			setTimeout(() => {
-				var tbody = this.$el.querySelector("tbody")
-        tbody && (tbody.innerHTML = this.sheetHTML)
-			}, 0)
+		mounted() {
+			let tbody = this.$el.querySelector('tbody')
+      tbody && (tbody.innerHTML = this.sheetHTML)
 		},
 		watch: {
 			sheetHTML() {
-				console.log("change")
-				var tbody = this.$el.querySelector("tbody")
-				console.log("tbody", tbody)
+				let tbody = this.$el.querySelector('tbody')
         tbody && (tbody.innerHTML = this.sheetHTML)
 			}
 		},

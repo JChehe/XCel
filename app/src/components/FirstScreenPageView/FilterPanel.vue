@@ -16,9 +16,9 @@
 		</div>
 		<div class="filter_form_group">
 			<div class="filter_form_group_inside">
-				<filter-form-single-logic is="my-component"></filter-form-single-logic>
-				<filter-form-multi-calc is="my-component"></filter-form-multi-calc>
-				<filter-form-double-cols-range is="my-component"></filter-form-double-cols-range>
+				<filter-form-single-logic></filter-form-single-logic>
+				<filter-form-multi-calc></filter-form-multi-calc>
+				<filter-form-double-cols-range></filter-form-double-cols-range>
 			</div>
 		</div>
 	</div>
@@ -43,9 +43,9 @@
 		data() {
 			return {
 				curCol: 1,
-				filterVal: "",
+				filterVal: '',
 				colOfSheet: 1,
-				filterFormNav: ["单列（组合）逻辑", "多列运算逻辑", "双列范围逻辑"],
+				filterFormNav: ['单列（组合）逻辑', '多列运算逻辑', '双列范围逻辑'],
 				activeFilterFormIndex: 0
 			}
 		},
@@ -64,13 +64,13 @@
 			}
 		},
 		created(){
-			ipcRenderer.on("filter-response", (event, arg) => {
+			ipcRenderer.on('filter-response', (event, arg) => {
 				this.setFileStatus(2)
       	this.setFilteredData(arg.filRow)
-      	ipcRenderer.send("exportFile-start")
+      	ipcRenderer.send('exportFile-start')
 	    })
 
-	    ipcRenderer.on("exportFile-response", (event, arg) => {
+	    ipcRenderer.on('exportFile-response', (event, arg) => {
 	    	console.log(arg.info)
 	    	this.setFileStatus(-1)
 	    	
@@ -89,12 +89,12 @@
 			},
 			filterHandler(){
 				if(this.curFilterTagListCount === 0) {
-					ipcRenderer.send("sync-alert-dialog", {
-						content: "请先添加筛选条件"
+					ipcRenderer.send('sync-alert-dialog', {
+						content: '请先添加筛选条件'
 					})
 				}else {
 					this.setFileStatus(1) 
-					ipcRenderer.send("filter-start", {
+					ipcRenderer.send('filter-start', {
 			      filterTagList: this.filterTagList,
 			      filterWay: this.filterWay,
 			      curActiveSheetName: this.activeSheet.name
@@ -179,15 +179,12 @@
 	  }
 	  &:nth-child(3) {
 	    width: 127px;
-	    .select {
-	      width: 107px;
-	    }
-	    input {
+	    p {
 	    	width: 107px;
 	      line-height: 24px;
-	      &::-webkit-input-placeholder{
-					color: #9B9B9B;
-				}
+				border: 1px solid #D8D8D8;
+				text-align: center;
+				cursor: pointer;
 	    }
 	  }
 	  &:nth-child(4) {

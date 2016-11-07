@@ -1,5 +1,5 @@
 <template>
-	<form @submit.prevent="addFilterHandler">
+	<form @submit.prevent="addFilterHandler" @keyup.stop>
 		<table class="table">
 			<tbody>
 				<tr>
@@ -8,12 +8,14 @@
 						<span class="select">
 							<select v-model="logicOperator">
 								<option value="and">且</option>
-								<option v-show="!curFilterTagListCount == 0" value="or" value="or">或</option>
+								<option v-show="!curFilterTagListCount == 0" value="or">或</option>
 							</select>
 							<p class="val_mask">{{ getLogicOperatorWords(logicOperator) }}</p>
 					</td>
 					<td>
-						<input type="text" placeholder="输入列（以，隔开）" v-model="operatorCol">
+						<p class="col_placeholder" @click="showColSelectDialog">
+							{{operatorCol.length === 0 ? "请选择列" : formatColGroup}}
+						</p>
 					</td>
 					<td>
 						<span class="select">
@@ -43,7 +45,7 @@
 						</div>
 					</td>
 					<td>
-						<group-select :group-id.sync="groupId"></group-select>
+						<group-select :group-id="groupId"></group-select>
 					</td>
 					<td>
 						<button type="submit">添加</button>
@@ -55,9 +57,9 @@
 </template>
 
 <script>
-	import { colOperator, getNumCol, getCharCol, getOperatorWords, getColOperatorWords, getColArithmeticOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from "../../utils/ExcelSet"
+	import { colOperator, getNumCol, getCharCol, getOperatorWords, getColOperatorWords, getColArithmeticOperatorWords, getLogicOperatorWords, getFilterWordsPrimitive } from '../../utils/ExcelSet'
 	import { getFilterOptions, getCurFilterTagListCount } from '../../vuex/getters'
-	import { addFilter } from '../../vuex/actions'
+	import { addFilter, setColSelectDialogStatus, setColSelectType } from '../../vuex/actions'
 	import GroupSelect from './GroupSelect'
 	import { ipcRenderer } from 'electron'
 
@@ -67,11 +69,11 @@
 		},
 		data(){
 			return {
-				operatorVal: "",
-				operatorCol: "", // 最终会转为数组
-				operator: ">",
-				colOperatorSelect: "+",
-				logicOperator: "and",
+				operatorVal: '',
+				operatorCol: [], // 最终会转为数组
+				operator: '>',
+				colOperatorSelect: '+',
+				logicOperator: 'and',
 				colOperator: colOperator,
 				groupId: -1
 			}
@@ -82,56 +84,66 @@
 				curFilterTagListCount: getCurFilterTagListCount
 			},
 			actions: {
+				setColSelectDialogStatus,
+				setColSelectType,
 				addFilter
 			}
+		},
+		mounted() {
+			window.eventBus.$on('colSelVal4Multi', (colSelectGroup) => {
+				this.operatorCol = colSelectGroup
+			})
 		},
 		watch: {
 			curFilterTagListCount(){
 				if(this.curFilterTagListCount == 0) {
-					this.logicOperator = "and"
+					this.logicOperator = 'and'
 				}
 			}
 		},
+		computed: {
+			formatColGroup() {
+				console.log(this.operatorCol)
+				return this.operatorCol.map((col, index) => {
+					return this.getCharCol(col)
+				}).join(',')
+			},
+		},
 		methods:{
 			getNumCol,
+			getCharCol,
 			getOperatorWords,
 			getColArithmeticOperatorWords,
 			getLogicOperatorWords,
 			getFilterWordsPrimitive,
 			getColOperatorWords,
+
+			setMultiColInput(arg) {
+				this.operatorCol = arg
+			},
+			showColSelectDialog() {
+				this.setColSelectType(1)
+				this.setColSelectDialogStatus(true)
+			},
 			addFilterHandler(){
-				var filterObj = {}
-				var filterWords = ""
-				var curCols = this.operatorCol.trim()
-				var operator = this.operator
-				var operatorWords = this.getOperatorWords(this.filterOptions, operator)
-				var opVal = this.operatorVal.trim()
-				var colOperatorSelect = this.colOperatorSelect
-				var colOperatorWords = this.getColOperatorWords(colOperator, colOperatorSelect)
-				// 去除两边的逗号
-				curCols = curCols.replace(/^[，*,*]*/ig, "").replace(/[，*,*]*$/ig, "")
-				// 切割为数组
-				curCols = curCols.split(/[,，]+/)
-				console.log("curCols", curCols)
-				for(var i = 0, len = curCols.length; i < len; i++){
-					var cCol = curCols[i]
-					console.log(cCol)
-					if(cCol.match(/[a-z]/ig)){
-						console.log("getNumCol(cCol)", getNumCol(cCol))
-						curCols.splice(i, 1, getNumCol(cCol))
-					}
-				}
+				let filterObj = {},
+						filterWords = '',
+						curCols = this.operatorCol,
+						operator = this.operator,
+						operatorWords = this.getOperatorWords(this.filterOptions, operator),
+						opVal = this.operatorVal.trim(),
+						colOperatorSelect = this.colOperatorSelect,
+						colOperatorWords = this.getColOperatorWords(colOperator, colOperatorSelect)
 
 				if(!this.validateForm({curCols, opVal, colOperatorSelect})) {
 					return
 				}
 
-				var colText = ""; 
+				let colText = '' 
 				curCols.forEach((col, index) => {
 					colText += `, ${getCharCol(col)}`
 				})
-				// colText去掉逗号+空格）字符
-				var preStr = `第${colText.slice(2)}列的值${colOperatorWords}`
+				let preStr = `第${colText.slice(2)}列的值${colOperatorWords}`
 
 				filterWords = preStr + this.getFilterWordsPrimitive({
 					operator,
@@ -141,46 +153,44 @@
 					colOperatorSelect
 				})
 
-				// 减一处理，以符合计算机的逻辑
-				curCols.forEach((item, index) => {
-					return curCols[index] = item - 1
-				})
+				
 
 				filterObj = {
 					filterType: 1,
 					groupId: this.groupId,
 					logicOperator: this.logicOperator,
-					col: curCols,
+					col: curCols.map((col, index) => {
+						return col - 1
+					}),
 					operator: this.operator,
 					value: opVal,
 					filterWords: filterWords,
 					colOperator: this.colOperatorSelect
 				}
-				console.log("filterObj",filterObj)
-				this.addFilter(filterObj)
 
-				this.operatorCol = ""
-				this.operatorVal = ""
+				this.addFilter(filterObj)
+				this.operatorCol = []
+				this.operatorVal = ''
 			},
 			validateForm(args){
-				var {curCols, opVal, colOperatorSelect} = args
-				var isValidated = false
-				var tipWords = "多列运算逻辑："
+				let { curCols, opVal, colOperatorSelect } = args,
+						isValidated = false,
+						tipWords = '多列运算逻辑：'
 
 				if(curCols.length === 0) {
-					tipWords += "请填写列"
+					tipWords += '请填写列'
 				}else if(curCols.length < 2) {
-					tipWords += "至少填写两列"
+					tipWords += '至少填写两列'
 				}else if(opVal.length === 0) {
-					tipWords += "请填写运算符"
-				}else if(colOperatorSelect.includes("time") && curCols.length > 2) {
-					tipWords += "中的时间相关操作只能选择两列"
+					tipWords += '请填写运算符'
+				}else if(colOperatorSelect.includes('time') && curCols.length > 2) {
+					tipWords += '中的时间相关操作只能选择两列'
 				}else {
 					isValidated = true
 				}
 				
 				if(!isValidated) {
-					ipcRenderer.send("sync-alert-dialog", {
+					ipcRenderer.send('sync-alert-dialog', {
 						content: tipWords
 					})
 					return false

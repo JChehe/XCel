@@ -4,8 +4,8 @@
 /* 来自 http://www.cnblogs.com/lavezhang/archive/2012/05/14/2499000.html */ 
 
 export function getCharCol(n) {
-  var temCol = "",
-    s = "",
+  let temCol = '',
+    s = '',
     m = 0
 
   while (n > 0) {
@@ -19,10 +19,10 @@ export function getCharCol(n) {
 
 export function getNumCol(s) {
   if (!s) return 0
-  var n = 0
-  for (var i = s.length - 1, j = 1; i >= 0; i--, j *= 26) {
-    var c = s[i].toUpperCase()
-    if (c < 'A' || c > "Z") return 0
+  let n = 0
+  for (let i = s.length - 1, j = 1; i >= 0; i--, j *= 26) {
+    let c = s[i].toUpperCase()
+    if (c < 'A' || c > 'Z') return 0
     n += (c.charCodeAt() - 64) * j
   }
 
@@ -30,62 +30,62 @@ export function getNumCol(s) {
 }
 
 export const colOperator = [{
-    char: "+",
-    words: "相加"
+    char: '+',
+    words: '相加'
   },{
-    char: "-",
-    words: "相减"
+    char: '-',
+    words: '相减'
   },{
-    char: "*",
-    words: "相乘"
+    char: '*',
+    words: '相乘'
   },{
-    char: "/",
-    words: "相除"
+    char: '/',
+    words: '相除'
   },{
-    char: "%",
-    words: "求余"
+    char: '%',
+    words: '求余'
   },{
-    char: "-(time)",
-    words: "时间相减"
+    char: '-(time)',
+    words: '时间相减'
   }/*,{
-    char: "+()",
-    words: "字符串拼接"
+    char: '+()',
+    words: '字符串拼接'
   }*/]
 export function getColArithmeticOperatorWords(sets, char) {
-  for(var i = 0, len = sets.length; i < len; i++ ) {
-    var curColOperator = sets[i]
+  for(let i = 0, len = sets.length; i < len; i++ ) {
+    let curColOperator = sets[i]
     if(curColOperator.char === char) {
       return curColOperator.words
     }
   }
-  return "匹配失败"
+  return '匹配失败'
 }
 
 export function getLogicOperatorWords(char) {
-  return char === "and" ? "且" : "或"
+  return char === 'and' ? '且' : '或'
 }
 
 export function getOperatorWords(sets, char) {
-  for(var i = 0, len = sets.length; i < len; i++){
-    var obj = sets[i]
+  for(let i = 0, len = sets.length; i < len; i++){
+    let obj = sets[i]
     if(obj.char === char) 
       return obj.words
   }
-  return "匹配失败"
+  return '匹配失败'
 }
 
 export function getColOperatorWords(sets, char) {
-  for(var i = 0, len = sets.length; i < len; i++){
-    var obj = sets[i]
+  for(let i = 0, len = sets.length; i < len; i++){
+    let obj = sets[i]
     if(obj.char === char) 
       return obj.words
   }
-  return "匹配失败"
+  return '匹配失败'
 }
 
 export function getFilterWordsPrimitive(args){
-  var { operator, operatorCol, operatorWords, val, colOperatorSelect, filterType } = args
-  var primitiveFilterWords = ""
+  let { operator, operatorCol, operatorWords, val, colOperatorSelect, filterType } = args,
+      primitiveFilterWords = ''
   // 判断是选择哪个操作符
   switch(operator){
     case 'startsWith': ;
@@ -93,9 +93,7 @@ export function getFilterWordsPrimitive(args){
     case 'regexp': primitiveFilterWords = `应用了正则表达式"/${val}/ig"`;break;
     default: 
       primitiveFilterWords = `${operatorWords}"${val}"`;
-      if(colOperatorSelect && colOperatorSelect.includes("time")) primitiveFilterWords += "分钟"
+      if(colOperatorSelect && colOperatorSelect.includes('time')) primitiveFilterWords += '分钟'
   }
   return primitiveFilterWords
 }
-
-

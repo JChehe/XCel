@@ -15,7 +15,7 @@
 			<file-list></file-list>
 		</div>
 		<div class="search_form">
-			<input type="text" id="search_file_input" placeholder="请输入搜索关键字" v-model="vuexSearchVal" debounce="300">
+			<input type="text" id="search_file_input" placeholder="请输入搜索关键字" v-model="vuexSearchVal">
 		</div>
 	</div>
 </template>

@@ -14,12 +14,12 @@
 	import Footer from './common/Footer'
 	import InstructionsArea from './InstructionsPageView/Instructions'
 	export default {
+		name: 'instructions',
 		components: {
 			vHeader,
 			InstructionsArea,
 			vFooter: Footer
-		},
-		name: "instructions",
+		}
 	}
 </script>
 

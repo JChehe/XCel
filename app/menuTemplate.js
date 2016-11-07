@@ -22,7 +22,7 @@ var template = [
         label: 'Reload',
         accelerator: 'CmdOrCtrl+R',
         click: function (item, focusedWindow) {
-          console.log("BrowserWindow.getAllWindows()", BrowserWindow.getAllWindows());
+          // console.log("BrowserWindow.getAllWindows()", BrowserWindow.getAllWindows());
           Array.prototype.forEach.call(BrowserWindow.getAllWindows(), (win, i) => {
             win.reload()
           })

@@ -10,11 +10,36 @@
     "build:mas": "cross-env PLATFORM_TARGET=mas node tasks/release.js",
     "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js",
     "dev": "node tasks/runner.js",
-    "pack": "cross-env NODE_ENV=production webpack -p --progress --colors",
     "postinstall": "cd app && npm install",
-    "vue:route": "node tasks/vue/route.js"
+    "vue:route": "node tasks/vue/route.js",
+    "pack": "build --dir",
+    "dist": "build"
   },
   "author": "AOTULabs <o2labs@qq.com>",
+  "build": {
+    "appId": "com.electron.xcel",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "dmg": {
+        "backgroundColor": "#6190e8",
+        "window": {
+          "width": 540,
+          "height": 380
+        }
+      }
+    },
+    "win": {
+      "remoteReleases": "https://github.com/JChehe/XCel",
+      "publish": [
+        "github",
+        "bintray"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "squirrelWindows": {
+      "iconUrl": "https://github.com/JChehe/XCel/blob/master/app/icons/icon.ico"
+    }
+  },
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.8.0",
@@ -29,6 +54,7 @@
     "del": "^2.2.1",
     "devtron": "^1.1.0",
     "electron": "^1.4.3",
+    "electron-builder": "^7.18.0",
     "electron-devtools-installer": "^1.1.4",
     "electron-packager": "^7.7.0",
     "electron-prebuilt": "^1.4.3",
@@ -45,15 +71,12 @@
     "url-loader": "^0.5.7",
     "vue-hot-reload-api": "^1.3.2",
     "vue-html-loader": "^1.2.2",
-    "vue-loader": "^8.3.1",
+    "vue-loader": "^9.5.0",
     "vue-style-loader": "^1.0.0",
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
-    "font-awesome": "^4.6.3",
-    "fs-extra": "^0.30.0",
-    "lodash": "^4.16.1",
-    "xlsx": "^0.8.0"
+    "lodash": "^4.16.6"
   }
 }

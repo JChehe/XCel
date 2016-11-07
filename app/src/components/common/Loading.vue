@@ -10,14 +10,14 @@
 </template>
 
 <script>
-	import { getFileStatus } from "../../vuex/getters"
+	import { getFileStatus } from '../../vuex/getters'
 	export default {
 		data(){
 			return {
 				loadingText: [
-					"文件正在导入中",
-					"文件正在过滤中",
-					"文件正在导出中"
+					'文件正在导入中',
+					'文件正在过滤中',
+					'文件正在导出中'
 				]
 			}
 		},

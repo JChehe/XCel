@@ -33,11 +33,9 @@
 </template>
 
 <script>
-	// const {shell} = require("electron")
-	import {shell} from "electron"
-	import pathModule from "path"
-	import {ipcRenderer} from "electron"
-	import xlsx from "xlsx"
+	import { shell } from 'electron'
+	import pathModule from 'path'
+	import { ipcRenderer } from 'electron'
 	import { 
 		getSideBarStatus,
 		getFilterPanelStatus,
@@ -53,10 +51,11 @@
 		setUploadFiles
 	} from '../../vuex/actions'
 
+	const AOTU_URL = 'https://aotu.io/'
 	export default {
 		data(){
 			return {
-				isShowInstruction: this.$route.name === "instructions"
+				isShowInstruction: this.$route.name === 'instructions'
 			}
 		},
 		vuex: {
@@ -80,37 +79,37 @@
 			}
 		},
 		created() {
-			ipcRenderer.on("open-file-response", (event, path) => {
+			ipcRenderer.on('open-file-response', (event, path) => {
 				this.setExcelData({
 					path: path,
-					type: "node"
+					type: 'node'
 				})
 				this.setUploadFiles(path)
 			})
 		},
 		methods: {
 			openAOTU() {
-				shell.openExternal("https://aotu.io/")
+				shell.openExternal(AOTU_URL)
 			},
 			toggleView(){
-				var curRouteName = this.$route.name
-				if(curRouteName === "instructions") {
-					this.$route.router.go("index")
+				let curRouteName = this.$route.name
+				if(curRouteName === 'instructions') {
+					this.$router.push('index')
 				}else{
-					this.$route.router.go("instructions")		
+					this.$router.push('instructions')		
 				}
 			},
 			focusSearchInput(){
 				if(!this.isShowSideBar){
 					this.toggleSideBar(true)
 				}
-				var searchInput = document.getElementById("search_file_input")
+				let searchInput = document.getElementById('search_file_input')
 				setTimeout(()=>{
 					searchInput && searchInput.focus()
 				}, 0)
 			},
 			handleFile(e) {
-				ipcRenderer.send("sync-openFile-dialog")
+				ipcRenderer.send('sync-openFile-dialog')
 			}
 		}
 	}

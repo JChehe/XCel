@@ -3,30 +3,22 @@ import Electron from 'vue-electron'
 import Resource from 'vue-resource'
 import Router from 'vue-router'
 
-// import 'bulma/css/bulma.css'
 import 'font-awesome/css/font-awesome.min.css'
 import App from './App'
-import filtersOfFileList from "./filters/fileList"
 import routes from './routes'
+import store from './vuex/store'
 
 Vue.use(Electron)
 Vue.use(Resource)
 Vue.use(Router)
 
-Vue.config.debug = process.env.NODE_ENV === 'development'
+window.eventBus = new Vue()
 
-Object.keys(filtersOfFileList).forEach((k) => {
-  Vue.filter(k, filtersOfFileList[k])
+const router = new Router(routes)
+
+new Vue({
+	el: '#app',
+	router: router,
+	store,
+	render: h => h(App)
 })
-
-const router = new Router()
-
-router.map(routes)
-router.beforeEach(() => {
-  window.scrollTo(0, 0)
-})
-router.redirect({
-  '*': '/'
-})
-
-router.start(App, 'app')

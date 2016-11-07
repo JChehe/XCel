@@ -1,16 +1,16 @@
-import Vue from 'vue'
-
 export default {
-  '/': {
-  	component: function(resolve){
-  		require(['./components/FirstScreenPageView'], resolve)
-  	},
-  	name: 'index'
-  },
-  '/instructions': {
-		component: function(resolve){
-  		require(['./components/InstructionsPageView'], resolve)
-  	},
-  	name: 'instructions'
-  }
+  routes: [{
+      path: '/',
+      name: 'index',
+      component: require('./components/FirstScreenPageView')
+    },
+    {
+      path: '/instructions',
+      name: 'instructions',
+      component:  require('./components/InstructionsPageView')
+    }, {
+      path: '*',
+      redirect: '/'
+    }
+  ]
 }

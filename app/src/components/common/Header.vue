@@ -11,12 +11,10 @@
 		  	v-show="!isShowInstruction">
 				筛选方式：
 				<label title="符合条件则保留">
-					<input type="radio" name="filter_way" value="0" 
-						v-model="vuexFilterWay">保留
+					<input type="radio" value="0" v-model="vuexFilterWay">保留
 				</label>
 				<label title="符合条件则剔除">
-					<input type="radio" name="filter_way" value="1" 
-						v-model="vuexFilterWay">剔除
+					<input type="radio" value="1" v-model="vuexFilterWay">剔除
 				</label>
 			</div>
 		</nav>
@@ -33,6 +31,13 @@
 		components :{
 			WindowTop
 		},
+		data() {
+			return {
+				isShowNav: false,
+				isShowInstruction: this.$route.name === 'instructions',
+				osStr: os.platform()
+			}
+		},
 		vuex: {
 			getters: {
 				filterWay: getFilterWay
@@ -40,13 +45,6 @@
 			actions: {
 				toggleSideBar,
 				setFilterWay
-			}
-		},
-		data() {
-			return {
-				isShowNav: false,
-				isShowInstruction: this.$route.name === "instructions",
-				osStr: os.platform()
 			}
 		},
 		computed: {
@@ -62,7 +60,7 @@
 		methods: {
 			clickHandler() {
 				if(this.isShowInstruction) {
-					this.$route.router.go("index")
+					this.$route.router.push('index')
 				}else {
 					this.toggleSideBar()
 				}
@@ -103,7 +101,7 @@
 			label:not(:last-child){
 				margin-right: 5px;
 			}
-			input[name="filter_way"] {
+			input[type="radio"] {
 				display: inline-block;
 				margin-right: 4px;
 				vertical-align: middle;

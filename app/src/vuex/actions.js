@@ -1,6 +1,6 @@
 import * as types from './mutation-types'
-import {ipcRenderer} from "electron"
-import pathModule from "path"
+import { ipcRenderer } from 'electron'
+import pathModule from 'path'
 
 // 文件列表相关
 export const changeFileType = ({ dispatch }, val) => {
@@ -11,7 +11,7 @@ export const changeSearchVal = ({ dispatch }, val) => {
 	dispatch(types.CHANGE_SEARCH_VALUE, val)
 }
 export const setUploadFiles = ({ dispatch }, path) => {
-	var file = {
+	let file = {
 		path: path,
 		name: pathModule.basename(path),
 		extname: pathModule.extname(path)
@@ -29,10 +29,10 @@ export const setFileStatus = ({ dispatch }, val) => {
 // data 目前都是 path
 export const setExcelData = ({ dispatch }, data) => {
 	dispatch(types.SET_UPLOAD_STATUS, 0)
-	ipcRenderer.send("readFile-start", {
+	ipcRenderer.send('readFile-start', {
     data: data
   })
-  ipcRenderer.once("readFile-response", (event, arg) => {
+  ipcRenderer.once('readFile-response', (event, arg) => {
   	dispatch(types.SET_EXCEL_BASE_INFO, arg)
   	dispatch(types.SET_UPLOAD_STATUS, -1)
   	dispatch(types.SET_ACTIVE_SHEET, 0)
@@ -55,19 +55,28 @@ export const setFilteredData = ({ dispatch }, val) => {
 }
 
 export const setFilterWay = ({ dispatch }, val) => {
+	console.log('setFilterWay', val)
 	dispatch(types.SET_FILTER_WAY, val)
 }
 export const toggleFilterPanelStatus = ({ dispatch },val) => {
 	dispatch(types.TOGGLE_FILTER_PANEL_STATUS, val)
 }
 
+export const setColSelectDialogStatus = ({ dispatch }, val) => {
+	dispatch(types.SET_COL_SELECT_DIALOG_STATUS, val)
+}
+export const setColSelectType = ({ dispatch }, val) => {
+	dispatch(types.SET_COL_SELECT_TYPE, val)
+}
+
+export const setColSelectVal = ({ dispatch }, val) => {
+	dispatch(types.SET_COL_SELECT_VAL, val)
+}
+
 // 其他
 export const toggleSideBar = ({ dispatch }, val) => {
 	dispatch(types.TOGGLE_SIDEBAR, val)
 }
-// export const exportFile = ({ dispatch }, val) => {
-// 	dispatch(types.EXPORT_FILE, val)
-// }
 
 // 窗口 window
 export const toggleWindowMax = ({ dispatch }) => {
