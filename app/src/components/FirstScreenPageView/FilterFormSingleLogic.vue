@@ -30,10 +30,11 @@
 					<td class="placeholder_td"></td>
 					<td>
 						<input type="text" placeholder="请填写运算符的值" 
+							:disabled="operator === 'empty' || operator === 'notEmpty'" 
 							v-model="operatorVal">
 					</td>
 					<td>
-						<group-select :group-id="groupId"></group-select>
+						<group-select :group-id="groupId" @changeSelect="changeSelHandler"></group-select>
 					</td>
 					<td>
 						<button type="submit">添加</button>
@@ -88,6 +89,11 @@
 				if(this.curFilterTagListCount == 0) {
 					this.logicOperator = 'and'
 				}
+			},
+			operator() {
+				if(this.operator === 'empty' || this.operator === 'notEmpty') {
+					this.operatorVal = undefined
+				}
 			}
 		},
 		methods: {
@@ -95,6 +101,9 @@
 			getLogicOperatorWords,
 			getOperatorWords,
 			getFilterWordsPrimitive,
+			changeSelHandler(groupId) {
+				this.groupId = groupId
+			},
 			showColSelectDialog() {
 				this.setColSelectType(0)
 				this.setColSelectDialogStatus(true)
@@ -105,7 +114,7 @@
 						curCol = this.operatorCol,
 						operator = this.operator,
 						operatorWords = this.getOperatorWords(this.filterOptions, operator),
-						opVal = this.operatorVal.trim()
+						opVal = this.operatorVal && this.operatorVal.trim()
 
 				if(!this.validateForm({curCol, opVal})) {
 					return
@@ -127,18 +136,22 @@
 					value: opVal,
 					filterWords: filterWords
 				}
+				console.log('filterObj', filterObj)
 				this.addFilter(filterObj)
 				this.operatorVal = ''
+				this.operator = '>'
 				this.operatorCol = []
+				this.groupId = -1
 			},
 			validateForm(args) {
 				let { curCol, opVal } = args,
 						isValidated = false,
 						tipWords = '单列运算逻辑：'
-
-				if(curCol == '0') {
+				console.log('opVal', opVal)
+				if(curCol.length === 0) {
 					tipWords += '请选择列'
-				}else if(opVal.length === 0) {
+				}else if(opVal !== undefined && opVal.length === 0) {
+					console.log("哈哈哈")
 					tipWords += '请填写运算符的值'
 				}else {
 					isValidated = true

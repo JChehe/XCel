@@ -31,7 +31,7 @@
 					<td>
 						<span class="select">
 							<select v-model="operator">
-								<option v-for="op in filterOptions" 
+								<option v-for="op in filteredOpt" 
 									:value="op.char">
 									{{ op.words }}
 								</option>
@@ -45,7 +45,7 @@
 						</div>
 					</td>
 					<td>
-						<group-select :group-id="groupId"></group-select>
+						<group-select :group-id="groupId" @changeSelect='changeSelHandler'></group-select>
 					</td>
 					<td>
 						<button type="submit">添加</button>
@@ -108,6 +108,15 @@
 					return this.getCharCol(col)
 				}).join(',')
 			},
+			filteredOpt() {
+				return this.filterOptions.filter((opt, index) => {
+					if(opt.char === 'empty' || opt.char === 'notEmpty') {
+						return false
+					}else {
+						return true
+					}
+				})
+			}
 		},
 		methods:{
 			getNumCol,
@@ -117,7 +126,9 @@
 			getLogicOperatorWords,
 			getFilterWordsPrimitive,
 			getColOperatorWords,
-
+			changeSelHandler(groupId) {
+				this.groupId = groupId
+			},
 			setMultiColInput(arg) {
 				this.operatorCol = arg
 			},
@@ -153,8 +164,6 @@
 					colOperatorSelect
 				})
 
-				
-
 				filterObj = {
 					filterType: 1,
 					groupId: this.groupId,
@@ -171,6 +180,8 @@
 				this.addFilter(filterObj)
 				this.operatorCol = []
 				this.operatorVal = ''
+				this.groupId = -1
+				this.operator = '>'
 			},
 			validateForm(args){
 				let { curCols, opVal, colOperatorSelect } = args,

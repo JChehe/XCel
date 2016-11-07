@@ -92,8 +92,15 @@ export function getFilterWordsPrimitive(args){
     case 'ends': primitiveFilterWords = `的${operatorWords}为“${val}”`;break;
     case 'regexp': primitiveFilterWords = `应用了正则表达式"/${val}/ig"`;break;
     default: 
-      primitiveFilterWords = `${operatorWords}"${val}"`;
-      if(colOperatorSelect && colOperatorSelect.includes('time')) primitiveFilterWords += '分钟'
+      if(operator === 'empty' || operator === 'notEmpty') {
+        primitiveFilterWords = `${operatorWords}`
+      }else {
+        primitiveFilterWords = `${operatorWords}"${val}"`
+      }
+
+      if(colOperatorSelect && colOperatorSelect.includes('time')) {
+        primitiveFilterWords += '分钟'
+      }
   }
   return primitiveFilterWords
 }

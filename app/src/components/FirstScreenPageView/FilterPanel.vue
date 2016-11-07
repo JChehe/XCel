@@ -233,7 +233,11 @@
 	  outline: 0;
 	  border:1px solid #D8D8D8;
 	  outline: none;
-	  padding: 0
+	  padding: 0;
+	  &:disabled {
+			cursor: not-allowed;
+			background-color: #eee;
+	  }
 	}
 	
 </style>

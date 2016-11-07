@@ -60,7 +60,13 @@ const state = {
   	},{
   		char: 'regexp',
   		words: '正则表达式'
-  	}
+  	},{
+      char: 'empty',
+      words: '为空'
+    }, {
+      char: 'notEmpty',
+      words: '不为空'
+    }
   ]
 }
 

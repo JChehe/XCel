@@ -3,7 +3,8 @@
 		<ul class="btn_group">
 			<li class="btn search_btn" title="搜索文件"
 				v-show="!isShowInstruction" 
-				@click="focusSearchInput">
+				@click="focusSearchInput"
+				:class="{active: isShowSideBar}">
 				<i class="fa fa-search"></i>
 			</li>
 			<li class="btn upload_btn" title="上传文件"
@@ -61,6 +62,7 @@
 		vuex: {
 			getters: {
 				isShowFilterPanel: getFilterPanelStatus,
+				isShowSideBar: getSideBarStatus,
 				filterWay: getFilterWay,
 				curOriRowCount: getCurOriRowCount,
 				curFilRowCount: getCurFilRowCount,
@@ -96,17 +98,17 @@
 				if(curRouteName === 'instructions') {
 					this.$router.push('index')
 				}else{
-					this.$router.push('instructions')		
+					this.$router.push('instructions')
 				}
 			},
 			focusSearchInput(){
-				if(!this.isShowSideBar){
-					this.toggleSideBar(true)
-				}
 				let searchInput = document.getElementById('search_file_input')
-				setTimeout(()=>{
-					searchInput && searchInput.focus()
-				}, 0)
+				this.toggleSideBar()
+				if(this.isShowSideBar){
+					this.$nextTick(() => {
+						searchInput && searchInput.focus()
+					})
+				}
 			},
 			handleFile(e) {
 				ipcRenderer.send('sync-openFile-dialog')
@@ -134,7 +136,7 @@
 		height: 56px;
 		background-color: #262626;
 		position: relative;
-		z-index: 99;
+		z-index: 101;
 		>div{
 			flex-wrap: nowrap;
 			white-space: nowrap;
@@ -161,6 +163,7 @@
 				line-height: 24px;
 				position: relative;
 				cursor: pointer;
+				transition: color .2s;
 				&:not(:last-child) {
 					margin-right: 2.5%;
 				}

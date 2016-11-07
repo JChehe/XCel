@@ -55,7 +55,6 @@ export const setFilteredData = ({ dispatch }, val) => {
 }
 
 export const setFilterWay = ({ dispatch }, val) => {
-	console.log('setFilterWay', val)
 	dispatch(types.SET_FILTER_WAY, val)
 }
 export const toggleFilterPanelStatus = ({ dispatch },val) => {
@@ -64,6 +63,7 @@ export const toggleFilterPanelStatus = ({ dispatch },val) => {
 
 export const setColSelectDialogStatus = ({ dispatch }, val) => {
 	dispatch(types.SET_COL_SELECT_DIALOG_STATUS, val)
+	dispatch(types.TOGGLE_SIDEBAR, false)
 }
 export const setColSelectType = ({ dispatch }, val) => {
 	dispatch(types.SET_COL_SELECT_TYPE, val)

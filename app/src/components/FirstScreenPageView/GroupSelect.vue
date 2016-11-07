@@ -1,10 +1,10 @@
 <template>
 	<span class="select">
-		<select v-model="groupId">
+		<select v-model="childGroupId" >
 			<option value="-1">组别</option>
-			<option v-for="index in groupNum" :value="getGroupValue(index)">{{ getGroupValue(index) }}</option>
+			<option v-for="index in groupNum" :value="index">{{ getGroupValue(index) }}</option>
 		</select>
-		<p class="val_mask">{{ getGroupName(groupId) }}</p>
+		<p class="val_mask">{{ getGroupName(childGroupId) }}</p>
 	</span>
 </template>
 
@@ -13,7 +13,8 @@
 	export default {
 		data() {
 			return {
-				groupNum: 5
+				groupNum: 5,
+				childGroupId: this.groupId
 			}
 		},
 		props: {
@@ -23,12 +24,21 @@
 				type: [Number, String]
 			}
 		},
+		watch: {
+			groupId() {
+				this.childGroupId = this.groupId
+			},
+			childGroupId() {
+				this.$emit('changeSelect', this.childGroupId)
+			}
+		},
 		methods: {
+			getCharCol,
 			getGroupValue(index) {
-				return getCharCol(index)
+				return this.getCharCol(index)
 			},
 			getGroupName(groupId) {
-				return groupId == '-1' ? '组别' : groupId
+				return groupId == '-1' ? '组别' : this.getCharCol(groupId)
 			}
 		}
 	}

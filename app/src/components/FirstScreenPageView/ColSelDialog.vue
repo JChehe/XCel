@@ -22,7 +22,7 @@
 				<ul v-else>
 					<li v-for="(item, index) in curColKeys" @click="toggleSelect(index + 1)" :class="{'active': selectedGroup.includes(index + 1)}">
 						<div>
-							<span>{{ getCharCol(index+1) }}</span>
+							<span>{{ getCharCol(index + 1) }}</span>
 							<p>{{ item }}</p>
 						</div>
 					</li>
@@ -142,16 +142,16 @@ import { ipcRenderer } from 'electron'
 					selectedGroup.splice(0, 1, index)
 				}else if(colSelectType === 1) {
 					if(selectedGroup.includes(index)) {
-						let index = selectedGroup.indexOf(index)
-						selectedGroup.splice(index, 1)
+						let i = selectedGroup.indexOf(index)
+						selectedGroup.splice(i, 1)
 					}else {
 						selectedGroup.push(index)
 					}	
 				}else if(colSelectType === 2) {
 					if(selectedGroup.length <= 2) {
 						if(selectedGroup.includes(index)) {
-							let index = selectedGroup.indexOf(index)
-							selectedGroup.splice(index, 1)
+							let i = selectedGroup.indexOf(index)
+							selectedGroup.splice(i, 1)
 						}else if(selectedGroup.length < 2) {
 							selectedGroup.push(index)
 						}	

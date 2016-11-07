@@ -2,7 +2,7 @@
 	<span class="tag">
 		<span class="logic_char">{{ getLogicOperator(filterTag.filters[0].logicOperator) }}</span>
 		<span class="group_id" v-if="filterTag.groupId != '-1'">
-			{{ filterTag.groupId }}
+			{{ getCharCol(filterTag.groupId) }}
 		</span>
 		<ul>
 			<li v-for="(filter, index) in filterTag.filters">
@@ -24,6 +24,7 @@
 
 <script>
 	import { delFilter } from '../../vuex/actions'
+	import { getCharCol } from "../../utils/ExcelSet"
 
 	export default {
 		props: {
@@ -42,6 +43,7 @@
 			}
 		},
 		methods: {
+			getCharCol,
 			delHandler(index){
 				this.delFilter(index)
 			},

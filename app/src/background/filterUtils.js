@@ -12,9 +12,10 @@ let filterUtils = {
   filterByOneOperator(args){
     let { row, colKeys, filterCol, operator, target } = args,
         selectKey = colKeys[filterCol],
-        curVal = row[selectKey]
-
-    if(curVal === undefined) {
+        curVal = row[selectKey],
+        isNotBelongEmpty = !(operator === 'empty' || operator === 'notEmpty')
+    if(isNotBelongEmpty && curVal === undefined) {
+      console.log("isisi")
       return false
     }else{
       return this.filterUnit({operator, curVal, target})
@@ -71,7 +72,7 @@ let filterUtils = {
     }else{
       let date0 = moment(row[colKeys[filterCol[0]]], 'm/d/y hh:mm'),
           date1 = moment(row[colKeys[filterCol[1]]], 'm/d/y hh:mm'),
-          diff = date1.diff(date0, 'seconds')
+          diff = Math.abs(date1.diff(date0, 'seconds'))
       // minutes
       calcResult = Math.floor(diff/60)
     }
@@ -102,8 +103,9 @@ let filterUtils = {
     return isNaN(result) ? undefined : result
   },
   filterUnit(args){
-    let { operator, curVal, target } = args
-    if(operator == undefined || target == undefined || curVal == undefined){
+    let { operator, curVal, target } = args,
+        isNotBelongEmpty = !(operator === 'empty' || operator === 'notEmpty')
+    if(operator == undefined || (isNotBelongEmpty && target == undefined) || (isNotBelongEmpty && curVal == undefined)){
       return false
     }
     if(!isNaN(+curVal) || !isNaN(+target)){ // +'a' 是 NaN，另外：toFixed是为了避免浮点数的不精确表示，如 0.1+0.2 = 0.30000000000000004
@@ -112,7 +114,7 @@ let filterUtils = {
       target = typeof (+target) === 'number' ? +(+target).toFixed(12) : (+target)
     }
     // console.log(typeof curVal, typeof operator, typeof target)
-    // console.log(curVal,operator,target)
+    console.log(curVal,operator,target)
     switch (operator) {
       case '>': return (curVal > target); break;
       case '<': return (curVal < target); break;
@@ -131,6 +133,8 @@ let filterUtils = {
       case 'regexp':
         let regexp = new RegExp(target, 'ig')
         return curVal.match(regexp); break;
+      case 'empty': console.log(curVal === undefined); return curVal === undefined; break;
+      case 'notEmpty': return curVal !== undefined; break;
       default: 
         console.log('未匹配操作符')
         return true

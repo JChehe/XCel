@@ -22,8 +22,8 @@
 								<option v-if="needConformColsNum === 0" value="1">
 									{{ generateNeedConformColWords(1) }} 
 								</option>
-								<option v-else v-for="index in needConformColsNum" :key="index"  :value="index + 1">
-									{{ generateNeedConformColWords(index + 1) }}
+								<option v-else v-for="index in needConformColsNum" :key="index"  :value="index">
+									{{ generateNeedConformColWords(index) }}
 								</option>
 							</select>
 							<p class="val_mask">{{ generateNeedConformColWords( needConformColIndex ) }}</p>
@@ -41,10 +41,12 @@
 						</span>
 					</td>
 					<td>
-							<input type="text" placeholder="请填写运算符的值" v-model="operatorVal">
+							<input type="text" placeholder="请填写运算符的值" 
+								:disabled="operator === 'empty' || operator === 'notEmpty'" 
+								v-model="operatorVal">
 					</td>
 					<td>
-						<group-select :group-id="groupId"></group-select>
+						<group-select :group-id="groupId" @changeSelect="changeSelHandler"></group-select>
 					</td>
 					<td>
 						<button type="submit">添加</button>
@@ -101,11 +103,18 @@
 				if(this.curFilterTagListCount == 0) {
 					this.logicOperator = 'and'
 				}
+			},
+			operator() {
+				if(this.operator === 'empty' || this.operator === 'notEmpty') {
+					this.operatorVal = undefined
+				}
+			},
+			operatorCol() {
+				this.generateNeedConformColNum()
 			}
 		},
 		computed: {
 			formatColGroup() {
-				console.log(this.operatorCol)
 				return this.operatorCol.map((col, index) => {
 					return this.getCharCol(col)
 				}).join(',')
@@ -135,6 +144,9 @@
 			getLogicOperatorWords,
 			getOperatorWords,
 			getFilterWordsPrimitive,
+			changeSelHandler(groupId) {
+				this.groupId = groupId
+			},
 			showColSelectDialog() {
 				this.setColSelectType(2)
 				this.setColSelectDialogStatus(true)
@@ -147,7 +159,8 @@
 						abs0 = Math.abs(+operatorCol[0]),
 						abs1 = Math.abs(+operatorCol[1]),
 						startIndex = Math.min(abs0, abs1),
-						endIndex = Math.max(abs0, abs1)
+						endIndex = Math.max(abs0, abs1),
+						tempColsArr = []
 
 				for(let i = startIndex, len = endIndex; i <= len; i++){
 					tempColsArr.push(i - 1)
@@ -155,17 +168,15 @@
 				this.operatorColArr = tempColsArr
 			},
 			addFilterHandler() {
-				this.generateNeedConformColNum()
-
 				let filterObj = {},
 						filterWords = '',
 						operatorColArr = this.operatorColArr,
 						operator = this.operator,
 						operatorWords = this.getOperatorWords(this.filterOptions, operator),
-						opVal = this.operatorVal.trim(),
+						opVal = this.operatorVal && this.operatorVal.trim(),
 						preStr = `第${getCharCol(operatorColArr[0] + 1)}至第${getCharCol(operatorColArr[operatorColArr.length - 1] + 1)}列范围内的值中，至少有${this.needConformColIndex}列`
 
-				if(!this.validateForm({operatorColArr, opVal})) {
+				if(!this.validateForm({operatorColArr, opVal, operator})) {
 					return
 				}
 				filterWords = preStr + this.getFilterWordsPrimitive({
@@ -173,7 +184,8 @@
 					operatorWords,
 					val: opVal
 				})
-				
+				console.log("this.operatorColArr",  this.operatorColArr)
+				console.log("operator", operator)
 				filterObj = {
 					filterType: 2,
 					groupId: this.groupId,
@@ -186,12 +198,16 @@
 				}
 				this.addFilter(filterObj)
 				this.operatorVal = ''
+				this.operator = '>'
+				this.groupId = -1
+				this.needConformColIndex = 1
 				this.operatorCol = []
 			},
 			validateForm(args) {
-				let { operatorColArr, opVal } = args,
+				let { operatorColArr, opVal, operator } = args,
 						isValidated = false,
-						tipWords = '双列范围逻辑：'
+						tipWords = '双列范围逻辑：',
+						isNotBelongEmpty = !(operator === 'empty' || operator === 'notEmpty')
 				
 				if(operatorColArr.length === 0) {
 					tipWords += '请填写列'
@@ -201,7 +217,7 @@
 					tipWords += '列从1开始'
 				}else if(this.curColCount !== 0 && operatorColArr[operatorColArr.length - 1] + 1 > this.curColCount){
 					tipWords += `超过最大列${this.curColCount}`
-				}else if(opVal.length === 0) {
+				}else if(isNotBelongEmpty && opVal.length === 0) {
 					tipWords += '请填写运算符的值'
 				}else {
 					isValidated = true
