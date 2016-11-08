@@ -15,7 +15,7 @@ let config = {
   // Docs: https://simulatedgreg.gitbooks.io/electron-vue/content/docs/building_your_app.html
   building: {
     'app-version': pkg.version,
-    arch: 'x64',
+    arch: ['x64', 'ia32'],
     asar: true,
     dir: path.join(__dirname, 'app'),
     icon: path.join(__dirname, 'app/icons/icon'),
