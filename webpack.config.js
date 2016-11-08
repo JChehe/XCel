@@ -9,7 +9,7 @@ const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const TransferWebpackPlugin = require('copy-webpack-plugin')
+
 let config = {
   devtool: '#eval-source-map',
   entry: {

@@ -15,6 +15,7 @@ let filterUtils = {
         curVal = row[selectKey],
         isNotBelongEmpty = !(operator === 'empty' || operator === 'notEmpty')
     if(isNotBelongEmpty && curVal === undefined) {
+      console.log("isisi")
       return false
     }else{
       return this.filterUnit({operator, curVal, target})
@@ -86,6 +87,7 @@ let filterUtils = {
     for(let i = 1, len = filterCol.length; i < len; i++){
       let cKey = colKeys[filterCol[i]],
           curVal = row[cKey] === undefined ? 0 : +row[cKey]
+      console.log('curVal', curVal)
       if(isNaN(curVal)) return undefined
 
       switch (colOperator){
@@ -97,6 +99,7 @@ let filterUtils = {
         default: console.log('calcNumSet未匹配操作符')
       }
     }
+    console.log('result', result)
     return isNaN(result) ? undefined : result
   },
   filterUnit(args){
@@ -111,7 +114,7 @@ let filterUtils = {
       target = typeof (+target) === 'number' ? +(+target).toFixed(12) : (+target)
     }
     // console.log(typeof curVal, typeof operator, typeof target)
-    // console.log(curVal,operator,target)
+    console.log(curVal,operator,target)
     switch (operator) {
       case '>': return (curVal > target); break;
       case '<': return (curVal < target); break;
@@ -130,7 +133,7 @@ let filterUtils = {
       case 'regexp':
         let regexp = new RegExp(target, 'ig')
         return curVal.match(regexp); break;
-      case 'empty': return curVal === undefined; break;
+      case 'empty': console.log(curVal === undefined); return curVal === undefined; break;
       case 'notEmpty': return curVal !== undefined; break;
       default: 
         console.log('未匹配操作符')
