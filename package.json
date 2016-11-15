@@ -12,7 +12,33 @@
     "dev": "node tasks/runner.js",
     "postinstall": "cd app && npm install",
     "vue:route": "node tasks/vue/route.js",
-    "pack": "cross-env NODE_ENV=production webpack -p --progress --colors"
+    "pack:electron-packager": "cross-env NODE_ENV=production webpack -p --progress --colors",
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "build": {
+    "appId": "ljc888",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "dmg": {
+        "backgroundColor": "#6190e8",
+        "window": {
+          "width": 540,
+          "height": 380
+        }
+      }
+    },
+    "win": {
+      "remoteReleases": "https://github.com/JChehe/XCel",
+      "publish": [
+        "github",
+        "bintray"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "squirrelWindows": {
+      "iconUrl": "https://github.com/JChehe/XCel/blob/master/app/icons/icon.ico"
+    }
   },
   "author": "AOTULabs <o2labs@qq.com>",
   "license": "MIT",

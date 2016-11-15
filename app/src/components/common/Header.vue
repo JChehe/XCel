@@ -60,7 +60,7 @@
 		methods: {
 			clickHandler() {
 				if(this.isShowInstruction) {
-					this.$route.router.push('index')
+					this.$router.push('index')
 				}else {
 					this.toggleSideBar()
 				}
