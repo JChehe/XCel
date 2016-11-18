@@ -1,5 +1,7 @@
 # XCEL - An Ultimate EXCEL Data Filter
 
+**【项目已迁移到团队github】https://github.com/o2team/xcel**
+
 XCEL 是由京东用户体验设计部 [凹凸实验室][1] 推出的一个 Excel 数据清洗工具，其通过可视化的方式让用户轻松地对 Excel 数据进行筛选。整个数据筛选处理过程利用 NodeJS 强大的异步处理功能，让你彻底告别在 Excel 里面自己写宏函数的卡顿、没响应的原始方式！
 
 下载试用：
